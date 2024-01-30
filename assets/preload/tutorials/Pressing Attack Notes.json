@@ -1,0 +1,35 @@
+{
+	"tutorial_text": [
+		{
+			"text": "PRESSING ATTACK NOTES\n\nAttack notes function for the player when used in their charting.\n\n\n\nThis attack is only executed on a GOOD or SICK rating.\n\nAn attack made with this note typically nullifies drawbacks, such as stamina drain or health drain.\n\n\n\nNote properties, mainly the Unblockable property, are reflected in the attack.",
+			"position": [210, 0],
+			"size": 16,
+			"screenCenterX": false,
+			"screenCenterY": true
+		}
+	],
+
+	"images": [
+		{
+			"image": "notes/attackNOTE_asset",
+			"position": [
+				30,
+				290
+			],
+			"no_antialiasing": false,
+			"flip_x": false,
+			"scale": 1,
+			"screenCenterX": false,
+			"screenCenterY": false,
+			"animation":
+				{
+					"loop": false,
+					"fps": 24,
+					"anim": "arrow",
+					"indices": [],
+					"name": "green"
+				}
+		}
+	]
+
+}

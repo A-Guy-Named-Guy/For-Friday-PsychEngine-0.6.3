@@ -1,0 +1,95 @@
+{
+	"tutorial_text": [
+		{
+			"text": "UNBLOCKABLES\n\nThis orange arrow and streak-icon over the opponent's guard indicates an unblockable attack.\n\nA parry must be performed to defend against an unblockable,\n\nperformed by pressing attack shorly before a successful block.\n\nThe opponent usually cannot defend against unblockable attacks from the player.\n\n\n\n\nSPECIAL ATTACKS\n\nThis blue attack and down-arrow icon indicates a special attack.\n\nSpecial attacks have particular effects that can vary from character to character.\n\n\n\nThe shrub, for example, uses a bash that must be dodged instead of blocked.\n\nDodging is performed by pressing the down note key by default,\n\nand is a common defense against offensive special attacks.\n\n\n\nSome specials require action to counter, usually a special attack of your own.\n\nUnlike all other attack directions, specials cannot be parried.",
+			"position": [15, 0],
+			"size": 16,
+			"screenCenterX": false,
+			"screenCenterY": true
+		}
+	],
+
+	"images": [
+		{
+			"image": "notes/indicator",
+			"position": [
+				1000,
+				370
+			],
+			"no_antialiasing": false,
+			"flip_x": false,
+			"scale": 1,
+			"screenCenterX": false,
+			"screenCenterY": false,
+			"animation":
+				{
+					"loop": false,
+					"fps": 24,
+					"anim": "specialIndicator",
+					"indices": [],
+					"name": "indicator bash"
+				}
+		},
+		{
+			"image": "notes/attackNOTE_asset",
+			"position": [
+				865,
+				431
+			],
+			"no_antialiasing": false,
+			"flip_x": false,
+			"scale": 1,
+			"screenCenterX": false,
+			"screenCenterY": false,
+			"animation":
+				{
+					"loop": false,
+					"fps": 24,
+					"anim": "arrow",
+					"indices": [],
+					"name": "blue"
+				}
+		},
+		{
+			"image": "notes/indicator",
+			"position": [
+				1000,
+				70
+			],
+			"no_antialiasing": false,
+			"flip_x": false,
+			"scale": 1,
+			"screenCenterX": false,
+			"screenCenterY": false,
+			"animation":
+				{
+					"loop": false,
+					"fps": 24,
+					"anim": "unblockableIndicator",
+					"indices": [],
+					"name": "indicator unblockable"
+				}
+		},
+		{
+			"image": "notes/unblockableNOTE_asset",
+			"position": [
+				855,
+				131
+			],
+			"no_antialiasing": false,
+			"flip_x": false,
+			"scale": 1,
+			"screenCenterX": false,
+			"screenCenterY": false,
+			"animation":
+				{
+					"loop": false,
+					"fps": 24,
+					"anim": "arrow",
+					"indices": [],
+					"name": "red"
+				}
+		}
+	]
+
+}

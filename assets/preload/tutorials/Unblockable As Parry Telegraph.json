@@ -1,0 +1,55 @@
+{
+	"tutorial_text": [
+		{
+			"text": "LIMITS OF BLOCKING\n\nBlocking enemy attacks is more restrictive than hitting a normal note by design.\n\nWhere a normal singing note allows for a late response, an attack concludes immediately once executed.\n\n\n\nDue to the lack of a late timing, blocking dense waves of attacks in faster songs manually can be infeasible.\n\nThis case is where parry's all guard benefit helps greatly.\n\n\n\nUNBLOCKABLE AS PARRY TELEGRAPH\n\nSince unblockable notes must be parried, they can be used to telegraph a good place to parry in a song.\n\n\n\nWhile nothing prevents parrying normal attacks to stay safe,\n\nSome charts may use unblockable notes as a visual indicator of when a safe time to parry would be.",
+			"position": [210, 0],
+			"size": 16,
+			"screenCenterX": false,
+			"screenCenterY": true
+		}
+	],
+
+	"images": [
+		{
+			"image": "notes/unblockableNOTE_asset",
+			"position": [
+				30,
+				180
+			],
+			"no_antialiasing": false,
+			"flip_x": false,
+			"scale": 1,
+			"screenCenterX": false,
+			"screenCenterY": false,
+			"animation":
+				{
+					"loop": false,
+					"fps": 24,
+					"anim": "arrow",
+					"indices": [],
+					"name": "green"
+				}
+		},
+		{
+			"image": "notes/unblockableNOTE_asset",
+			"position": [
+				30,
+				378
+			],
+			"no_antialiasing": false,
+			"flip_x": false,
+			"scale": 1,
+			"screenCenterX": false,
+			"screenCenterY": false,
+			"animation":
+				{
+					"loop": false,
+					"fps": 24,
+					"anim": "arrow",
+					"indices": [],
+					"name": "blue"
+				}
+		}
+	]
+
+}

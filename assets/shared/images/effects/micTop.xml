@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='utf-8'?>
+<TextureAtlas imagePath="micTop.png">
+<SubTexture name="emptyFrame" x="0" y="0" width="1" height="1" frameX="0" frameY="0" frameWidth="0" frameHeight="0" />
+<SubTexture name="leftMicTop0000" x="842" y="0" width="647" height="102" frameX="-7" frameY="-348" frameWidth="1016" frameHeight="628" />
+<SubTexture name="rightMicTop0000" x="0" y="581" width="709" height="135" frameX="-53" frameY="-351" frameWidth="1016" frameHeight="628" />
+<SubTexture name="leftMicUnblockableTop0000" x="0" y="716" width="660" height="118" frameX="0" frameY="-340" frameWidth="1016" frameHeight="628" />
+<SubTexture name="rightMicUnblockableTop0000" x="0" y="431" width="723" height="150" frameX="-46" frameY="-344" frameWidth="1016" frameHeight="628" />
+<SubTexture name="upMic0000" x="428" y="0" width="414" height="416" frameX="-16" frameY="-158" frameWidth="1016" frameHeight="628" />
+<SubTexture name="upMicUnblockable0000" x="0" y="0" width="428" height="431" frameX="-9" frameY="-151" frameWidth="1016" frameHeight="628" />
+</TextureAtlas>

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<TextureAtlas imagePath="deathNOTE_asset.png">
+<SubTexture name="purple0000" x="312" y="0" width="161" height="154" frameX="0" frameY="0" frameWidth="161" frameHeight="161" />
+<SubTexture name="blue0000" x="0" y="0" width="156" height="161" frameX="0" frameY="0" frameWidth="161" frameHeight="161" />
+<SubTexture name="green0000" x="156" y="0" width="156" height="161" frameX="0" frameY="0" frameWidth="161" frameHeight="161" />
+<SubTexture name="red0000" x="0" y="161" width="161" height="154" frameX="0" frameY="0" frameWidth="161" frameHeight="161" />
+</TextureAtlas>

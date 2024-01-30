@@ -1,0 +1,114 @@
+<?xml version='1.0' encoding='utf-8'?>
+<TextureAtlas imagePath="guard.png">
+<SubTexture name="left active0000" x="0" y="0" width="131" height="133" frameX="0" frameY="-83" frameWidth="244" frameHeight="216" />
+<SubTexture name="left active0001" x="262" y="0" width="132" height="127" frameX="0" frameY="-89" frameWidth="244" frameHeight="216" />
+<SubTexture name="left active0002" x="262" y="127" width="119" height="117" frameX="-10" frameY="-92" frameWidth="244" frameHeight="216" />
+<SubTexture name="left passive0000" x="357" y="502" width="119" height="117" frameX="-10" frameY="-92" frameWidth="244" frameHeight="216" />
+<SubTexture name="left inactive0000" x="476" y="502" width="119" height="117" frameX="-10" frameY="-92" frameWidth="244" frameHeight="216" />
+<SubTexture name="attack left0000" x="131" y="0" width="131" height="133" frameX="0" frameY="-83" frameWidth="244" frameHeight="216" />
+<SubTexture name="attack left0001" x="394" y="246" width="123" height="120" frameX="-6" frameY="-92" frameWidth="244" frameHeight="216" />
+<SubTexture name="attack left0002" x="274" y="262" width="119" height="117" frameX="-10" frameY="-92" frameWidth="244" frameHeight="216" />
+<SubTexture name="right active0000" x="0" y="133" width="131" height="129" frameX="-113" frameY="-87" frameWidth="244" frameHeight="216" />
+<SubTexture name="right active0001" x="0" y="262" width="137" height="123" frameX="-107" frameY="-92" frameWidth="244" frameHeight="216" />
+<SubTexture name="right active0002" x="712" y="232" width="115" height="114" frameX="-119" frameY="-94" frameWidth="244" frameHeight="216" />
+<SubTexture name="right passive0000" x="115" y="733" width="115" height="114" frameX="-119" frameY="-94" frameWidth="244" frameHeight="216" />
+<SubTexture name="right inactive0000" x="230" y="733" width="115" height="114" frameX="-119" frameY="-94" frameWidth="244" frameHeight="216" />
+<SubTexture name="attack right0000" x="131" y="133" width="131" height="129" frameX="-113" frameY="-87" frameWidth="244" frameHeight="216" />
+<SubTexture name="attack right0001" x="137" y="262" width="137" height="123" frameX="-107" frameY="-92" frameWidth="244" frameHeight="216" />
+<SubTexture name="attack right0002" x="712" y="346" width="115" height="114" frameX="-119" frameY="-94" frameWidth="244" frameHeight="216" />
+<SubTexture name="up active0000" x="394" y="0" width="199" height="123" frameX="-19" frameY="0" frameWidth="244" frameHeight="216" />
+<SubTexture name="up active0001" x="712" y="0" width="184" height="116" frameX="-26" frameY="-2" frameWidth="244" frameHeight="216" />
+<SubTexture name="up active0002" x="345" y="733" width="180" height="113" frameX="-28" frameY="-5" frameWidth="244" frameHeight="216" />
+<SubTexture name="up passive0000" x="360" y="847" width="180" height="113" frameX="-28" frameY="-5" frameWidth="244" frameHeight="216" />
+<SubTexture name="up inactive0000" x="540" y="847" width="180" height="113" frameX="-28" frameY="-5" frameWidth="244" frameHeight="216" />
+<SubTexture name="attack up0000" x="394" y="123" width="199" height="123" frameX="-19" frameY="0" frameWidth="244" frameHeight="216" />
+<SubTexture name="attack up0001" x="712" y="116" width="184" height="116" frameX="-26" frameY="-2" frameWidth="244" frameHeight="216" />
+<SubTexture name="attack up0002" x="525" y="733" width="180" height="113" frameX="-28" frameY="-5" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex left0000" x="0" y="0" width="131" height="133" frameX="0" frameY="-83" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex left0001" x="262" y="0" width="132" height="127" frameX="0" frameY="-89" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex left0002" x="0" y="385" width="119" height="117" frameX="-10" frameY="-92" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex left0003" x="119" y="385" width="119" height="117" frameX="-10" frameY="-92" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex left0004" x="238" y="385" width="119" height="117" frameX="-10" frameY="-92" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex left0005" x="357" y="385" width="119" height="117" frameX="-10" frameY="-92" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex left0006" x="593" y="0" width="119" height="117" frameX="-10" frameY="-92" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex left0007" x="593" y="117" width="119" height="117" frameX="-10" frameY="-92" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex left0008" x="593" y="234" width="119" height="117" frameX="-10" frameY="-92" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex left0009" x="593" y="351" width="119" height="117" frameX="-10" frameY="-92" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex left0010" x="0" y="502" width="119" height="117" frameX="-10" frameY="-92" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex left0011" x="119" y="502" width="119" height="117" frameX="-10" frameY="-92" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex left0012" x="238" y="502" width="119" height="117" frameX="-10" frameY="-92" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex left0013" x="357" y="502" width="119" height="117" frameX="-10" frameY="-92" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex left0014" x="476" y="502" width="119" height="117" frameX="-10" frameY="-92" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex left subtle0000" x="0" y="385" width="119" height="117" frameX="-10" frameY="-92" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex left subtle0001" x="0" y="385" width="119" height="117" frameX="-10" frameY="-92" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex left subtle0002" x="0" y="385" width="119" height="117" frameX="-10" frameY="-92" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex left subtle0003" x="119" y="385" width="119" height="117" frameX="-10" frameY="-92" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex left subtle0004" x="238" y="385" width="119" height="117" frameX="-10" frameY="-92" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex left subtle0005" x="357" y="385" width="119" height="117" frameX="-10" frameY="-92" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex left subtle0006" x="593" y="0" width="119" height="117" frameX="-10" frameY="-92" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex left subtle0007" x="593" y="117" width="119" height="117" frameX="-10" frameY="-92" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex left subtle0008" x="593" y="234" width="119" height="117" frameX="-10" frameY="-92" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex left subtle0009" x="593" y="351" width="119" height="117" frameX="-10" frameY="-92" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex left subtle0010" x="0" y="502" width="119" height="117" frameX="-10" frameY="-92" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex left subtle0011" x="119" y="502" width="119" height="117" frameX="-10" frameY="-92" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex left subtle0012" x="238" y="502" width="119" height="117" frameX="-10" frameY="-92" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex left subtle0013" x="357" y="502" width="119" height="117" frameX="-10" frameY="-92" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex up0000" x="394" y="0" width="199" height="123" frameX="-19" frameY="0" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex up0001" x="712" y="0" width="184" height="116" frameX="-26" frameY="-2" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex up0002" x="345" y="733" width="180" height="113" frameX="-28" frameY="-5" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex up0003" x="705" y="733" width="180" height="113" frameX="-28" frameY="-5" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex up0004" x="896" y="0" width="180" height="113" frameX="-28" frameY="-5" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex up0005" x="896" y="113" width="180" height="113" frameX="-28" frameY="-5" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex up0006" x="896" y="226" width="180" height="113" frameX="-28" frameY="-5" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex up0007" x="896" y="339" width="180" height="113" frameX="-28" frameY="-5" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex up0008" x="896" y="452" width="180" height="113" frameX="-28" frameY="-5" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex up0009" x="896" y="565" width="180" height="113" frameX="-28" frameY="-5" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex up0010" x="896" y="678" width="180" height="113" frameX="-28" frameY="-5" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex up0011" x="0" y="847" width="180" height="113" frameX="-28" frameY="-5" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex up0012" x="180" y="847" width="180" height="113" frameX="-28" frameY="-5" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex up0013" x="360" y="847" width="180" height="113" frameX="-28" frameY="-5" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex up0014" x="540" y="847" width="180" height="113" frameX="-28" frameY="-5" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex up subtle0000" x="345" y="733" width="180" height="113" frameX="-28" frameY="-5" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex up subtle0001" x="345" y="733" width="180" height="113" frameX="-28" frameY="-5" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex up subtle0002" x="345" y="733" width="180" height="113" frameX="-28" frameY="-5" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex up subtle0003" x="705" y="733" width="180" height="113" frameX="-28" frameY="-5" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex up subtle0004" x="896" y="0" width="180" height="113" frameX="-28" frameY="-5" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex up subtle0005" x="896" y="113" width="180" height="113" frameX="-28" frameY="-5" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex up subtle0006" x="896" y="226" width="180" height="113" frameX="-28" frameY="-5" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex up subtle0007" x="896" y="339" width="180" height="113" frameX="-28" frameY="-5" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex up subtle0008" x="896" y="452" width="180" height="113" frameX="-28" frameY="-5" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex up subtle0009" x="896" y="565" width="180" height="113" frameX="-28" frameY="-5" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex up subtle0010" x="896" y="678" width="180" height="113" frameX="-28" frameY="-5" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex up subtle0011" x="0" y="847" width="180" height="113" frameX="-28" frameY="-5" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex up subtle0012" x="180" y="847" width="180" height="113" frameX="-28" frameY="-5" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex up subtle0013" x="360" y="847" width="180" height="113" frameX="-28" frameY="-5" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex right0000" x="0" y="133" width="131" height="129" frameX="-113" frameY="-87" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex right0001" x="0" y="262" width="137" height="123" frameX="-107" frameY="-92" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex right0002" x="712" y="460" width="115" height="114" frameX="-119" frameY="-94" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex right0003" x="476" y="385" width="115" height="114" frameX="-119" frameY="-94" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex right0004" x="595" y="502" width="115" height="114" frameX="-119" frameY="-94" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex right0005" x="0" y="619" width="115" height="114" frameX="-119" frameY="-94" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex right0006" x="115" y="619" width="115" height="114" frameX="-119" frameY="-94" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex right0007" x="230" y="619" width="115" height="114" frameX="-119" frameY="-94" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex right0008" x="345" y="619" width="115" height="114" frameX="-119" frameY="-94" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex right0009" x="460" y="619" width="115" height="114" frameX="-119" frameY="-94" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex right0010" x="575" y="619" width="115" height="114" frameX="-119" frameY="-94" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex right0011" x="690" y="619" width="115" height="114" frameX="-119" frameY="-94" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex right0012" x="0" y="733" width="115" height="114" frameX="-119" frameY="-94" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex right0013" x="115" y="733" width="115" height="114" frameX="-119" frameY="-94" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex right0014" x="230" y="733" width="115" height="114" frameX="-119" frameY="-94" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex right subtle0000" x="712" y="460" width="115" height="114" frameX="-119" frameY="-94" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex right subtle0001" x="712" y="460" width="115" height="114" frameX="-119" frameY="-94" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex right subtle0002" x="712" y="460" width="115" height="114" frameX="-119" frameY="-94" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex right subtle0003" x="476" y="385" width="115" height="114" frameX="-119" frameY="-94" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex right subtle0004" x="595" y="502" width="115" height="114" frameX="-119" frameY="-94" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex right subtle0005" x="0" y="619" width="115" height="114" frameX="-119" frameY="-94" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex right subtle0006" x="115" y="619" width="115" height="114" frameX="-119" frameY="-94" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex right subtle0007" x="230" y="619" width="115" height="114" frameX="-119" frameY="-94" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex right subtle0008" x="345" y="619" width="115" height="114" frameX="-119" frameY="-94" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex right subtle0009" x="460" y="619" width="115" height="114" frameX="-119" frameY="-94" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex right subtle0010" x="575" y="619" width="115" height="114" frameX="-119" frameY="-94" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex right subtle0011" x="690" y="619" width="115" height="114" frameX="-119" frameY="-94" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex right subtle0012" x="0" y="733" width="115" height="114" frameX="-119" frameY="-94" frameWidth="244" frameHeight="216" />
+<SubTexture name="reflex right subtle0013" x="115" y="733" width="115" height="114" frameX="-119" frameY="-94" frameWidth="244" frameHeight="216" />
+</TextureAtlas>

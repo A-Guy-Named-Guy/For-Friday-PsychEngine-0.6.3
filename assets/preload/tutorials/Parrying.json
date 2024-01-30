@@ -1,0 +1,11 @@
+{
+	"tutorial_text": [
+		{
+			"text": "Parrying is performed by inputting an attack before blocking the opponent's attack.\n\n\n\nMore specifically, the goal is to match the opponent attack direction, then press the attack key\n\nin a window about twice as long as hitting a normal singing note would be.\n\n\n\nSTRENGTHS\n\nAll characters recover stamina and health from parries.\n\nFurthermore, the parry causes an all-guard benefit, which blocks normal and unblockable attacks.\n\n\n\nParrying provides great defensive advantages, but there is a core limitation to remember:\n\n\n\nATTACKS VOID GUARD\n\nAttacking voids the guard of a character with a temporary guard, and cancels any active singing guards.\n\nThis means that missing a parry, whether due to a misstime to failing to match the direction in time,\n\nwill cancel all guard benefits until refreshed.\n\n\n\nParries allow great opportunities to make space, to bounce-back from mistakes, and to apply further offense,\n\nbut treating parries with patience is far safer than risking the guard benefit with a mistimed input.",
+			"position": [15, 0],
+			"size": 16,
+			"screenCenterX": false,
+			"screenCenterY": true
+		}
+	]
+}

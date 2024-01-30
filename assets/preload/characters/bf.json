@@ -1,0 +1,510 @@
+{
+	"animations": [
+		{
+			"offsets": [
+				-5,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "idle",
+			"indices": [],
+			"name": "BF idle dance"
+		},
+		{
+			"offsets": [
+				5,
+				-6
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singLEFT",
+			"indices": [],
+			"name": "BF NOTE LEFT0"
+		},
+		{
+			"offsets": [
+				-20,
+				-51
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singDOWN",
+			"indices": [],
+			"name": "BF NOTE DOWN0"
+		},
+		{
+			"offsets": [
+				-46,
+				27
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singUP",
+			"indices": [],
+			"name": "BF NOTE UP0"
+		},
+		{
+			"offsets": [
+				-48,
+				-7
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singRIGHT",
+			"indices": [],
+			"name": "BF NOTE RIGHT0"
+		},
+		{
+			"offsets": [
+				7,
+				19
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singLEFTmiss",
+			"indices": [],
+			"name": "BF NOTE LEFT MISS"
+		},
+		{
+			"offsets": [
+				-15,
+				-19
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singDOWNmiss",
+			"indices": [],
+			"name": "BF NOTE DOWN MISS"
+		},
+		{
+			"offsets": [
+				-46,
+				27
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singUPmiss",
+			"indices": [],
+			"name": "BF NOTE UP MISS"
+		},
+		{
+			"offsets": [
+				-44,
+				22
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singRIGHTmiss",
+			"indices": [],
+			"name": "BF NOTE RIGHT MISS"
+		},
+		{
+			"offsets": [
+				388,
+				171
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatAttackLEFT",
+			"indices": [],
+			"name": "BOYFRIEND leftAttack"
+		},
+		{
+			"offsets": [
+				388,
+				171
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatAttackUP",
+			"indices": [],
+			"name": "BOYFRIEND upAttack"
+		},
+		{
+			"offsets": [
+				388,
+				171
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatAttackRIGHT",
+			"indices": [],
+			"name": "BOYFRIEND rightAttack"
+		},
+		{
+			"offsets": [
+				388,
+				171
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatAttackLEFTunblockable",
+			"indices": [],
+			"name": "BOYFRIEND leftAttack"
+		},
+		{
+			"offsets": [
+				388,
+				171
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatAttackUPunblockable",
+			"indices": [],
+			"name": "BOYFRIEND upAttack"
+		},
+		{
+			"offsets": [
+				388,
+				171
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatAttackRIGHTunblockable",
+			"indices": [],
+			"name": "BOYFRIEND rightAttack"
+		},
+		{
+			"offsets": [
+				388,
+				171
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatAttackSPECIAL",
+			"indices": [],
+			"name": "BOYFRIEND special0"
+		},
+		{
+			"offsets": [
+				388,
+				171
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindLEFT",
+			"indices": [],
+			"name": "BOYFRIEND leftWind"
+		},
+		{
+			"offsets": [
+				388,
+				171
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindUP",
+			"indices": [],
+			"name": "BOYFRIEND upWind"
+		},
+		{
+			"offsets": [
+				388,
+				171
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindRIGHT",
+			"indices": [],
+			"name": "BOYFRIEND rightWind"
+		},
+		{
+			"offsets": [
+				388,
+				171
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindSPECIAL",
+			"indices": [],
+			"name": "BOYFRIEND downReady"
+		},
+		{
+			"offsets": [
+				388,
+				171
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindLEFTunblockable",
+			"indices": [],
+			"name": "BOYFRIEND leftWind"
+		},
+		{
+			"offsets": [
+				388,
+				171
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindUPunblockable",
+			"indices": [],
+			"name": "BOYFRIEND upWind"
+		},
+		{
+			"offsets": [
+				388,
+				171
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindRIGHTunblockable",
+			"indices": [],
+			"name": "BOYFRIEND rightWind"
+		},
+		{
+			"offsets": [
+				388,
+				171
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindSPECIALunblockable",
+			"indices": [],
+			"name": "BOYFRIEND downReady"
+		},
+		{
+			"offsets": [
+				388,
+				171
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatBlockLEFT",
+			"indices": [],
+			"name": "BOYFRIEND leftDodge0"
+		},
+		{
+			"offsets": [
+				388,
+				171
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatBlockUP",
+			"indices": [],
+			"name": "BOYFRIEND upDodge0"
+		},
+		{
+			"offsets": [
+				388,
+				171
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatBlockRIGHT",
+			"indices": [],
+			"name": "BOYFRIEND rightDodge0"
+		},
+		{
+			"offsets": [
+				388,
+				171
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatParryLEFT",
+			"indices": [],
+			"name": "BOYFRIEND leftParry0"
+		},
+		{
+			"offsets": [
+				388,
+				171
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatParryUP",
+			"indices": [],
+			"name": "BOYFRIEND upParry0"
+		},
+		{
+			"offsets": [
+				388,
+				171
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatParryRIGHT",
+			"indices": [],
+			"name": "BOYFRIEND rightParry0"
+		},
+		{
+			"offsets": [
+				388,
+				171
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatReadyLEFT",
+			"indices": [],
+			"name": "BOYFRIEND leftReady"
+		},
+		{
+			"offsets": [
+				388,
+				171
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatReadyUP",
+			"indices": [],
+			"name": "BOYFRIEND upReady"
+		},
+		{
+			"offsets": [
+				388,
+				171
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatReadyRIGHT",
+			"indices": [],
+			"name": "BOYFRIEND rightReady"
+		},
+		{
+			"offsets": [
+				388,
+				171
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatReadyDOWN",
+			"indices": [],
+			"name": "BOYFRIEND downReady"
+		},
+		{
+			"offsets": [
+				388,
+				171
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatHitLEFT",
+			"indices": [],
+			"name": "BOYFRIEND leftHit"
+		},
+		{
+			"offsets": [
+				388,
+				171
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatHitUP",
+			"indices": [],
+			"name": "BOYFRIEND upHit"
+		},
+		{
+			"offsets": [
+				388,
+				171
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatHitRIGHT",
+			"indices": [],
+			"name": "BOYFRIEND rightHit"
+		},
+		{
+			"offsets": [
+				388,
+				171
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatHit",
+			"indices": [],
+			"name": "BOYFRIEND specialHit"
+		},
+		{
+			"offsets": [
+				388,
+				171
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatDodge",
+			"indices": [],
+			"name": "BOYFRIEND downDodge"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "firstDeath",
+			"indices": [],
+			"name": "BF dies"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "deathLoop",
+			"indices": [],
+			"name": "BF Dead Loop"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "deathConfirm",
+			"indices": [],
+			"name": "BF Dead confirm"
+		}
+	],
+	"no_antialiasing": false,
+	"image": "characters/BOYFRIEND",
+	"position": [
+		0,
+		350
+	],
+	"healthicon": "bf",
+	"flip_x": true,
+	"healthbar_colors": [
+		49,
+		176,
+		209
+	],
+	"camera_position": [
+		0,
+		0
+	],
+	"sing_duration": 4,
+	"scale": 1,
+	
+	"death_characterName": "bf-dead",
+	"idle_defaultFrame": 10,
+	"has_reflexGuard": true,
+	"has_unblockableNoteAttacks": true,
+	"stamina_cost": 0.2,
+	"default_guard_position": 0,
+	"special_attack": "recover",
+	"ifPlayer_damage": 2,
+	"ifEnemy_damage": 12,
+	"posture_damage": 3,
+	"posture_max": 90,
+	"combat_healthMax": 80,
+	"posture_recoveryCoefficient": 0.8,
+	"alternatingIdle": false,
+	
+	"combatSoundEffects": [["block", "whiff"], ["strike", "strike"], ["parry", "whiff"], ["oos", "oos"], ["miss", "whiff"], ["heal", "heal"]],
+	"soundsToPickFromRandom": [["whiff", [1, 3]], ["strike", [1, 4]]],
+	"soundsToVaryVolume": [["whiff", [0.9, 1]], ["strike", [0.7, 0.9]], ["heal" , [0.7, 0.9]], ["oos", [0.7, 0.9]]],
+
+	"characterExtras": [
+		"bfFace",
+		"bfMicTop",
+		"bfMicBottom"
+	]
+}

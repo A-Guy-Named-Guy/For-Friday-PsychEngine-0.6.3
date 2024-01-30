@@ -1,0 +1,38 @@
+{
+	"song_json_names": ["training"],
+	"tutorial_title": "Character: Boyfriend",
+
+	"tutorial_text": [
+		{
+			"text": "Boyfriend relies on bravado and confidence to achieve victory,\n\nand is deceptively adept at combat despite what his appearance would suggest.\n\n\n\nBoyfriend revolves heavily around attacking to your chart's singing notes,\n\nand to the opponent's attacking notes.\n\nPressing attack before or shortly after hitting a singing note makes the attack\n\nunblockable, consume less stamina, and deal greater damage.\n\nBoyfriend's parry effect restores a large amount of health and stamina,\n\nhelping greatly in fueling Boyfriend's offense and recovering from mistakes.\n\n\n\nBoyfriend will still be defeated if his stamina fully depletes.\n\nA sound will play to warn if your attacks are close to depleting stamina.\n\nBoyfriend can \"pose\" using \"$specialBind\" to trade half your health for stamina.\n\n\n\nThis move can't directly kill you, though consider the tradeoff carefully.\n\n\n\nOverall, Boyfriend has strong offense while singing,\n\nwith great survivability and sustain by parrying enemy attacks.",
+			"position": [540, 0],
+			"size": 16,
+			"screenCenterX": false,
+			"screenCenterY": true
+		}
+	],
+
+	"images": [
+		{
+			"image": "effects/shrubEffect",
+			"position": [
+				-15,
+				0
+			],
+			"no_antialiasing": false,
+			"flip_x": false,
+			"scale": 1,
+			"screenCenterX": false,
+			"screenCenterY": true,
+			"animation":
+				{
+					"loop": true,
+					"fps": 24,
+					"anim": "combatWindLEFTunblockable",
+					"indices": [],
+					"name": "shrubEffect unblockableLeft"
+				}
+		}
+	]
+
+}

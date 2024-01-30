@@ -1,0 +1,68 @@
+{
+	"animations": [
+		{
+			"offsets": [
+				125,
+				-100
+			],
+			"loop": true,
+			"fps": 24,
+			"anim": "combatWindLEFTunblockable",
+			"indices": [],
+			"name": "generalEffect unblockable"
+		},
+		{
+			"offsets": [
+				100,
+				-20
+			],
+			"loop": true,
+			"fps": 24,
+			"anim": "combatWindUPunblockable",
+			"indices": [],
+			"name": "generalEffect unblockable"
+		},
+		{
+			"offsets": [
+				0,
+				-20
+			],
+			"loop": true,
+			"fps": 24,
+			"anim": "combatWindRIGHTunblockable",
+			"indices": [],
+			"name": "generalEffect unblockable"
+		},
+		{
+			"offsets": [
+				60,
+				-20
+			],
+			"loop": true,
+			"fps": 24,
+			"anim": "combatWindSPECIAL",
+			"indices": [],
+			"name": "generalEffect bash"
+		},
+		{
+			"offsets": [
+				60,
+				-20
+			],
+			"loop": true,
+			"fps": 24,
+			"anim": "combatWindSPECIALunblockable",
+			"indices": [],
+			"name": "generalEffect bash"
+		}
+	],
+	"image": "effects/generalEffect",
+	"global_offset": [
+		0,
+		0
+	],
+	"scale": 1,
+
+	"layer": 1,
+	"isEffect": true
+}

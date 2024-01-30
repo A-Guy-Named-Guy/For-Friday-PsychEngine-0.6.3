@@ -1,0 +1,708 @@
+{
+	"animations": [
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "idle",
+			"indices": [],
+			"name": "shrubSerious rightIdle"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "idleLEFT",
+			"indices": [],
+			"name": "shrubSerious leftIdle"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "idleUP",
+			"indices": [],
+			"name": "shrubSerious upIdle"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "idleRIGHT",
+			"indices": [],
+			"name": "shrubSerious rightIdle"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "idleDownLEFT",
+			"indices": [],
+			"name": "shrubSerious leftDownIdle"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "idleDownUP",
+			"indices": [],
+			"name": "shrubSerious upDownIdle"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "idleDownRIGHT",
+			"indices": [],
+			"name": "shrubSerious rightDownIdle"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singLEFT",
+			"indices": [],
+			"name": "shrubSerious singLeft"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singDOWN",
+			"indices": [],
+			"name": "shrubSerious singDown"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singUP",
+			"indices": [],
+			"name": "shrubSerious singUp"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singRIGHT",
+			"indices": [],
+			"name": "shrubSerious singRight"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singLEFTmiss",
+			"indices": [],
+			"name": "shrubSerious missLEFT"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singDOWNmiss",
+			"indices": [],
+			"name": "shrubSerious missDOWN"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singUPmiss",
+			"indices": [],
+			"name": "shrubSerious missUP"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singRIGHTmiss",
+			"indices": [],
+			"name": "shrubSerious missRIGHT"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatAttackLEFT",
+			"indices": [],
+			"name": "shrubSerious attackLeft"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatAttackUP",
+			"indices": [],
+			"name": "shrubSerious attackUp"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatAttackRIGHT",
+			"indices": [],
+			"name": "shrubSerious attackRight"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatAttackLEFTunblockable",
+			"indices": [],
+			"name": "shrubSerious attackLeft"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatAttackUPunblockable",
+			"indices": [],
+			"name": "shrubSerious attackUp"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatAttackRIGHTunblockable",
+			"indices": [],
+			"name": "shrubSerious attackRight"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatAttackSPECIAL",
+			"indices": [],
+			"name": "shrubSerious attackBash"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindLEFT",
+			"indices": [],
+			"name": "shrubSerious windLeft"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindUP",
+			"indices": [],
+			"name": "shrubSerious windUp"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindRIGHT",
+			"indices": [],
+			"name": "shrubSerious windRight"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindSPECIAL",
+			"indices": [],
+			"name": "shrubSerious windBash"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindLEFTunblockable",
+			"indices": [],
+			"name": "shrubSerious windLeft"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindUPunblockable",
+			"indices": [],
+			"name": "shrubSerious windUp"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindRIGHTunblockable",
+			"indices": [],
+			"name": "shrubSerious windRight"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindSPECIALunblockable",
+			"indices": [],
+			"name": "shrubSerious windBash"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindshortLEFT",
+			"indices": [],
+			"name": "shrubSerious shortWindLeft"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindshortUP",
+			"indices": [],
+			"name": "shrubSerious shortWindUp"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindshortRIGHT",
+			"indices": [],
+			"name": "shrubSerious shortWindRight"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindshortSPECIAL",
+			"indices": [],
+			"name": "shrubSerious shortWindBash"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindshortLEFTunblockable",
+			"indices": [],
+			"name": "shrubSerious shortWindLeft"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindshortUPunblockable",
+			"indices": [],
+			"name": "shrubSerious shortWindUp"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindshortRIGHTunblockable",
+			"indices": [],
+			"name": "shrubSerious shortWindRight"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindshortSPECIALunblockable",
+			"indices": [],
+			"name": "shrubSerious shortWindBash"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatBlockLEFT",
+			"indices": [],
+			"name": "shrubSerious blockLeft"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatBlockUP",
+			"indices": [],
+			"name": "shrubSerious blockUp"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatBlockRIGHT",
+			"indices": [],
+			"name": "shrubSerious blockRight"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatParryLEFT",
+			"indices": [],
+			"name": "shrubSerious blockLeft"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatParryUP",
+			"indices": [],
+			"name": "shrubSerious blockUp"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatParryRIGHT",
+			"indices": [],
+			"name": "shrubSerious blockRight"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatSwapRightLEFT",
+			"indices": [],
+			"name": "shrubSerious switchLEFT"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatSwapLeftUP",
+			"indices": [],
+			"name": "shrubSerious switchLeftUP"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatSwapUpRIGHT",
+			"indices": [],
+			"name": "shrubSerious switchRIGHT"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatSwapRightUP",
+			"indices": [],
+			"name": "shrubSerious switchRightUP"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatSwapUpLEFT",
+			"indices": [],
+			"name": "shrubSerious switchLEFT"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatSwapLeftRIGHT",
+			"indices": [],
+			"name": "shrubSerious switchRIGHT"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatReadyDOWN",
+			"indices": [],
+			"name": "shrubSerious windBash"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatHitLEFT",
+			"indices": [],
+			"name": "shrubSerious hitLeft"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatHitUP",
+			"indices": [],
+			"name": "shrubSerious hitUp"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatHitRIGHT",
+			"indices": [],
+			"name": "shrubSerious hitRight"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatDodge",
+			"indices": [],
+			"name": "shrubSerious windBash"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatStartupLEFT",
+			"indices": [],
+			"name": "shrubSerious startupLeft"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatStartupUP",
+			"indices": [],
+			"name": "shrubSerious startupUp"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatStartupRIGHT",
+			"indices": [],
+			"name": "shrubSerious startupRight"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "firstDeath",
+			"indices": [],
+			"name": "shrubDeath"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "transition",
+			"indices": [],
+			"name": "shrubSerious transition"
+		}
+	],
+	"no_antialiasing": false,
+	"image": "characters/shrubSerious",
+	"position": [
+		-317,
+		28
+	],
+	"healthicon": "shrubSerious",
+	"flip_x": false,
+	"healthbar_colors": [
+		40,
+		73,
+		31
+	],
+	"camera_position": [
+		-150,
+		150
+	],
+	"sing_duration": 4,
+	"scale": 1,
+	
+	"death_soundName": "fnf_loss_sfx-shrub",
+	"death_characterName": "shrubDeath",
+	"idle_defaultFrame": 12,
+	"has_reflexGuard": false,
+	"has_unblockableNoteAttacks": false,
+	"stamina_cost": 0.2,
+	"default_guard_position": 3,
+	"posture_max": 160,
+	"posture_recoveryCoefficient": 1.2,
+	"combat_healthMax": 140,
+	"special_attack": "bash",
+	"ifPlayer_damage": 5,
+	"ifEnemy_damage": 15,
+	"posture_damage": 4,
+	"alternatingIdle": true,
+
+	"combatSoundEffects": [["block", "stickHit"], ["strike", "strike"], ["parry", "stickParry"], ["oos", "oos"], ["postureBreak", "postureBreak"], ["bash", "bash"], ["miss", "whiff"], ["heal", "heal"]],
+	"soundsToPickFromRandom": [["whiff", [1, 3]], ["strike", [1, 4]]],
+	"soundsToVaryVolume": [["whiff", [0.9, 1]], ["strike", [0.7, 0.9]], ["stickHit", [0.7, 0.9]], ["stickParry", [0.6, 0.8]], ["postureBreak", [0.5, 0.7]], ["bash", [0.5, 0.7]], ["oos", [0.7, 0.9]]],
+
+	"characterExtras": [
+		"shrubSeriousAttackTypeShine"
+	]
+	
+}

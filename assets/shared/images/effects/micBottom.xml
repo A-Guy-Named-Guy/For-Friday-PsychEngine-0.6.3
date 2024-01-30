@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<TextureAtlas imagePath="micBottom.png">
+<SubTexture name="leftMicBottom0000" x="0" y="102" width="120" height="18" frameX="-199" frameY="-347" frameWidth="1016" frameHeight="628" />
+<SubTexture name="rightMicBottom0000" x="0" y="45" width="221" height="31" frameX="-328" frameY="-341" frameWidth="1016" frameHeight="628" />
+<SubTexture name="leftMicUnblockableBottom0000" x="0" y="76" width="124" height="26" frameX="-199" frameY="-343" frameWidth="1016" frameHeight="628" />
+<SubTexture name="rightMicUnblockableBottom0000" x="0" y="0" width="225" height="45" frameX="-328" frameY="-334" frameWidth="1016" frameHeight="628" />
+</TextureAtlas>

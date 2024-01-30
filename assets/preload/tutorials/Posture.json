@@ -1,0 +1,11 @@
+{
+	"tutorial_text": [
+		{
+			"text": "THE POSTURE SYSTEM\n\nThe posture system is a concept that measures the opponent's \"exhaustion\".\n\nWhen the opponent's posture is raised to full, they are vulnerable in some way, whether to basic attacks or a critical blow.\n\nMost combat interactions with the opponent, defensive or offensive, increases their posture.\n\nThe opponent's posture will start to reduce if they are idle and have not weathered a posture-damaging action for a short time.\n\n\n\nPOSTURE RECOVERY\n\nWhile the opponent attacks their posture will not decrease, but if they are standing idle they will eventually start to recover.\n\nAttacks, blocks, etc. cause a brief period of posture recovery pause.\n\nTo ensure that the progress made in building enemy posture is not lost, it is critical to maintain consistent pressure.\n\n\n\nThe rate of enemy posture regen is cut if the opponent has sustained some health damage.\n\nThis regen penalty applies every quarter of their health drained.\n\nAlthough posture itself is key to dealing enough damage, managing to chip some in through other means is still helpful.",
+			"position": [15, 0],
+			"size": 16,
+			"screenCenterX": false,
+			"screenCenterY": true
+		}
+	]
+}

@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='utf-8'?>
+<TextureAtlas imagePath="indicator.png">
+<SubTexture name="indicator bash0000" x="248" y="0" width="222" height="242" frameX="-16" frameY="-10" frameWidth="256" frameHeight="256" />
+<SubTexture name="indicator bash0001" x="248" y="0" width="222" height="242" frameX="-16" frameY="-10" frameWidth="256" frameHeight="256" />
+<SubTexture name="indicator bash0002" x="175" y="248" width="165" height="221" frameX="-48" frameY="-20" frameWidth="256" frameHeight="256" />
+<SubTexture name="indicator bash0003" x="175" y="248" width="165" height="221" frameX="-48" frameY="-20" frameWidth="256" frameHeight="256" />
+<SubTexture name="indicator bash0004" x="470" y="0" width="158" height="218" frameX="-54" frameY="-22" frameWidth="256" frameHeight="256" />
+<SubTexture name="indicator bash0005" x="470" y="0" width="158" height="218" frameX="-54" frameY="-22" frameWidth="256" frameHeight="256" />
+<SubTexture name="indicator unblockable0000" x="0" y="0" width="248" height="248" frameX="-9" frameY="-10" frameWidth="256" frameHeight="256" />
+<SubTexture name="indicator unblockable0001" x="0" y="0" width="248" height="248" frameX="-9" frameY="-10" frameWidth="256" frameHeight="256" />
+<SubTexture name="indicator unblockable0002" x="0" y="248" width="175" height="222" frameX="-41" frameY="-20" frameWidth="256" frameHeight="256" />
+<SubTexture name="indicator unblockable0003" x="0" y="248" width="175" height="222" frameX="-41" frameY="-20" frameWidth="256" frameHeight="256" />
+<SubTexture name="indicator unblockable0004" x="470" y="218" width="158" height="218" frameX="-54" frameY="-22" frameWidth="256" frameHeight="256" />
+<SubTexture name="indicator unblockable0005" x="470" y="218" width="158" height="218" frameX="-54" frameY="-22" frameWidth="256" frameHeight="256" />
+<SubTexture name="indicator dumbFix" x="0" y="0" width="1" height="1" frameX="-0" frameY="0" frameWidth="0" frameHeight="0" />
+</TextureAtlas>

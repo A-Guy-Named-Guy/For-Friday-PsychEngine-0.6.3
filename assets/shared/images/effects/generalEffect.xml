@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='utf-8'?>
+<TextureAtlas imagePath="generalEffect.png">
+<SubTexture name="generalEffect bash0000" x="0" y="0" width="566" height="458" frameX="-338" frameY="-226" frameWidth="1601" frameHeight="903" />
+<SubTexture name="generalEffect bash0001" x="566" y="0" width="557" height="454" frameX="-354" frameY="-230" frameWidth="1601" frameHeight="903" />
+<SubTexture name="generalEffect bash0002" x="1123" y="0" width="555" height="451" frameX="-347" frameY="-237" frameWidth="1601" frameHeight="903" />
+<SubTexture name="generalEffect bash0003" x="1123" y="0" width="555" height="451" frameX="-347" frameY="-237" frameWidth="1601" frameHeight="903" />
+<SubTexture name="generalEffect bash0004" x="0" y="458" width="541" height="413" frameX="-333" frameY="-275" frameWidth="1601" frameHeight="903" />
+<SubTexture name="generalEffect bash0005" x="541" y="458" width="527" height="403" frameX="-347" frameY="-285" frameWidth="1601" frameHeight="903" />
+<SubTexture name="generalEffect bash0006" x="1068" y="458" width="527" height="520" frameX="-347" frameY="-168" frameWidth="1601" frameHeight="903" />
+<SubTexture name="generalEffect bash0007" x="0" y="978" width="527" height="507" frameX="-347" frameY="-181" frameWidth="1601" frameHeight="903" />
+<SubTexture name="generalEffect unblockable0000" x="527" y="978" width="566" height="458" frameX="-338" frameY="-226" frameWidth="1601" frameHeight="903" />
+<SubTexture name="generalEffect unblockable0001" x="1093" y="978" width="557" height="454" frameX="-354" frameY="-230" frameWidth="1601" frameHeight="903" />
+<SubTexture name="generalEffect unblockable0002" x="0" y="1485" width="555" height="451" frameX="-347" frameY="-237" frameWidth="1601" frameHeight="903" />
+<SubTexture name="generalEffect unblockable0003" x="0" y="1485" width="555" height="451" frameX="-347" frameY="-237" frameWidth="1601" frameHeight="903" />
+<SubTexture name="generalEffect unblockable0004" x="555" y="1485" width="541" height="413" frameX="-333" frameY="-275" frameWidth="1601" frameHeight="903" />
+<SubTexture name="generalEffect unblockable0005" x="1096" y="1485" width="527" height="403" frameX="-347" frameY="-285" frameWidth="1601" frameHeight="903" />
+<SubTexture name="generalEffect unblockable0006" x="0" y="1936" width="527" height="520" frameX="-347" frameY="-168" frameWidth="1601" frameHeight="903" />
+<SubTexture name="generalEffect unblockable0007" x="527" y="1936" width="527" height="507" frameX="-347" frameY="-181" frameWidth="1601" frameHeight="903" />
+</TextureAtlas>

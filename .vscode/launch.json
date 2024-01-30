@@ -1,0 +1,29 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+
+
+		{
+			"name": "Build + Debug",
+			"type": "lime",
+			"request": "launch"
+		},
+		{
+			"name": "Haxe Interpreter",
+			"type": "haxe-eval",
+			"request": "launch"
+		},
+		{
+			"name": "HXCPP",
+			"type": "hxcpp",
+			"request": "launch",
+			"program": "${workspaceFolder}export/debug/windows/bin/PsychEngine.exe",
+			"preLaunchTask": "lime: test windows -debug"
+		},
+		{
+			"name": "Macro",
+			"type": "haxe-eval",
+			"request": "launch"
+		}
+	]
+}

@@ -1,0 +1,278 @@
+{
+	"animations": [
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindLEFTunblockable",
+			"indices": [],
+			"name": "shrubEffect unblockableLeft",
+			"finishCallback": "toLoopAnim"
+		},
+		{
+			"offsets": [
+				75,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindUPunblockable",
+			"indices": [],
+			"name": "shrubEffect unblockableUp",
+			"finishCallback": "toLoopAnim"
+		},
+		{
+			"offsets": [
+				50,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindRIGHTunblockable",
+			"indices": [],
+			"name": "shrubEffect unblockableRight",
+			"finishCallback": "toLoopAnim"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindSPECIAL",
+			"indices": [],
+			"name": "shrubEffect unblockableBash",
+			"finishCallback": "toLoopAnim"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindSPECIALunblockable",
+			"indices": [],
+			"name": "shrubEffect unblockableBash",
+			"finishCallback": "toLoopAnim"
+		},		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindshortLEFTunblockable",
+			"indices": [],
+			"name": "shrubEffect unblockableLeft",
+			"finishCallback": "toLoopAnim"
+		},
+		{
+			"offsets": [
+				75,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindshortUPunblockable",
+			"indices": [],
+			"name": "shrubEffect unblockableUp",
+			"finishCallback": "toLoopAnim"
+		},
+		{
+			"offsets": [
+				50,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindshortRIGHTunblockable",
+			"indices": [],
+			"name": "shrubEffect unblockableRight",
+			"finishCallback": "toLoopAnim"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindshortSPECIAL",
+			"indices": [],
+			"name": "shrubEffect unblockableBash",
+			"finishCallback": "toLoopAnim"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindshortSPECIALunblockable",
+			"indices": [],
+			"name": "shrubEffect unblockableBash",
+			"finishCallback": "toLoopAnim"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": true,
+			"fps": 24,
+			"anim": "combatWindLEFTunblockableLOOP",
+			"indices": [],
+			"name": "shrubEffect unblockableLoopLeft"
+		},
+		{
+			"offsets": [
+				75,
+				0
+			],
+			"loop": true,
+			"fps": 24,
+			"anim": "combatWindUPunblockableLOOP",
+			"indices": [],
+			"name": "shrubEffect unblockableLoopUp"
+		},
+		{
+			"offsets": [
+				50,
+				0
+			],
+			"loop": true,
+			"fps": 24,
+			"anim": "combatWindRIGHTunblockableLOOP",
+			"indices": [],
+			"name": "shrubEffect unblockableLoopRight"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": true,
+			"fps": 24,
+			"anim": "combatWindSPECIALLOOP",
+			"indices": [],
+			"name": "shrubEffect unblockableLoopBash"
+		},
+		{
+			"offsets": [
+				50,
+				0
+			],
+			"loop": true,
+			"fps": 24,
+			"anim": "combatWindSPECIALunblockableLOOP",
+			"indices": [],
+			"name": "shrubEffect unblockableBash"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": true,
+			"fps": 24,
+			"anim": "combatWindshortLEFTunblockableLOOP",
+			"indices": [],
+			"name": "shrubEffect unblockableLoopLeft"
+		},
+		{
+			"offsets": [
+				75,
+				0
+			],
+			"loop": true,
+			"fps": 24,
+			"anim": "combatWindshortUPunblockableLOOP",
+			"indices": [],
+			"name": "shrubEffect unblockableLoopUp"
+		},
+		{
+			"offsets": [
+				50,
+				0
+			],
+			"loop": true,
+			"fps": 24,
+			"anim": "combatWindshortRIGHTunblockableLOOP",
+			"indices": [],
+			"name": "shrubEffect unblockableLoopRight"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": true,
+			"fps": 24,
+			"anim": "combatWindshortSPECIALLOOP",
+			"indices": [],
+			"name": "shrubEffect unblockableLoopBash"
+		},
+		{
+			"offsets": [
+				50,
+				0
+			],
+			"loop": true,
+			"fps": 24,
+			"anim": "combatWindshortSPECIALunblockableLOOP",
+			"indices": [],
+			"name": "shrubEffect unblockableBash"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatAttackLEFTunblockable",
+			"indices": [],
+			"name": "shrubEffect effectLeft",
+			"finishCallback": "finish"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatAttackUPunblockable",
+			"indices": [],
+			"name": "shrubEffect effectUp",
+			"finishCallback": "finish"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatAttackRIGHTunblockable",
+			"indices": [],
+			"name": "shrubEffect effectRight",
+			"finishCallback": "finish"
+		}
+	],
+	"image": "effects/shrubEffect",
+	"global_offset": [
+		0,
+		0
+	],
+	"scale": 1,
+
+	"layer": 1,
+	"isEffect": true
+}

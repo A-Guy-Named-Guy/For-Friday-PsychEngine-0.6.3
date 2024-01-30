@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
+<TextureAtlas imagePath="left.png">
+<SubTexture name="active0000" x="0" y="0" width="110" height="126" frameX="0" frameY="0" frameWidth="108" frameHeight="124" />
+<SubTexture name="active0001" x="220" y="0" width="106" height="122" frameX="-4" frameY="-1" frameWidth="108" frameHeight="124" />
+<SubTexture name="active0002" x="106" y="126" width="105" height="119" frameX="-5" frameY="-2" frameWidth="108" frameHeight="124" />
+<SubTexture name="passive0000" x="211" y="126" width="105" height="119" frameX="-5" frameY="-2" frameWidth="108" frameHeight="124" />
+<SubTexture name="inactive0000" x="326" y="0" width="105" height="119" frameX="-5" frameY="-2" frameWidth="108" frameHeight="124" />
+<SubTexture name="attack0000" x="110" y="0" width="110" height="126" frameX="0" frameY="0" frameWidth="108" frameHeight="124" />
+<SubTexture name="attack0001" x="0" y="126" width="106" height="122" frameX="-4" frameY="-1" frameWidth="108" frameHeight="124" />
+<SubTexture name="attack0002" x="326" y="119" width="105" height="119" frameX="-5" frameY="-2" frameWidth="108" frameHeight="124" />
+</TextureAtlas>

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<TextureAtlas imagePath="fastNOTE_asset.png">
+<SubTexture name="purple0000" x="0" y="0" width="116" height="149" frameX="-2" frameY="-1" frameWidth="161" frameHeight="161" />
+<SubTexture name="blue0000" x="232" y="0" width="150" height="116" frameX="-2" frameY="-42" frameWidth="161" frameHeight="161" />
+<SubTexture name="green0000" x="0" y="149" width="150" height="116" frameX="-2" frameY="-1" frameWidth="161" frameHeight="161" />
+<SubTexture name="red0000" x="116" y="0" width="116" height="149" frameX="-43" frameY="-1" frameWidth="161" frameHeight="161" />
+</TextureAtlas>

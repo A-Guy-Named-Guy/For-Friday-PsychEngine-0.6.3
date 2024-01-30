@@ -1,0 +1,11 @@
+{
+	"tutorial_text": [
+		{
+			"text": "PLAYER SPECIALS\n\n\"Special Attacks\" are performed with the \"$specialBind\" input.\n\n\n\nSome characters may have a maneuver bound to the \"special input\" as an extra tool. A character with a bash, for instance,\n\ncan use it for a few purposes, such as interrupting enemy attacks or specials, or functioning as an opener to guarantee\n\nan attack lands.\n\n\n\nENEMY SPECIALS\n\nEnemies, too, can have a special attack that is performed on the \"down attack\" note in their charting.\n\nThe effect of this special can make a core difference in how the enemy must be approached.\n\nThe Shrub, for instance, has a bash as his special attack.\n\nBashes deal stamina damage and prevent blocking for a short time. A simple attack.\n\n\n\nPressing the \"Down Guard\" key (most likely the button to hit a down note) causes you to dodge.\n\nThough the bash special is dodged using this input,\n\nnot all special attacks are countered with a dodge.",
+			"position": [15, 0],
+			"size": 16,
+			"screenCenterX": false,
+			"screenCenterY": true
+		}
+	]
+}

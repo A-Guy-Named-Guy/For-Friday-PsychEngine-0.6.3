@@ -1,0 +1,35 @@
+{
+	"tutorial_text": [
+		{
+			"text": "KILL NOTE\n\nThis note may be used at the end of songs that require a combat victory to complete.\n\n\n\nThis attack cannot be defended against, unless the opponent's health is reduced to 0 by the time it is executed.\n\nIf the opponent is defeated by the time the note occurs, it functions as a normal attack.\n\n\n\nThis note will kill you if the opponent has any health remaining by the end of the fight.",
+			"position": [210, 0],
+			"size": 16,
+			"screenCenterX": false,
+			"screenCenterY": true
+		}
+	],
+
+	"images": [
+		{
+			"image": "notes/deathNOTE_asset",
+			"position": [
+				30,
+				290
+			],
+			"no_antialiasing": false,
+			"flip_x": false,
+			"scale": 1,
+			"screenCenterX": false,
+			"screenCenterY": false,
+			"animation":
+				{
+					"loop": false,
+					"fps": 24,
+					"anim": "arrow",
+					"indices": [],
+					"name": "green"
+				}
+		}
+	]
+
+}

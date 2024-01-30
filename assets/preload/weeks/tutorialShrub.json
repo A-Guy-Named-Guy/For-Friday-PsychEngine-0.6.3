@@ -1,0 +1,24 @@
+{
+	"songs": [
+		["training-reverse", "bf", [146, 113, 253]],
+		["trial-reverse", "bf", [146, 113, 253]],
+		["dominion-reversal", "bf", [146, 113, 253]]
+	],
+
+	"weekCharacters": [
+		"",
+		"bf",
+		"gf"
+	],
+	"weekBackground": "stage",
+
+	"storyName": "The Art of Battle",
+	"weekBefore": "tutorial",
+	"weekName": "Tutorial",
+	"startUnlocked": true,
+
+	"hideStoryMode": false,
+	"hideFreeplay": false,
+
+	"characterSpecific": "shrub"
+}

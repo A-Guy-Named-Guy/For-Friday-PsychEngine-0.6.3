@@ -1,0 +1,22 @@
+{
+	"songs": [
+		["Dom-Rev-Reverse", "bf", [146, 113, 253]]
+	],
+
+	"weekCharacters": [
+		"",
+		"bf",
+		"gf"
+	],
+	"weekBackground": "stage",
+
+	"storyName": "The Art of Battle",
+	"weekBefore": "tutorial",
+	"weekName": "Tutorial",
+	"startUnlocked": true,
+
+	"hideStoryMode": true,
+	"hideFreeplay": false,
+
+	"characterSpecific": "shrub"
+}

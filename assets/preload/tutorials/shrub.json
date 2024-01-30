@@ -1,0 +1,29 @@
+{
+	"tutorial_title": "Character: Shrub",
+
+	"tutorial_text": [
+		{
+			"text": "Though lacking a consistent offense in the form of unblockables,\n\nthe Shrub can apply damage via posture infliction.\n\n\n\nThe Shrub can bash with the \"$specialBind\" keyboard input.\n\n\n\nAttacking to a down singing note instead bashes,\n\nwhich interrupts opponent actions/special attacks, and ability\n\nto block for a short time.\n\n\n\nIf the opponent has full posture, an attack after a bash will\n\ndeal lethal damage.\n\n\n\nThe Shrub is not defeated upon depleting stamina, but he cannot\n\nperform any maneuvers he does not have enough stamina for.\n\n\n\nPassively chip enemy posture by blocking attack flurries,\n\nthrow attacks during moments of downtime to stop recovery,\n\nthen end with a lethal bash-to-attack once posture reaches full.",
+			"position": [580, 0],
+			"size": 16,
+			"screenCenterX": false,
+			"screenCenterY": true
+		}
+	],
+
+	"images": [
+		{
+			"image": "characterSelect/shrub",
+			"position": [
+				15,
+				0
+			],
+			"no_antialiasing": false,
+			"flip_x": false,
+			"scale": 1,
+			"screenCenterX": false,
+			"screenCenterY": true
+		}
+	]
+
+}

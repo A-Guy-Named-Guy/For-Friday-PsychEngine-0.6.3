@@ -1,0 +1,54 @@
+{
+	"tutorial_text": [
+		{
+			"text": "VICTORY\n\nThere are two classes of victory: \"Singing\" and \"Combat\" victory.\n\n\n\nSING VICTORY\n\nA sing victory is the default victory, as it only requires surviving to the end of a song.\n\n\n\nCOMBAT VICTORY\n\nA combat victory, meanwhile, requires the opponent's health to be reduced to 0 by the conclusion of the fight.\n\n\n\nVictories may be restricted or required per song. On a song that disallows combat, only a sing victory is possible,\n\nwhile some songs will force failure if the opponent is not defeated.\n\nAny song that ends in story mode will give a chance to restart the song for an alternative victory condition, and\n\nalso a note for if an ending has a particular effect, such as a required combat victory or an alternate ending.",
+			"position": [15, 76],
+			"size": 16,
+			"screenCenterX": false,
+			"screenCenterY": false
+		}
+	],
+
+	"images": [
+		{
+			"image": "victoryMedal",
+			"position": [
+				256,
+				480
+			],
+			"no_antialiasing": false,
+			"flip_x": false,
+			"scale": 1,
+			"screenCenterX": false,
+			"screenCenterY": false,
+			"animation":
+				{
+					"loop": false,
+					"fps": 24,
+					"anim": "singNormal",
+					"indices": [],
+					"name": "victoryMedal idle0003"
+				}
+		},
+		{
+			"image": "victoryMedal",
+			"position": [
+				683,
+				480
+			],
+			"no_antialiasing": false,
+			"flip_x": false,
+			"scale": 1,
+			"screenCenterX": false,
+			"screenCenterY": false,
+			"animation":
+				{
+					"loop": false,
+					"fps": 24,
+					"anim": "combatNormal",
+					"indices": [],
+					"name": "victoryMedal idle0008"
+				}
+		}
+	]
+}

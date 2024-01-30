@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<TextureAtlas imagePath="windNOTE_assets.png">
+<SubTexture name="purple0000" x="300" y="0" width="156" height="149" frameX="-2" frameY="-1" frameWidth="161" frameHeight="161" />
+<SubTexture name="blue0000" x="0" y="0" width="150" height="157" frameX="-2" frameY="-1" frameWidth="161" frameHeight="161" />
+<SubTexture name="green0000" x="150" y="0" width="150" height="156" frameX="-2" frameY="-1" frameWidth="161" frameHeight="161" />
+<SubTexture name="red0000" x="0" y="157" width="157" height="149" frameX="-2" frameY="-1" frameWidth="161" frameHeight="161" />
+</TextureAtlas>

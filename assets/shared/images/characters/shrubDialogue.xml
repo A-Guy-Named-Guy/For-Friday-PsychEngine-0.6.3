@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<TextureAtlas imagePath="shrubDialogue.png">
+<SubTexture name="shrubDialogue hi0000" x="602" y="448" width="550" height="339" frameX="-200" frameY="-200" frameWidth="1280" frameHeight="720" />
+<SubTexture name="shrubDialogue here0000" x="0" y="448" width="602" height="341" frameX="-213" frameY="-198" frameWidth="1280" frameHeight="720" />
+<SubTexture name="shrubDialogue triumph0000" x="0" y="789" width="530" height="339" frameX="-204" frameY="-203" frameWidth="1280" frameHeight="720" />
+<SubTexture name="shrubDialogue serious0000" x="577" y="0" width="613" height="435" frameX="-200" frameY="-178" frameWidth="1280" frameHeight="720" />
+<SubTexture name="shrubDialogue getReady0000" x="0" y="0" width="577" height="448" frameX="-205" frameY="-179" frameWidth="1280" frameHeight="720" />
+</TextureAtlas>

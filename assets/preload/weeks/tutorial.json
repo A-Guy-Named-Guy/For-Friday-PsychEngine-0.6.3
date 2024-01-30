@@ -1,0 +1,24 @@
+{
+	"songs": [
+		["training", "shrub", [40, 73, 31]],
+		["trial", "shrub", [40, 73, 31]],
+		["dominion", "shrubSerious", [40, 73, 31]]
+	],
+
+	"weekCharacters": [
+		"",
+		"bf",
+		"gf"
+	],
+	"weekBackground": "stage",
+
+	"storyName": "The Art of Battle",
+	"weekBefore": "tutorial",
+	"weekName": "Tutorial",
+	"startUnlocked": true,
+
+	"hideStoryMode": false,
+	"hideFreeplay": false,
+
+	"characterSpecific": "bf"
+}

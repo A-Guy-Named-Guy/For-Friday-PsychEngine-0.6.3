@@ -1,0 +1,60 @@
+{
+	"tutorial_list": [
+		"Current Song Tutorial",
+		"Fundamentals",
+		"Characters",
+		"Attack Types",
+		"Special Attacks",
+		"Parrying",
+		"Posture",
+		"Victory Conditions",
+		"Kill Note",
+		"Pressing Attack Notes",
+		"Unblockable As Parry Telegraph"
+	],
+
+	"check_all_difficulties_for_tutorial": ["dominion-reversal"],
+	"all_difficulties_check_exceptions": ["dominion-reversal-easy"],
+
+	"tutorial_song_pages": [
+		{
+			"song": "training",
+			"pages": ["Fundamentals", "boyfriend"]
+		},
+		{
+			"song": "trial",
+			"pages": ["Attack Types", "Parrying", "Victory Conditions"]
+		},
+		{
+			"song": "dominion",
+			"pages": ["Kill Note"]
+		},
+		{
+			"song": "training-reverse",
+			"pages": ["Posture", "shrub"]
+		},
+		{
+			"song": "dominion-reversal",
+			"pages": ["Pressing Attack Notes", "Unblockable As Parry Telegraph"]
+		},
+		{
+			"song": "dominion-reversal-hard",
+			"pages": ["Unblockable As Parry Telegraph"]
+		}
+	],
+
+	"tutorial_clusters": [
+		{
+			"name": "Characters",
+			"pages": ["boyfriend", "shrub"]
+		}
+	],
+
+	"default_menu_music": "tutorialMenu",
+	"menu_music": [
+		{
+			"song_name": "none",
+			"tutorial_song": ["dominion", "dominion-reversal"]
+		}
+	]
+}

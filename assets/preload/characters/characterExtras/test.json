@@ -1,0 +1,85 @@
+{
+	"animations": [
+		{
+			"finishCallback": "finish",
+			"loop": false,
+			"offsets": [
+				0,
+				0
+			],
+			"anim": "combatAttackRIGHT",
+			"fps": 24,
+			"name": "rightMicTop",
+			"indices": []
+		},
+		{
+			"finishCallback": "fade",
+			"loop": false,
+			"offsets": [
+				0,
+				0
+			],
+			"anim": "combatAttackUPunblockable",
+			"fps": 24,
+			"name": "upMicUnblockable",
+			"indices": []
+		},
+		{
+			"finishCallback": "fade",
+			"loop": false,
+			"offsets": [
+				0,
+				0
+			],
+			"anim": "combatAttackRIGHTunblockable",
+			"fps": 24,
+			"name": "rightMicUnblockableTop",
+			"indices": []
+		},
+		{
+			"finishCallback": "finish",
+			"offsets": [
+				0,
+				13
+			],
+			"indices": [],
+			"fps": 24,
+			"anim": "combatAttackLEFT",
+			"loop": false,
+			"name": "leftMicTop"
+		},
+		{
+			"finishCallback": "finish",
+			"offsets": [
+				0,
+				57
+			],
+			"indices": [],
+			"fps": 24,
+			"anim": "combatAttackUP",
+			"loop": false,
+			"name": "upMic0"
+		},
+		{
+			"finishCallback": "fade",
+			"offsets": [
+				0,
+				0
+			],
+			"indices": [],
+			"fps": 24,
+			"anim": "combatAttackLEFTunblockable",
+			"loop": false,
+			"name": "leftMicUnblockableTop"
+		}
+	],
+	"no_antialiasing": false,
+	"image": "effects/micTop",
+	"global_offset": [
+		388,
+		171
+	],
+	"flip_x": false,
+	"layer": 3,
+	"scale": 1
+}

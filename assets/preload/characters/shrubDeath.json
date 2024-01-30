@@ -1,0 +1,58 @@
+{
+	"animations": [
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "firstDeath",
+			"indices": [],
+			"name": "shrubDeath"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "deathLoop",
+			"indices": [],
+			"name": "shrubDeath0051"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "deathConfirm",
+			"indices": [],
+			"name": "shrubDeath0051"
+		}
+	],
+	"no_antialiasing": false,
+	"image": "characters/shrubDeath",
+	"position": [
+		0,
+		0
+	],
+	"healthicon": "shrub",
+	"flip_x": false,
+	"healthbar_colors": [
+		40,
+		73,
+		31
+	],
+	"camera_position": [
+		-150,
+		150
+	],
+	"sing_duration": 4,
+	"scale": 1,
+	"death_soundName": "fnf_loss_sfx-shrub",
+	"death_characterName": "shrubDeath"
+}

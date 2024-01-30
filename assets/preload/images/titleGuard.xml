@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='utf-8'?>
+<TextureAtlas imagePath="titleGuard.png">
+<SubTexture name="titleGuard leftActive0000" x="0" y="0" width="113" height="107" frameX="-475" frameY="-63" frameWidth="1139" frameHeight="509" />
+<SubTexture name="titleGuard leftActive0001" x="0" y="0" width="113" height="107" frameX="-475" frameY="-63" frameWidth="1139" frameHeight="509" />
+<SubTexture name="titleGuard leftActive0002" x="0" y="107" width="98" height="88" frameX="-490" frameY="-73" frameWidth="1139" frameHeight="509" />
+<SubTexture name="titleGuard leftActive0003" x="0" y="107" width="98" height="88" frameX="-490" frameY="-73" frameWidth="1139" frameHeight="509" />
+<SubTexture name="titleGuard leftActive0004" x="98" y="107" width="98" height="87" frameX="-491" frameY="-73" frameWidth="1139" frameHeight="509" />
+<SubTexture name="titleGuard leftActive0005" x="98" y="107" width="98" height="87" frameX="-491" frameY="-73" frameWidth="1139" frameHeight="509" />
+<SubTexture name="titleGuard leftActive0006" x="98" y="107" width="98" height="87" frameX="-491" frameY="-73" frameWidth="1139" frameHeight="509" />
+<SubTexture name="titleGuard leftActive0007" x="98" y="107" width="98" height="87" frameX="-491" frameY="-73" frameWidth="1139" frameHeight="509" />
+<SubTexture name="titleGuard leftActive0008" x="98" y="107" width="98" height="87" frameX="-491" frameY="-73" frameWidth="1139" frameHeight="509" />
+<SubTexture name="titleGuard leftActive0009" x="98" y="107" width="98" height="87" frameX="-491" frameY="-73" frameWidth="1139" frameHeight="509" />
+<SubTexture name="titleGuard leftActive0010" x="98" y="107" width="98" height="87" frameX="-491" frameY="-73" frameWidth="1139" frameHeight="509" />
+<SubTexture name="titleGuard rightActive0000" x="113" y="0" width="99" height="98" frameX="-579" frameY="-69" frameWidth="1139" frameHeight="509" />
+<SubTexture name="titleGuard rightActive0001" x="113" y="0" width="99" height="98" frameX="-579" frameY="-69" frameWidth="1139" frameHeight="509" />
+<SubTexture name="titleGuard rightActive0002" x="212" y="0" width="90" height="85" frameX="-580" frameY="-74" frameWidth="1139" frameHeight="509" />
+<SubTexture name="titleGuard rightActive0003" x="212" y="0" width="90" height="85" frameX="-580" frameY="-74" frameWidth="1139" frameHeight="509" />
+<SubTexture name="titleGuard rightActive0004" x="212" y="85" width="89" height="84" frameX="-580" frameY="-74" frameWidth="1139" frameHeight="509" />
+<SubTexture name="titleGuard rightActive0005" x="212" y="85" width="89" height="84" frameX="-580" frameY="-74" frameWidth="1139" frameHeight="509" />
+<SubTexture name="titleGuard rightActive0006" x="212" y="85" width="89" height="84" frameX="-580" frameY="-74" frameWidth="1139" frameHeight="509" />
+<SubTexture name="titleGuard rightActive0007" x="212" y="85" width="89" height="84" frameX="-580" frameY="-74" frameWidth="1139" frameHeight="509" />
+<SubTexture name="titleGuard rightActive0008" x="212" y="85" width="89" height="84" frameX="-580" frameY="-74" frameWidth="1139" frameHeight="509" />
+<SubTexture name="titleGuard rightActive0009" x="212" y="85" width="89" height="84" frameX="-580" frameY="-74" frameWidth="1139" frameHeight="509" />
+<SubTexture name="titleGuard rightActive0010" x="212" y="85" width="89" height="84" frameX="-580" frameY="-74" frameWidth="1139" frameHeight="509" />
+<SubTexture name="titleGuard rightActive0011" x="212" y="85" width="89" height="84" frameX="-580" frameY="-74" frameWidth="1139" frameHeight="509" />
+<SubTexture name="titleGuard upActive0000" x="182" y="195" width="116" height="81" frameX="-528" frameY="-14" frameWidth="1139" frameHeight="509" />
+<SubTexture name="titleGuard upActive0001" x="182" y="195" width="116" height="81" frameX="-528" frameY="-14" frameWidth="1139" frameHeight="509" />
+<SubTexture name="titleGuard upActive0002" x="302" y="0" width="92" height="63" frameX="-539" frameY="-29" frameWidth="1139" frameHeight="509" />
+<SubTexture name="titleGuard upActive0003" x="302" y="0" width="92" height="63" frameX="-539" frameY="-29" frameWidth="1139" frameHeight="509" />
+<SubTexture name="titleGuard upActive0004" x="302" y="63" width="90" height="62" frameX="-540" frameY="-30" frameWidth="1139" frameHeight="509" />
+<SubTexture name="titleGuard upActive0005" x="302" y="63" width="90" height="62" frameX="-540" frameY="-30" frameWidth="1139" frameHeight="509" />
+<SubTexture name="titleGuard upActive0006" x="302" y="63" width="90" height="62" frameX="-540" frameY="-30" frameWidth="1139" frameHeight="509" />
+<SubTexture name="titleGuard upActive0007" x="302" y="63" width="90" height="62" frameX="-540" frameY="-30" frameWidth="1139" frameHeight="509" />
+<SubTexture name="titleGuard upActive0008" x="302" y="63" width="90" height="62" frameX="-540" frameY="-30" frameWidth="1139" frameHeight="509" />
+<SubTexture name="titleGuard upActive0009" x="302" y="63" width="90" height="62" frameX="-540" frameY="-30" frameWidth="1139" frameHeight="509" />
+<SubTexture name="titleGuard upActive0010" x="302" y="63" width="90" height="62" frameX="-540" frameY="-30" frameWidth="1139" frameHeight="509" />
+<SubTexture name="titleGuard upActive0011" x="302" y="63" width="90" height="62" frameX="-540" frameY="-30" frameWidth="1139" frameHeight="509" />
+<SubTexture name="titleGuard leftPassive0000" x="0" y="195" width="94" height="83" frameX="-495" frameY="-73" frameWidth="1139" frameHeight="509" />
+<SubTexture name="titleGuard rightPassive0000" x="94" y="195" width="88" height="83" frameX="-580" frameY="-74" frameWidth="1139" frameHeight="509" />
+<SubTexture name="titleGuard upPassive0000" x="302" y="125" width="86" height="60" frameX="-542" frameY="-32" frameWidth="1139" frameHeight="509" />
+</TextureAtlas>

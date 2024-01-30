@@ -1,0 +1,75 @@
+{
+	"tutorial_text": [
+		{
+			"text": "CONTROLS\n\nThis tri-arrow graphic visualizes the guard position of you and your opponent.\n\nYou control your guard with the same inputs for notes.\n\nTo attack, press the \"$attackBind\" input.\n\n\n\nDEFENSE\n\nTo block attacks, match your guard direction to the opponent's attack.\n\nYour guard must match before the attack occurs to block successfully.\n\n\n\nParrying is an enhanced defense, performed by attacking before blocking an attack.\n\nParrying, as well as hitting singing notes, grants a temporary all-guard benefit,\n\nAs well as restoring some health and stamina.\n\n\n\nOFFENSE\n\nThe opponent will block any attack when not performing a combat action.\n\nFor this reason the opponent has a very strong innate defense.\n\nUsing your character's particular offense is key if you're pursuing a combat victory.\n\n\n\nVICTORY\n\nThere are two victory types: A \"singing\" victory, and a \"combat\" victory.\n\nA singing victory occurs on reaching the end of a song, while a combat victory occurs if the opponent's health is also depleted.\n\nFocusing simply on survival is a viable path to victory.",
+			"position": [15, 0],
+			"size": 16,
+			"screenCenterX": false,
+			"screenCenterY": true
+		}
+	],
+
+	"images": [
+		{
+			"image": "notes/guard",
+			"position": [
+				900,
+				200
+			],
+			"no_antialiasing": false,
+			"flip_x": false,
+			"scale": 1,
+			"screenCenterX": false,
+			"screenCenterY": false,
+			"animation":
+				{
+					"loop": false,
+					"fps": 24,
+					"anim": "active",
+					"indices": [],
+					"name": "left active0002"
+				}
+		},
+		{
+			"image": "notes/guard",
+			"position": [
+				900,
+				200
+			],
+			"no_antialiasing": false,
+			"flip_x": false,
+			"scale": 1,
+			"screenCenterX": false,
+			"screenCenterY": false,
+			"animation":
+				{
+					"loop": false,
+					"fps": 24,
+					"anim": "active",
+					"indices": [],
+					"name": "up active0002"
+				}
+		},
+		{
+			"image": "notes/guard",
+			"position": [
+				900,
+				200
+			],
+			"no_antialiasing": false,
+			"flip_x": false,
+			"scale": 1,
+			"screenCenterX": false,
+			"screenCenterY": false,
+			"animation":
+				{
+					"loop": false,
+					"fps": 24,
+					"anim": "active",
+					"indices": [],
+					"name": "right active0002"
+				}
+		}
+	]
+
+}

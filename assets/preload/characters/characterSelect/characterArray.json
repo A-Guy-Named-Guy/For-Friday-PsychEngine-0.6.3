@@ -1,0 +1,18 @@
+{
+	"characters":[
+		{
+			"name": "bf",
+			"portrait_position": [25, 150],
+			"name_position": [651, 587],
+			"description": "Boyfriend is a rapping-based combatant based around attacks well-timed to both his and the opponent's charts.\n\nHowever, his non-timed attacks are costly, and Boyfriend can fall quickly if he does not recover with well-timed dodges.\n\n- Attacks in sync with hitting a note performs a stronger, unblockable attack\n\n- Attacks matching the direction of the opponent's attack instead perform an enhanced dodge, restoring extra health and stamina\n\n\n- Guard changes avoid attacks only temporarily\n\n- Attacks have a high stamina cost\n\n- Is defeated if stamina fully depletes"
+		},
+		{
+			"name": "shrub",
+			"portrait_position": [25, 150],
+			"name_position": [651, 587],
+			"description": "The Shrub serves as a mentor to teach the basic concepts of combat when faced as an enemy.\n\nHere, he serves as a placeholder for demonstrating multiple characters and how their methods may differ.\n\nThe Shrub is a more patient fighter, weathering blows until striking when the opponent becomes exhausted.\n\n- Guard remains active indefinitely\n\n- Can bash to stun and inflict vulnerability to a followup attack\n\n- Is not defeated on stamina depletion\n\n\n- Cannot act without sufficient stamina\n\n- Requires signficant opponent exhaustion to consistently deal damage"
+		}
+	],
+
+	"useCharacterSelect": false
+}
