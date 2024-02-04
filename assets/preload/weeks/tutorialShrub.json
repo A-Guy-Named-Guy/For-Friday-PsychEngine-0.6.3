@@ -22,5 +22,7 @@
 
 	"characterSpecific": "shrub",
 	"disable_sing_victory": ["dominion-reversal"],
+	"disable_combat_victory": [],
+	"require_combat_victory": [],
 	"reverse_player_enemy_position": true
 }
