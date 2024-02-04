@@ -1,4 +1,4 @@
-package;
+package forfriday;
 
 import flixel.FlxG;
 import flixel.FlxSprite;

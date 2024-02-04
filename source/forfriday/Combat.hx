@@ -1,4 +1,4 @@
-package;
+package forfriday;
 
 import Song.SwagSong;
 import flash.geom.Rectangle;
@@ -54,7 +54,6 @@ class Combat extends PlayState
 	public static var singVictoryDisabled:Array<String> = ['dominion', 'dominion-reversal'];
 	public static var combatVictoryDisabled:Array<String> = [''];
 	public static var combatNoteTypes:Array<String> = ['attack', 'wind', 'shortwind'];
-	public static var playerOneFlipSideArray:Array<String> = ['shrub', 'shrubSerious'];
 	public static var characterFlipSide:Bool = false;
 
 	var timerReady:Bool = false;
@@ -66,10 +65,6 @@ class Combat extends PlayState
 
 	var playerGuard:FlxTypedGroup<FlxSprite> = null;
 	var enemyGuard:FlxTypedGroup<FlxSprite> = null;
-	var playerReflexGuard:FlxTypedGroup<ReflexGuardArrow> = null;
-	var enemyReflexGuard:FlxTypedGroup<ReflexGuardArrow> = null;
-	var playerReflexGuardOutline:FlxTypedGroup<FlxSprite> = null;
-	var enemyReflexGuardOutline:FlxTypedGroup<FlxSprite> = null;
 
 	var cpuGuard:FlxTypedGroup<FlxSprite> = null;
 	var playerGuardActive:Bool = false;
@@ -149,7 +144,7 @@ class Combat extends PlayState
 
 		combatVictory = false;
 
-		if (playerOneFlipSideArray.contains(PlayState.SONG.player1))
+		if (PlayState.instance.flipBoyfriendAndDad)
 		{
 			characterFlipSide = true;
 		}
@@ -163,10 +158,6 @@ class Combat extends PlayState
 
 			playerGuard = new FlxTypedGroup<FlxSprite>();
 			enemyGuard = new FlxTypedGroup<FlxSprite>();
-			playerReflexGuard = new FlxTypedGroup<ReflexGuardArrow>();
-			enemyReflexGuard = new FlxTypedGroup<ReflexGuardArrow>();
-			playerReflexGuardOutline = new FlxTypedGroup<FlxSprite>();
-			enemyReflexGuardOutline = new FlxTypedGroup<FlxSprite>();
 
 			trace('start SONG.player1');
 			// Character-specific effects
@@ -191,7 +182,6 @@ class Combat extends PlayState
 
 			generateHealthBar('player');
 			generateHealthBar('enemy');
-			generateHealthBar('testGuard');
 
 			hitOverlay = new FlxSprite(0, 0);
 			hitOverlay.updateHitbox();
@@ -262,7 +252,7 @@ class Combat extends PlayState
 								attackTypeIndicator.visible = true;
 								if (attackNoteToIndicate.isSpecialNote)
 									attackTypeIndicator.animation.play('specialIndicator');
-								if (attackNoteToIndicate.isUnblockable)
+								else if (attackNoteToIndicate.isUnblockable)
 									attackTypeIndicator.animation.play('unblockableIndicator');
 							}
 						}
@@ -311,10 +301,13 @@ class Combat extends PlayState
 						if (daNote.wasGoodHit)
 						{
 							enemyPassiveGuard = false;
-							enemyPassiveGuardTimer.start(stepTimerCrochet * 4, function(tmr:FlxTimer)
-							{
-								enemyPassiveGuard = true;
-							});
+							if (enemyPassiveGuardTimer.active)
+								enemyPassiveGuardTimer.reset();
+							else
+								enemyPassiveGuardTimer.start(stepTimerCrochet * 4, function(tmr:FlxTimer)
+								{
+									enemyPassiveGuard = true;
+								});
 
 							switch (daNote.noteType)
 							{
@@ -376,12 +369,15 @@ class Combat extends PlayState
 															cameraBounce(1);
 
 															PlayState.instance.boyfriend.isBashed = true;
-															playerWasBashedTimer.start(bashDuration, function(tmr:FlxTimer)
-															{
-																PlayState.instance.boyfriend.isBashed = false;
-																if (!PlayState.instance.boyfriend.hasReflexGuard)
-																	playerGuardActive = true;
-															});
+															if (playerWasBashedTimer.active)
+																playerWasBashedTimer.reset();
+															else
+																playerWasBashedTimer.start(bashDuration, function(tmr:FlxTimer)
+																{
+																	PlayState.instance.boyfriend.isBashed = false;
+																	if (!PlayState.instance.boyfriend.hasReflexGuard)
+																		playerGuardActive = true;
+																});
 
 															playerGuardActive = false;
 														}
@@ -431,7 +427,6 @@ class Combat extends PlayState
 													|| (!PlayState.instance.boyfriend.hasReflexGuard))
 												{
 													// Brackets to make this less visually awful
-													// On another note: If someone knows a way to shorten this boyfriend call, would be great
 													if (PlayState.instance.boyfriend.animation.getByName(appendDirection('combatParry',
 														PlayState.instance.boyfriend.guardPosition)) != null)
 													{
@@ -565,10 +560,15 @@ class Combat extends PlayState
 					if (instantSingAttack)
 						executeAttack();
 					else
-						attackDelayTimer.start(0.05, function(tmr:FlxTimer)
-						{
-							executeAttack();
-						});
+					{
+						if (attackDelayTimer.active)
+							attackDelayTimer.reset();
+						else
+							attackDelayTimer.start(0.05, function(tmr:FlxTimer)
+							{
+								executeAttack();
+							});
+					}
 
 					if (timerReady)
 					{
@@ -593,7 +593,10 @@ class Combat extends PlayState
 				{
 					hasStartedAttack = false;
 
-					isDodge = true;
+					if (isDodgeTimer.active)
+						isDodgeTimer.reset();
+					else
+						isDodge = true;
 					isDodgeTimer.start(stepTimerCrochet * 4, function(tmr:FlxTimer)
 					{
 						isDodge = false;
@@ -829,6 +832,8 @@ class Combat extends PlayState
 	public function generateGuardArrows(player:Int):Void
 	{
 		// var guardWidgetWidth:Float = 0;
+		var leftGuardX:Float = 0;
+		var upGuardY:Float = 0;
 		for (i in 0...3)
 		{
 			var guardArrow:FlxSprite = new FlxSprite(50, 450);
@@ -836,30 +841,22 @@ class Combat extends PlayState
 				guardArrow.y = 50;
 
 			var curGuard:String = 'left';
-			var fillColor:FlxColor = 0xC24B99;
 			var guardPosition:Int = i;
-			var arrowAngle:Int = 0;
 			switch (i)
 			{
 				case 0:
 					guardArrow.x += 5;
 					guardArrow.y += 76;
-					arrowAngle = -120;
-				// guardWidgetWidth += guardArrow.width;
 				case 1:
 					curGuard = 'up';
-					guardArrow.x += 29;
+					guardArrow.x += 30;
 					guardArrow.y += 18;
-					fillColor = 0x12FA05;
 					guardPosition += 1;
 				case 2:
 					curGuard = 'right';
 					guardArrow.x += 76;
 					guardArrow.y += 76;
-					fillColor = 0xF9393F;
-					arrowAngle = 120;
 					guardPosition += 1;
-					// guardWidgetWidth += guardArrow.width - (guardArrow.width - 76);
 			}
 
 			guardArrow.frames = Paths.getSparrowAtlas('guards/fnfStyle/' + curGuard);
@@ -870,25 +867,12 @@ class Combat extends PlayState
 
 			guardArrow.x += ((FlxG.width - 195 - 50) * player);
 
+			guardArrow.animation.addByPrefix('active', 'active', 12, false);
+			guardArrow.animation.addByPrefix('reflex', 'reflex', 12, false);
+			guardArrow.animation.addByPrefix('singGuard', 'singGuard', 12, false);
+			guardArrow.animation.addByPrefix('attack', 'attack', 12, false);
 			guardArrow.animation.addByPrefix('passive', 'passive');
 			guardArrow.animation.addByPrefix('inactive', 'inactive');
-			guardArrow.animation.addByPrefix('active', 'active', 12, false);
-			guardArrow.animation.addByPrefix('attack', 'attack', 12, false);
-
-			var reflexGuardArrow:ReflexGuardArrow = new ReflexGuardArrow(guardArrow, reflexGuardTimer, singGuardTimer, guardPosition, fillColor, arrowAngle,
-				'guards/fnfStyle/' + curGuard + 'Empty');
-			reflexGuardArrow.antialiasing = true;
-			reflexGuardArrow.setGraphicSize(Std.int(guardArrow.width * 0.7));
-			reflexGuardArrow.updateHitbox();
-			reflexGuardArrow.scrollFactor.set();
-
-			var reflexGuardOutline:FlxSprite = new FlxSprite(guardArrow.x, guardArrow.y, Paths.image('guards/fnfStyle/' + curGuard + 'Outline'));
-			reflexGuardOutline.antialiasing = true;
-			reflexGuardOutline.setGraphicSize(Std.int(guardArrow.width * 0.7));
-			reflexGuardOutline.updateHitbox();
-			reflexGuardOutline.x = guardArrow.x;
-			reflexGuardOutline.y = guardArrow.y;
-			reflexGuardOutline.scrollFactor.set();
 
 			guardArrow.y -= 10;
 			guardArrow.alpha = 0;
@@ -900,12 +884,8 @@ class Combat extends PlayState
 				{
 					case 0:
 						playerGuard.add(guardArrow);
-						playerReflexGuard.add(reflexGuardArrow);
-						playerReflexGuardOutline.add(reflexGuardOutline);
 					case 1:
 						enemyGuard.add(guardArrow);
-						enemyReflexGuard.add(reflexGuardArrow);
-						enemyReflexGuardOutline.add(reflexGuardOutline);
 				}
 			}
 			else
@@ -914,44 +894,42 @@ class Combat extends PlayState
 				{
 					case 0:
 						enemyGuard.add(guardArrow);
-						enemyReflexGuard.add(reflexGuardArrow);
-						enemyReflexGuardOutline.add(reflexGuardOutline);
 					case 1:
 						playerGuard.add(guardArrow);
-						playerReflexGuard.add(reflexGuardArrow);
-						playerReflexGuardOutline.add(reflexGuardOutline);
 				}
 			}
 
 			guardArrow.animation.play('passive');
 
 			combatUI.add(guardArrow);
-			combatUI.add(reflexGuardArrow);
-			// combatUI.add(reflexGuardOutline);
 
-			if (i == 2)
+			switch (i)
 			{
-				updateGuardUI(enemyGuard, 'neutral');
-				updateGuardUI(playerGuard, 'neutral');
-
-				if ((characterFlipSide && player == 1) || (!characterFlipSide && player == 0))
-				{
-					attackTypeIndicator.frames = Paths.getSparrowAtlas('notes/indicator');
-					attackTypeIndicator.animation.addByPrefix('specialIndicator', 'indicator bash', false);
-					attackTypeIndicator.animation.addByPrefix('unblockableIndicator', 'indicator unblockable', false);
-					attackTypeIndicator.antialiasing = true;
-					attackTypeIndicator.setGraphicSize(Std.int(attackTypeIndicator.width * 0.7));
-					attackTypeIndicator.updateHitbox();
-					attackTypeIndicator.scrollFactor.set();
-
-					attackTypeIndicator.x = guardArrow.x - 7;
-					attackTypeIndicator.y = guardArrow.y - 7;
-					trace(guardArrow.x);
-					attackTypeIndicator.animation.play('specialIndicator');
-					attackTypeIndicator.visible = false;
-					combatUI.add(attackTypeIndicator);
-				}
+				case 0:
+					leftGuardX = guardArrow.x;
+				case 1:
+					upGuardY = guardArrow.y;
 			}
+		}
+
+		updateGuardUI(enemyGuard, 'neutral');
+		updateGuardUI(playerGuard, 'neutral');
+
+		if ((characterFlipSide && player == 1) || (!characterFlipSide && player == 0))
+		{
+			attackTypeIndicator.frames = Paths.getSparrowAtlas('notes/indicator');
+			attackTypeIndicator.animation.addByPrefix('specialIndicator', 'indicator bash', false);
+			attackTypeIndicator.animation.addByPrefix('unblockableIndicator', 'indicator unblockable', false);
+			attackTypeIndicator.antialiasing = true;
+			attackTypeIndicator.setGraphicSize(Std.int(attackTypeIndicator.width * 0.6));
+			attackTypeIndicator.updateHitbox();
+			attackTypeIndicator.scrollFactor.set();
+
+			attackTypeIndicator.x = leftGuardX - 5;
+			attackTypeIndicator.y = upGuardY + 2;
+			attackTypeIndicator.animation.play('specialIndicator');
+			attackTypeIndicator.visible = false;
+			combatUI.add(attackTypeIndicator);
 		}
 	}
 
@@ -1032,21 +1010,6 @@ class Combat extends PlayState
 				}
 				PlayState.instance.iconP2.x -= 35;
 				PlayState.instance.iconP2.y += 10;
-			case 'testGuard':
-				var upArrow:FlxSprite = new FlxSprite(50, 200, Paths.image('guards/fnfStyle/up_0005'));
-				// upArrow.clipRect = new FlxRect(50, 200, upArrow.width, upArrow.height);
-
-				var upArrowGreen:FlxSprite = new FlxSprite(150, 200);
-				upArrowGreen.makeGraphic(150, 150, FlxColor.LIME);
-				var rect = new FlxRect(0, 0, 50, 50);
-				// var point = new Point(0, 0);
-
-				// var bitmap:FlxGraphic = upArrow.graphic;
-				// var imageFrame:FlxImageFrame = FlxImageFrame.fromImage(Paths.image('guards/fnfStyle/up_0005'));
-				upArrowGreen.frame = upArrow.frame.clipTo(rect, upArrowGreen.frame);
-
-				// combatUI.add(upArrow);
-				combatUI.add(upArrowGreen);
 		}
 	}
 
@@ -1129,10 +1092,13 @@ class Combat extends PlayState
 
 		PlayState.instance.dad.isBashed = true;
 
-		enemyWasBashedTimer.start(bashDuration, function(tmr:FlxTimer)
-		{
-			PlayState.instance.dad.isBashed = false;
-		});
+		if (enemyWasBashedTimer.active)
+			enemyWasBashedTimer.reset();
+		else
+			enemyWasBashedTimer.start(bashDuration, function(tmr:FlxTimer)
+			{
+				PlayState.instance.dad.isBashed = false;
+			});
 
 		cancelStates();
 	}
@@ -1147,7 +1113,7 @@ class Combat extends PlayState
 
 		var soonestNote:Note = getSoonestNote('bufferCheck', true);
 
-		if (soonestNote != null && !noteAttack)
+		if (soonestNote != null && !noteAttack && !hasSustainAttacked)
 		{
 			if (soonestNote.noteType == 'attack')
 				bufferNoteAttack = false;
@@ -1160,17 +1126,20 @@ class Combat extends PlayState
 			executeAttack = false;
 		}
 
-		var noteToParry:Note = getSoonestNote('isCombatNote');
+		if (!PlayState.instance.dad.isBashed)
+		{
+			var noteToParry:Note = getSoonestNote('isCombatNote');
 
-		if (noteToParry != null)
-			if (noteToParry.noteData == PlayState.instance.boyfriend.guardPosition)
-			{
-				hasParried = true;
-				if (!allowParryAttack)
-					executeAttack = false;
-				else
-					executeAttack = true;
-			}
+			if (noteToParry != null)
+				if (noteToParry.noteData == PlayState.instance.boyfriend.guardPosition)
+				{
+					hasParried = true;
+					if (!allowParryAttack || !hasSustainAttacked)
+						executeAttack = false;
+					else
+						executeAttack = true;
+				}
+		}
 
 		if (executeAttack || noteAttack)
 		{
@@ -1225,10 +1194,13 @@ class Combat extends PlayState
 					hasParried = false;
 
 					attackRecovery = true;
-					attackRecoveryTimer.start(stepTimerCrochet / 2, function(tmr:FlxTimer)
-					{
-						attackRecovery = false;
-					});
+					if (attackRecoveryTimer.active)
+						attackRecoveryTimer.reset();
+					else
+						attackRecoveryTimer.start(stepTimerCrochet / 2, function(tmr:FlxTimer)
+						{
+							attackRecovery = false;
+						});
 
 					cancelSingGuard();
 
@@ -1345,7 +1317,7 @@ class Combat extends PlayState
 					noteAttack = false;
 				}
 
-				updateGuardUI(enemyGuard, 'normal');
+				updateGuardUI(enemyGuard, 'neutral');
 			}
 			else if (debugAttackTrigger)
 				trace('attackRecovery, hasParried, or noteAttack failed');
@@ -1403,27 +1375,19 @@ class Combat extends PlayState
 	{
 		var hasReflexGuard:Bool = false;
 		var guardPosition:Int = 0;
-		var characterReflexGuard:FlxTypedGroup<ReflexGuardArrow> = playerReflexGuard;
-		var characterReflexGuardOutline:FlxTypedGroup<FlxSprite> = playerReflexGuardOutline;
 
 		if (characterGuard == playerGuard)
 		{
 			hasReflexGuard = PlayState.instance.boyfriend.hasReflexGuard;
 			guardPosition = PlayState.instance.boyfriend.guardPosition;
-			characterReflexGuard = playerReflexGuard;
-			characterReflexGuardOutline = playerReflexGuardOutline;
 		}
 		else if (characterGuard == enemyGuard)
 		{
 			hasReflexGuard = PlayState.instance.dad.hasReflexGuard;
 			guardPosition = PlayState.instance.dad.guardPosition;
-			characterReflexGuard = enemyReflexGuard;
-			characterReflexGuardOutline = enemyReflexGuardOutline;
 		}
 
 		var guardArrayPosition:Int = guardPosition > 0 ? guardPosition - 1 : guardPosition;
-
-		endReflexGuard(characterReflexGuard, characterReflexGuardOutline);
 
 		characterGuard.forEach(function(spr:FlxSprite)
 		{
@@ -1435,99 +1399,48 @@ class Combat extends PlayState
 				case 'normal':
 					if (characterGuard.members[guardArrayPosition] == spr)
 					{
-						spr.animation.play('active');
-
 						if (hasReflexGuard)
-						{
-							// spr.animation.finishCallback = function(name:String)
-							// {
-							// updateGuardUI(characterGuard, 'inactive');
-							startReflexGuardAnimation(characterReflexGuard, characterReflexGuardOutline, guardPosition, updateType);
-							// }
-						}
+							spr.animation.play('reflex', true);
+						else
+							spr.animation.play('active', true);
 					}
 					else
-						spr.animation.play('passive');
+						spr.animation.play('passive', true);
 				case 'neutral':
 					if (characterGuard.members[guardArrayPosition] == spr)
 					{
-						spr.animation.play('active', false, false, 3);
 						if (hasReflexGuard)
-							startReflexGuardAnimation(characterReflexGuard, characterReflexGuardOutline, guardPosition, updateType);
+							spr.animation.play('reflex', true, false, 3);
+						else
+							spr.animation.play('active', true, false, 3);
 					}
 					else
-						spr.animation.play('passive');
+						spr.animation.play('passive', true);
 				case 'singGuard':
-					spr.animation.play('active');
-
-					// spr.animation.finishCallback = function(name:String)
-					// {
-					// updateGuardUI(characterGuard, 'inactive');
-					startReflexGuardAnimation(characterReflexGuard, characterReflexGuardOutline, guardPosition, updateType);
-				// }
+					if (hasReflexGuard)
+					{
+						if (characterGuard.members[guardArrayPosition] == spr)
+							spr.animation.play('reflex', true);
+						else
+							spr.animation.play('singGuard', true);
+					}
+					else
+						spr.animation.play('singGuard', true);
 				case 'attack':
 					if (characterGuard.members[guardArrayPosition] == spr)
 					{
-						spr.animation.play('attack');
+						spr.animation.play('attack', true);
 					}
 					else
-						spr.animation.play('passive');
+						spr.animation.play('passive', true);
 				case 'inactive':
 					if (characterGuard.members[guardArrayPosition] == spr)
 					{
-						spr.animation.play('inactive');
+						spr.animation.play('inactive', true);
 					}
 					else
-						spr.animation.play('passive');
+						spr.animation.play('passive', true);
 			}
-		});
-	}
-
-	/**
-	 * Used when updating the guard widget's animations for when a reflex guard should start depleting
-	**/
-	function startReflexGuardAnimation(characterReflexGuard:FlxTypedGroup<ReflexGuardArrow>, characterReflexGuardOutline:FlxTypedGroup<FlxSprite>,
-			guardPosition:Int, updateType:String)
-	{
-		var guardArrayPosition:Int = guardPosition > 0 ? guardPosition - 1 : guardPosition;
-
-		characterReflexGuard.forEach(function(arw:ReflexGuardArrow)
-		{
-			if ((arw.guardArrowPosition == guardPosition && (updateType == 'normal' || updateType == 'neutral'))
-				|| updateType == 'singGuard')
-			{
-				arw.visible = true;
-				arw.active = true;
-			}
-			else
-			{
-				arw.visible = false;
-				arw.active = false;
-			}
-		});
-
-		characterReflexGuardOutline.forEach(function(spr:FlxSprite)
-		{
-			if (characterReflexGuardOutline.members[guardArrayPosition] == spr || updateType == 'singGuard')
-			{
-				spr.visible = true;
-			}
-			else
-				spr.visible = false;
-		});
-	}
-
-	function endReflexGuard(characterReflexGuard:FlxTypedGroup<ReflexGuardArrow>, characterReflexGuardOutline:FlxTypedGroup<FlxSprite>)
-	{
-		characterReflexGuard.forEach(function(arw:ReflexGuardArrow)
-		{
-			arw.visible = false;
-			arw.active = false;
-		});
-
-		characterReflexGuardOutline.forEach(function(spr:FlxSprite)
-		{
-			spr.visible = false;
 		});
 	}
 
@@ -1563,36 +1476,52 @@ class Combat extends PlayState
 		hasStartedAttack = false;
 	}
 
-	public function noteGoodHitCombat(noteData:Int, isSustainNote:Bool, noteType:String, rating:String):Void
+	public function noteGoodHitCombat(note:Note):Void
 	{
-		if (!isSustainNote)
+		if (!note.isSustainNote)
 			hasSustainAttacked = false;
 
-		if (noteData != 1)
-			PlayState.instance.boyfriend.guardPosition = noteData;
+		if (note.noteData != 1)
+			PlayState.instance.boyfriend.guardPosition = note.noteData;
 		manuallySwitchedGuard = false;
 
 		noteAttack = true;
-		noteAttackTimer = new FlxTimer().start(stepTimerCrochet / 2, function(tmr:FlxTimer)
-		{
-			noteAttack = false;
-		});
+
+		var duration:Float = stepTimerCrochet / 2;
+		var nextNote:Note = getSoonestNote('any', true, true);
+		// The "noteGoodHit" function in PlayState seems to be executed every 2 steps,
+		// ...but if the noteAttack window is as long as this, it causes weird behavior
+		// Thus why this extra duration is narrowed down to only hitting a sustain note
+		//
+		// The 1.1 multiplier is to *just* tilt the duration long enough to not let the timer run out before the next note hit function call
+		if (nextNote != null && nextNote.isSustainNote)
+			duration = stepTimerCrochet * 1.1;
+
+		if (noteAttackTimer.active)
+			noteAttackTimer.reset();
+		else
+			noteAttackTimer = new FlxTimer().start(duration, function(tmr:FlxTimer)
+			{
+				noteAttack = false;
+				trace(noteAttackTimer.time);
+			});
 
 		// You might notice the similarities to noteAttack
 		// Remember that noteAttack can get cleared due to various circumstances, so having this separate variable/timer is important
 		instantSingAttack = true;
-		instantSingAttackTimer.start(stepTimerCrochet / 2, function(tmr:FlxTimer)
-		{
-			instantSingAttack = false;
-		});
+		if (instantSingAttackTimer.active)
+			instantSingAttackTimer.reset();
+		else
+			instantSingAttackTimer.start(duration, function(tmr:FlxTimer)
+			{
+				instantSingAttack = false;
+			});
 
 		hasStartedAttack = false;
 
 		// Little animation tidbit to keep down-note attacks from getting monotonous
-		if (noteData == 1)
-		{
+		if (note.noteData == 1)
 			downAttackPositionShift = true;
-		}
 		else
 			downAttackPositionShift = false;
 
@@ -1601,7 +1530,7 @@ class Combat extends PlayState
 
 		startSingGuard();
 
-		if (noteType == 'wind' || noteType == 'shortwind')
+		if (note.noteType == 'wind' || note.noteType == 'shortwind')
 		{
 			// Transfering this function to a variable since it (probably?) saves on performance
 			// Dunno how taxing this function really is tbh
@@ -1610,13 +1539,13 @@ class Combat extends PlayState
 			var windNote:Note = getSoonestNote('attackNote');
 
 			if (windNote != null)
-				noteData = windNote.noteData;
+				note.noteData = windNote.noteData;
 		}
 
-		if (noteData == 1)
+		if (note.noteData == 1)
 			initiateChain();
 
-		switch (noteType)
+		switch (note.noteType)
 		{
 			case '' | 'normal':
 				if (bufferNoteAttack)
@@ -1627,24 +1556,22 @@ class Combat extends PlayState
 				// Sound effects playing way off sounds real bad
 				// So this "balance" decision is pretty much to remedy that sound issue
 				// It's rewarding precision, I swear
-				if (rating == 'good' || rating == 'sick')
+				if (note.rating == 'good' || note.rating == 'sick')
 				{
-					if (noteData == 1)
+					if (note.noteData == 1)
 						evaluateAttack('attackNote');
 					else
 						playerAttack(0);
 				}
 			case 'wind':
 				// Keep in mind for these wind cases that noteData gets changed to the soonest attack note
-				PlayState.instance.boyfriend.playAnim(appendDirection('combatWind', noteData, true), true);
+				PlayState.instance.boyfriend.playAnim(appendDirection('combatWind', note.noteData, true), true);
 			case 'shortwind':
-				if (PlayState.instance.boyfriend.animation.getByName(appendDirection('combatWindshort', noteData)) == null)
-					PlayState.instance.boyfriend.playAnim(appendDirection('combatWind', noteData, true), true);
+				if (PlayState.instance.boyfriend.animation.getByName(appendDirection('combatWindshort', note.noteData)) == null)
+					PlayState.instance.boyfriend.playAnim(appendDirection('combatWind', note.noteData, true), true);
 				else
-					PlayState.instance.boyfriend.playAnim(appendDirection('combatWindshort', noteData, true), true);
+					PlayState.instance.boyfriend.playAnim(appendDirection('combatWindshort', note.noteData, true), true);
 		}
-
-		bufferNoteAttack = false;
 	}
 
 	/**
@@ -1692,10 +1619,13 @@ class Combat extends PlayState
 
 		// Timer length is a constant instead of some kind of stepTimerCrochet to maintain consistency between song speeds
 
-		posturePauseTimer.start(3, function(tmr:FlxTimer)
-		{
-			posturePause = false;
-		});
+		if (posturePauseTimer.active)
+			posturePauseTimer.reset();
+		else
+			posturePauseTimer.start(3, function(tmr:FlxTimer)
+			{
+				posturePause = false;
+			});
 
 		PlayState.instance.dad.posture += PlayState.instance.boyfriend.postureDamage * postureDamageModifer;
 	}
@@ -1803,6 +1733,9 @@ class Combat extends PlayState
 				achievementHealthStepCount += 1;
 	}
 
+	/**
+	 * Cancels any ongoing dodges and chains
+	 */
 	function cancelStates():Void
 	{
 		isDodgeTimer.cancel();
@@ -1814,10 +1747,13 @@ class Combat extends PlayState
 	function initiateChain():Void
 	{
 		inChain = true;
-		chainTimer = new FlxTimer().start(stepTimerCrochet * 6, function(tmr:FlxTimer)
-		{
-			inChain = false;
-		});
+		if (chainTimer.active)
+			chainTimer.reset();
+		else
+			chainTimer = new FlxTimer().start(stepTimerCrochet * 6, function(tmr:FlxTimer)
+			{
+				inChain = false;
+			});
 	}
 
 	/**
@@ -1896,11 +1832,12 @@ class Combat extends PlayState
 	 *
 	 * @param noteCheck 'any' to check any note, 'indicateNote' checks the note's indicateNote range, 'isCombatNote' checks isCombatNote range, otherwise compares noteType to noteCheck string.
 	 * @param mustPress Put in place of daNote.mustPress; true checks player notes, false checks opponent's
+	 * @param ignoreFirst Gets the *second* soonest note, for comparing to a note right on hit, like in "noteGoodHitCombat", which would otherwise just pick up the same note that was hit
 	**/
-	function getSoonestNote(noteCheck:String = 'any', mustPress:Bool = false):Note
+	function getSoonestNote(noteCheck:String = 'any', mustPress:Bool = false, ignoreFirst:Bool = false):Note
 	{
-		var nextStrumTime:Float = 0;
 		var nextNote:Note = null;
+		var secondNote:Note = null;
 
 		// This figures out which valid note is the soonest note to be played
 		// This is used to fix picking up note signals from notes being too close together
@@ -1929,11 +1866,19 @@ class Combat extends PlayState
 				}
 			}
 
-			if (performNoteCheck && (daNote.strumTime <= nextStrumTime || nextStrumTime == 0))
-				nextNote = daNote;
+			if (performNoteCheck)
+			{
+				if (nextNote == null || nextNote != null && daNote.strumTime < nextNote.strumTime)
+					nextNote = daNote;
+
+				if (secondNote == null)
+					secondNote = nextNote;
+				else if (nextNote != null && daNote.strumTime < secondNote.strumTime && daNote.strumTime < nextNote.strumTime)
+					secondNote = daNote;
+			}
 		});
 
-		return nextNote;
+		return (ignoreFirst ? secondNote : nextNote);
 	}
 
 	/**

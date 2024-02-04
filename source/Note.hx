@@ -183,6 +183,12 @@ class Note extends FlxSprite
 						reloadNote('unblockable', 'NOTE', '_asset', true);
 					else
 						reloadNote('attack', 'NOTE', '_asset', true);
+
+					// isSpecialNote needs to be narrowed to only flip on attack notes,
+					// So given that noteType's determined somewhere outside note construction next best place to flip this is here
+					// Thus why this isn't flipped alongside isUnblockable
+					if (noteData == 1)
+						isSpecialNote = true;
 				case 'wind':
 					// Just want to point out here that I did look into altering saturation this way in lieu of the extra spritesheets
 					// Unfortunately, however colors handled here trends towards white instead of black when lowering saturation
@@ -233,8 +239,6 @@ class Note extends FlxSprite
 		// Therefore, this changes the note from a normal note to an unblockable note
 		this.isUnblockable = isUnblockable;
 		this.isDeathNote = isDeathNote;
-		if (noteData == 1 && noteType == 'attack')
-			isSpecialNote = true;
 
 		x += (ClientPrefs.middleScroll ? PlayState.STRUM_X_MIDDLESCROLL : PlayState.STRUM_X) + 50;
 		// MAKE SURE ITS DEFINITELY OFF SCREEN?

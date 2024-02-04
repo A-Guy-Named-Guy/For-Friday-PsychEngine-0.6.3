@@ -4,7 +4,6 @@ package editors;
 import Discord.DiscordClient;
 #end
 import Character;
-import CharacterExtra;
 import animateatlas.AtlasFrameMaker;
 import flixel.FlxCamera;
 import flixel.FlxG;
@@ -30,6 +29,7 @@ import flixel.text.FlxText;
 import flixel.ui.FlxButton;
 import flixel.ui.FlxSpriteButton;
 import flixel.util.FlxColor;
+import forfriday.CharacterExtra;
 import haxe.Json;
 import lime.system.Clipboard;
 import openfl.events.Event;

@@ -11,10 +11,10 @@
 
 	"images": [
 		{
-			"image": "notes/guard",
+			"image": "guards/fnfStyle/left",
 			"position": [
-				900,
-				200
+				905,
+				276
 			],
 			"no_antialiasing": false,
 			"flip_x": false,
@@ -27,14 +27,14 @@
 					"fps": 24,
 					"anim": "active",
 					"indices": [],
-					"name": "left active0002"
+					"name": "active0002"
 				}
 		},
 		{
-			"image": "notes/guard",
+			"image": "guards/fnfStyle/up",
 			"position": [
-				900,
-				200
+				940,
+				197
 			],
 			"no_antialiasing": false,
 			"flip_x": false,
@@ -47,14 +47,14 @@
 					"fps": 24,
 					"anim": "active",
 					"indices": [],
-					"name": "up active0002"
+					"name": "active0002"
 				}
 		},
 		{
-			"image": "notes/guard",
+			"image": "guards/fnfStyle/right",
 			"position": [
-				900,
-				200
+				1006,
+				276
 			],
 			"no_antialiasing": false,
 			"flip_x": false,
@@ -67,7 +67,7 @@
 					"fps": 24,
 					"anim": "active",
 					"indices": [],
-					"name": "right active0002"
+					"name": "active0002"
 				}
 		}
 	]

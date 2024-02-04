@@ -14,6 +14,7 @@ import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
 import flixel.util.FlxStringUtil;
+import forfriday.TutorialSubState;
 
 class PauseSubState extends MusicBeatSubstate
 {

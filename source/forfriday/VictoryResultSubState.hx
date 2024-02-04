@@ -1,4 +1,4 @@
-package;
+package forfriday;
 
 import Controls.Control;
 import flixel.FlxG;

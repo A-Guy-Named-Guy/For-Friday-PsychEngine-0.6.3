@@ -20,5 +20,7 @@
 	"hideStoryMode": false,
 	"hideFreeplay": false,
 
-	"characterSpecific": "shrub"
+	"characterSpecific": "shrub",
+	"disable_sing_victory": ["dominion-reversal"],
+	"reverse_player_enemy_position": true
 }

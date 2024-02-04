@@ -4,6 +4,8 @@ package;
 import sys.FileSystem;
 import sys.io.File;
 #end
+import forfriday.CharacterSelectState;
+import forfriday.Combat;
 import haxe.Json;
 import haxe.format.JsonParser;
 import lime.utils.Assets;
@@ -26,8 +28,12 @@ typedef WeekFile =
 	var hideStoryMode:Bool;
 	var hideFreeplay:Bool;
 	var difficulties:String;
-	// Combat change
+	// Combat changes
 	var characterSpecific:String;
+	var disable_sing_victory:Array<String>;
+	var disable_combat_victory:Array<String>;
+	var require_combat_victory:Array<String>;
+	var reverse_player_enemy_position:Bool;
 }
 
 class WeekData
@@ -52,6 +58,10 @@ class WeekData
 	public var difficulties:String;
 	// Combat change
 	public var characterSpecific:String;
+	public var needCombatVictory:Array<String>;
+	public var singVictoryDisabled:Array<String>;
+	public var combatVictoryDisabled:Array<String>;
+	public var flipBoyfriendAndDad:Bool;
 
 	public var fileName:String;
 
@@ -75,7 +85,11 @@ class WeekData
 			hideFreeplay: false,
 			difficulties: '',
 			// Combat change
-			characterSpecific: ''
+			characterSpecific: '',
+			disable_sing_victory: [],
+			disable_combat_victory: [],
+			require_combat_victory: [],
+			reverse_player_enemy_position: false
 		};
 		return weekFile;
 	}
@@ -97,6 +111,10 @@ class WeekData
 		difficulties = weekFile.difficulties;
 		// Combat change
 		characterSpecific = weekFile.characterSpecific;
+		singVictoryDisabled = weekFile.disable_sing_victory;
+		combatVictoryDisabled = weekFile.disable_combat_victory;
+		needCombatVictory = weekFile.require_combat_victory;
+		flipBoyfriendAndDad = weekFile.reverse_player_enemy_position;
 
 		this.fileName = fileName;
 	}
@@ -151,6 +169,10 @@ class WeekData
 		var originalLength:Int = directories.length;
 		#end
 
+		// Combat change
+		var disableSingVictoryArray:Array<String> = [];
+		var disableCombatVictoryArray:Array<String> = [];
+
 		var sexList:Array<String> = CoolUtil.coolTextFile(Paths.getPreloadPath('weeks/weekList.txt'));
 		for (i in 0...sexList.length)
 		{
@@ -171,7 +193,8 @@ class WeekData
 						}
 						#end
 
-						// Combat change
+						// Combat changes
+						// Add character check
 						if (weekFile != null
 							&& (isStoryMode == null
 								|| (isStoryMode
@@ -184,11 +207,36 @@ class WeekData
 						{
 							weeksLoaded.set(sexList[i], weekFile);
 							weeksList.push(sexList[i]);
+
+							// Combat changes
+							if (weekFile.singVictoryDisabled != null)
+								for (i in 0...weekFile.singVictoryDisabled.length)
+								{
+									disableSingVictoryArray.push(weekFile.singVictoryDisabled[i]);
+								}
+
+							if (weekFile.combatVictoryDisabled != null)
+								for (i in 0...weekFile.combatVictoryDisabled.length)
+								{
+									disableCombatVictoryArray.push(weekFile.combatVictoryDisabled[i]);
+								}
+							// End of changes
 						}
 					}
 				}
 			}
 		}
+
+		// Combat changes
+		for (i in 0...disableSingVictoryArray.length)
+		{
+			Combat.singVictoryDisabled.push(disableSingVictoryArray[i]);
+		}
+		for (i in 0...disableCombatVictoryArray.length)
+		{
+			Combat.combatVictoryDisabled.push(disableCombatVictoryArray[i]);
+		}
+		// End of changes
 
 		#if MODS_ALLOWED
 		for (i in 0...directories.length)

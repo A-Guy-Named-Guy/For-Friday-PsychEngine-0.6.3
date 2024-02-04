@@ -20,5 +20,8 @@
 	"hideStoryMode": false,
 	"hideFreeplay": false,
 
-	"characterSpecific": "bf"
+	"characterSpecific": "bf",
+	"disable_sing_victory": ["dominion"],
+	"disable_combat_victory": [],
+	"require_combat_victory": ["trial"]
 }

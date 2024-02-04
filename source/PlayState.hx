@@ -49,6 +49,12 @@ import flixel.util.FlxSave;
 import flixel.util.FlxSort;
 import flixel.util.FlxStringUtil;
 import flixel.util.FlxTimer;
+import forfriday.CharacterExtra;
+import forfriday.Combat;
+import forfriday.CombatDialogue;
+import forfriday.TutorialSubState;
+import forfriday.VictoryControl;
+import forfriday.VictoryResultSubState;
 import haxe.Json;
 import lime.utils.Assets;
 import openfl.Lib;
@@ -94,6 +100,8 @@ class PlayState extends MusicBeatState
 	public var boyfriendSpriteGroup:FlxSpriteGroup;
 	public var dadSpriteGroup:FlxSpriteGroup;
 	public var spriteOrder = new FlxTypedGroup<FlxSprite>();
+
+	var flipBoyfriendAndDad:Bool = false;
 
 	public static var sortByZ = function(Order:Int, Obj1:Dynamic, Obj2:Dynamic):Int
 	{
@@ -462,6 +470,9 @@ class PlayState extends MusicBeatState
 			detailsText = "Freeplay";
 		}
 
+		// Combat change
+		flipBoyfriendAndDad = WeekData.getCurrentWeek().flipBoyfriendAndDad;
+
 		// String for when the game is paused
 		detailsPausedText = "Paused - " + detailsText;
 		#end
@@ -525,7 +536,7 @@ class PlayState extends MusicBeatState
 		isPixelStage = stageData.isPixelStage;
 
 		// Combat change
-		if (Combat.playerOneFlipSideArray.contains(SONG.player1))
+		if (flipBoyfriendAndDad)
 		{
 			var dummyData:Array<Dynamic> = stageData.boyfriend;
 			stageData.boyfriend = stageData.opponent;
@@ -1555,7 +1566,7 @@ class PlayState extends MusicBeatState
 		spriteOrder.add(dadGroup);
 		add(spriteOrder);
 
-		if (Combat.playerOneFlipSideArray.contains(SONG.player1))
+		if (flipBoyfriendAndDad)
 		{
 			if (!SONG.disableCombat)
 			{
@@ -1607,6 +1618,10 @@ class PlayState extends MusicBeatState
 			// The vanilla "health" functions as a stamina bar, so the enemy's color doesn't need an influence here
 			dad.healthColorArray = [255, 0, 0];
 			reloadHealthBarColors();
+
+			Combat.needCombatVictory = WeekData.getCurrentWeek().needCombatVictory;
+			Combat.singVictoryDisabled = WeekData.getCurrentWeek().singVictoryDisabled;
+			Combat.combatVictoryDisabled = WeekData.getCurrentWeek().combatVictoryDisabled;
 		}
 		// End of changes
 	}
@@ -2443,7 +2458,7 @@ class PlayState extends MusicBeatState
 
 			// Combat change
 			// Flips the UI around
-			if (Combat.playerOneFlipSideArray.contains(SONG.player1))
+			if (flipBoyfriendAndDad)
 			{
 				Combat.flipCharacterSide();
 			}
@@ -4329,7 +4344,7 @@ class PlayState extends MusicBeatState
 								boyfriend.combatHealth = storeCurBfHealth;
 							}
 
-							if (Combat.playerOneFlipSideArray.contains(SONG.player1))
+							if (flipBoyfriendAndDad)
 							{
 								boyfriend.flipX = false;
 								if (boyfriend.characterSprites.members.length > 0)
@@ -4380,7 +4395,7 @@ class PlayState extends MusicBeatState
 								dad.combatHealth = storeCurDadHealth;
 							}
 
-							if (Combat.playerOneFlipSideArray.contains(SONG.player1))
+							if (flipBoyfriendAndDad)
 							{
 								dad.flipX = false;
 								if (dad.characterSprites.members.length > 0)
@@ -5605,7 +5620,7 @@ class PlayState extends MusicBeatState
 			// Also stores the relevant data of the note since that info is already used correctly in this function
 			// Basically it skips having to figure out which note is the correct one to be tracking
 			if (!SONG.disableCombat)
-				COMBAT.noteGoodHitCombat(note.noteData, note.isSustainNote, note.noteType, note.rating);
+				COMBAT.noteGoodHitCombat(note);
 
 			if (cpuControlled)
 			{

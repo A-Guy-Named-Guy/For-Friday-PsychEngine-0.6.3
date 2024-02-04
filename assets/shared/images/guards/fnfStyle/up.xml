@@ -1,11 +1,38 @@
 <?xml version='1.0' encoding='utf-8'?>
 <TextureAtlas imagePath="up.png">
-<SubTexture name="active0000" x="0" y="0" width="143" height="116" frameX="0" frameY="0" frameWidth="141" frameHeight="114" />
-<SubTexture name="active0001" x="0" y="116" width="139" height="112" frameX="-2" frameY="-4" frameWidth="141" frameHeight="114" />
-<SubTexture name="active0002" x="286" y="0" width="136" height="110" frameX="-4" frameY="-6" frameWidth="141" frameHeight="114" />
-<SubTexture name="passive0000" x="286" y="110" width="136" height="110" frameX="-4" frameY="-6" frameWidth="141" frameHeight="114" />
-<SubTexture name="inactive0000" x="0" y="228" width="136" height="110" frameX="-4" frameY="-6" frameWidth="141" frameHeight="114" />
-<SubTexture name="attack0000" x="143" y="0" width="143" height="116" frameX="0" frameY="0" frameWidth="141" frameHeight="114" />
-<SubTexture name="attack0001" x="139" y="116" width="139" height="112" frameX="-2" frameY="-4" frameWidth="141" frameHeight="114" />
-<SubTexture name="attack0002" x="136" y="228" width="136" height="110" frameX="-4" frameY="-6" frameWidth="141" frameHeight="114" />
+<SubTexture name="active0000" x="0" y="0" width="144" height="116" frameX="0" frameY="0" frameWidth="142" frameHeight="114" />
+<SubTexture name="active0001" x="0" y="116" width="139" height="112" frameX="-2" frameY="-4" frameWidth="142" frameHeight="114" />
+<SubTexture name="active0002" x="136" y="228" width="136" height="110" frameX="-4" frameY="-6" frameWidth="142" frameHeight="114" />
+<SubTexture name="reflex0000" x="0" y="0" width="144" height="116" frameX="0" frameY="0" frameWidth="142" frameHeight="114" />
+<SubTexture name="reflex0001" x="0" y="116" width="139" height="112" frameX="-2" frameY="-4" frameWidth="142" frameHeight="114" />
+<SubTexture name="reflex0002" x="136" y="228" width="136" height="110" frameX="-4" frameY="-6" frameWidth="142" frameHeight="114" />
+<SubTexture name="reflex0003" x="272" y="228" width="136" height="110" frameX="-4" frameY="-6" frameWidth="142" frameHeight="114" />
+<SubTexture name="reflex0004" x="424" y="0" width="136" height="110" frameX="-4" frameY="-6" frameWidth="142" frameHeight="114" />
+<SubTexture name="reflex0005" x="424" y="110" width="136" height="110" frameX="-4" frameY="-6" frameWidth="142" frameHeight="114" />
+<SubTexture name="reflex0006" x="424" y="220" width="136" height="110" frameX="-4" frameY="-6" frameWidth="142" frameHeight="114" />
+<SubTexture name="reflex0007" x="0" y="338" width="136" height="110" frameX="-4" frameY="-6" frameWidth="142" frameHeight="114" />
+<SubTexture name="reflex0008" x="136" y="338" width="136" height="110" frameX="-4" frameY="-6" frameWidth="142" frameHeight="114" />
+<SubTexture name="reflex0009" x="272" y="338" width="136" height="110" frameX="-4" frameY="-6" frameWidth="142" frameHeight="114" />
+<SubTexture name="reflex0010" x="408" y="338" width="136" height="110" frameX="-4" frameY="-6" frameWidth="142" frameHeight="114" />
+<SubTexture name="reflex0011" x="0" y="448" width="136" height="110" frameX="-4" frameY="-6" frameWidth="142" frameHeight="114" />
+<SubTexture name="reflex0012" x="288" y="0" width="136" height="110" frameX="-4" frameY="-6" frameWidth="142" frameHeight="114" />
+<SubTexture name="reflex0013" x="288" y="110" width="136" height="110" frameX="-4" frameY="-6" frameWidth="142" frameHeight="114" />
+<SubTexture name="singGuard0000" x="0" y="0" width="144" height="116" frameX="0" frameY="0" frameWidth="142" frameHeight="114" />
+<SubTexture name="singGuard0001" x="0" y="116" width="139" height="112" frameX="-2" frameY="-4" frameWidth="142" frameHeight="114" />
+<SubTexture name="singGuard0002" x="136" y="228" width="136" height="110" frameX="-4" frameY="-6" frameWidth="142" frameHeight="114" />
+<SubTexture name="singGuard0003" x="272" y="228" width="136" height="110" frameX="-4" frameY="-6" frameWidth="142" frameHeight="114" />
+<SubTexture name="singGuard0004" x="424" y="0" width="136" height="110" frameX="-4" frameY="-6" frameWidth="142" frameHeight="114" />
+<SubTexture name="singGuard0005" x="424" y="110" width="136" height="110" frameX="-4" frameY="-6" frameWidth="142" frameHeight="114" />
+<SubTexture name="singGuard0006" x="424" y="220" width="136" height="110" frameX="-4" frameY="-6" frameWidth="142" frameHeight="114" />
+<SubTexture name="singGuard0007" x="0" y="338" width="136" height="110" frameX="-4" frameY="-6" frameWidth="142" frameHeight="114" />
+<SubTexture name="singGuard0008" x="136" y="338" width="136" height="110" frameX="-4" frameY="-6" frameWidth="142" frameHeight="114" />
+<SubTexture name="singGuard0009" x="272" y="338" width="136" height="110" frameX="-4" frameY="-6" frameWidth="142" frameHeight="114" />
+<SubTexture name="singGuard0010" x="408" y="338" width="136" height="110" frameX="-4" frameY="-6" frameWidth="142" frameHeight="114" />
+<SubTexture name="singGuard0011" x="0" y="448" width="136" height="110" frameX="-4" frameY="-6" frameWidth="142" frameHeight="114" />
+<SubTexture name="singGuard0012" x="288" y="0" width="136" height="110" frameX="-4" frameY="-6" frameWidth="142" frameHeight="114" />
+<SubTexture name="passive0000" x="288" y="0" width="136" height="110" frameX="-4" frameY="-6" frameWidth="142" frameHeight="114" />
+<SubTexture name="inactive0000" x="288" y="110" width="136" height="110" frameX="-4" frameY="-6" frameWidth="142" frameHeight="114" />
+<SubTexture name="attack0000" x="144" y="0" width="144" height="116" frameX="0" frameY="0" frameWidth="142" frameHeight="114" />
+<SubTexture name="attack0001" x="139" y="116" width="139" height="112" frameX="-2" frameY="-4" frameWidth="142" frameHeight="114" />
+<SubTexture name="attack0002" x="0" y="228" width="136" height="110" frameX="-4" frameY="-6" frameWidth="142" frameHeight="114" />
 </TextureAtlas>

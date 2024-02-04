@@ -1,4 +1,4 @@
-package;
+package forfriday;
 
 import PlayState;
 import flixel.FlxG;

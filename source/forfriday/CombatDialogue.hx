@@ -1,4 +1,4 @@
-package;
+package forfriday;
 
 import flash.text.TextFormat;
 import flixel.FlxG;
@@ -65,7 +65,7 @@ class CombatDialogue extends FlxSpriteGroup
 			'Now, we fight for honor.'
 		],
 		'training-easy' => [
-			'Hello! It seems you have chosen the easy difficulty.',
+			'Hello! You\'ve chosen the easy difficulty, though this is more of a "disable combat" option.',
 			'Songs that involve enough singing to justify it are encouraged to reserve the "easy" difficulty as the mode to pick for playing with combat mechanics disabled.',
 			'Therefore, if your only interest is vanilla gameplay, you\'re in the right place! Otherwise, the core content is Normal difficulty and higher.',
 			'I\'ll let you go here. Good luck!'
@@ -117,7 +117,7 @@ class CombatDialogue extends FlxSpriteGroup
 			'Do check out Dominion-Reversal-Reversed\'s easy chart in Freeplay for a nice little vanilla time. Good luck on this song in the meantime!'
 		],
 		'training-reverse-hard' => [
-			'Hello there! Seems you picked Hard mode! Unquestionably one of the choices of all time.',
+			'Hello there! Seems you picked Hard mode!',
 			'Greater challenge awaits thee, no doubt, but this time around there\'s a bit of extra mechanical demand.',
 			'It\'ll become more relevant in Trial next stage, but what I\'ll say is this: If notes are getting too dense to block, parry or bash! Stops offense right in its tracks!',
 			'Go ahead and experiment with that for now. You\'ll need to make thorough use of it later. Good luck.'

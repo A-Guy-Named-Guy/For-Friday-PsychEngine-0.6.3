@@ -12,6 +12,8 @@ import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.group.FlxSpriteGroup;
 import flixel.tweens.FlxTween;
 import flixel.util.FlxSort;
+import forfriday.CharacterExtra;
+import forfriday.Combat;
 import haxe.Json;
 import haxe.format.JsonParser;
 import openfl.utils.AssetType;
@@ -110,6 +112,7 @@ class Character extends FlxSprite
 	// Variables for characters
 	public var zDepth:Int = 0;
 	public var idleDefaultFrame:Int = 10;
+	public var playerOneFlipSide:Bool = false;
 	public var alternatingIdle:Bool = false;
 	public var guardPosition:Int = 0;
 	public var isBashed = false;

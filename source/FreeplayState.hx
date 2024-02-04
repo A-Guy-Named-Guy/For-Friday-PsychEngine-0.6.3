@@ -16,6 +16,7 @@ import flixel.system.FlxSound;
 import flixel.text.FlxText;
 import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
+import forfriday.VictoryControl;
 import lime.utils.Assets;
 import openfl.utils.Assets as OpenFlAssets;
 

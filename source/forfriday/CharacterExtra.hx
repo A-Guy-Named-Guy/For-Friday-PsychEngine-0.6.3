@@ -1,4 +1,4 @@
-package;
+package forfriday;
 
 import animateatlas.AtlasFrameMaker;
 import flixel.FlxG;
