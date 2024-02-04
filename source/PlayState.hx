@@ -4431,7 +4431,9 @@ class PlayState extends MusicBeatState
 				// The health bar has specific colors for the sake of serving as a stamina bar during combat
 				// So this should be prevented during combat
 				if (!SONG.disableCombat)
-					reloadHealthBarColors();
+					dad.healthColorArray = [255, 0, 0];
+
+				reloadHealthBarColors();
 
 			case 'BG Freaks Expression':
 				if (bgGirls != null)

@@ -110,7 +110,7 @@ class VictoryResultSubState extends MusicBeatSubstate
 
 		var infoText:FlxText = new FlxText(0, (victoryMedal.y + victoryMedal.height + 10), (FlxG.width - 20), "", 32);
 
-		if (Combat.needCombatVictory.contains(song))
+		if (Combat.needCombatVictory != null && Combat.needCombatVictory.contains(song))
 		{
 			infoText.text += "A combat victory is required to advance.";
 			if (!Combat.combatVictory)
