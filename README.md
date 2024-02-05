@@ -26,38 +26,20 @@ _____________________________________
 * Basically you can mod using existing mechanics, it's just that trying to make something new may be a challenge without source modding
 * This is subject to change! But most likely will come with an official release of some original content using this system far in the future
 
-## Charting-Based Combat
+## Effects System
 ![](https://github.com/A-Guy-Named-Guy/For-Friday-PsychEngine-0.6.3/blob/master/docs/img/characterMenuEffects.png)
-* You can now chart "Event" notes, which are bookmarks that trigger specific actions that usually were hardcoded on the vanilla version of the game.
-* Your song's BPM can now have decimal values
-* You can manually adjust a Note's strum time if you're really going for milisecond precision
-* You can change a note's type on the Editor, it comes with two example types:
-  * Alt Animation: Forces an alt animation to play, useful for songs like Ugh/Stress
-  * Hey: Forces a "Hey" animation instead of the base Sing animation, if Boyfriend hits this note, Girlfriend will do a "Hey!" too.
+* You can now add extra sprites, which performs the same animation as the parent character
+* (It's not very obvious but the face is a separate sprite in this example)
+* The character editor has been adapted to support altering effects, including some extra features like altering the sprite's angle
 
-## Multiple editors to assist you in making your own Mod
-![Screenshot_3](https://user-images.githubusercontent.com/44785097/144629914-1fe55999-2f18-4cc1-bc70-afe616d74ae5.png)
-* Working both for Source code modding and Downloaded builds!
+## Soft-Coded Tutorials
+![](https://github.com/A-Guy-Named-Guy/For-Friday-PsychEngine-0.6.3/blob/master/docs/img/tutorial.png)
+* Tutorials use jsons that can have the text and images set as you wish
+* The important thing is to keep in mind the "tutorialList.json" file is a core one that stores the info of what's displayed on this screen, among other things
 
-## Story mode menu rework:
-![](https://i.imgur.com/UB2EKpV.png)
-* Added a different BG to every song (less Tutorial)
-* All menu characters are now in individual spritesheets, makes modding it easier.
-
-## Credits menu
-![Screenshot_1](https://user-images.githubusercontent.com/44785097/144632635-f263fb22-b879-4d6b-96d6-865e9562b907.png)
-* You can add a head icon, name, description and a Redirect link for when the player presses Enter while the item is currently selected.
-
-## Awards/Achievements
-* The engine comes with 16 example achievements that you can mess with and learn how it works (Check Achievements.hx and search for "checkForAchievement" on PlayState.hx)
-
-## Options menu:
-* You can change Note colors, Delay and Combo Offset, Controls and Preferences there.
- * On Preferences you can toggle Downscroll, Middlescroll, Anti-Aliasing, Framerate, Low Quality, Note Splashes, Flashing Lights, etc.
-
-## Other gameplay features:
-* When the enemy hits a note, their strum note also glows.
-* Lag doesn't impact the camera movement and player icon scaling anymore.
-* Some stuff based on Week 7's changes has been put in (Background colors on Freeplay, Note splashes)
-* You can reset your Score on Freeplay/Story Mode by pressing Reset button.
-* You can listen to a song or adjust Scroll Speed/Damage taken/etc. on Freeplay by pressing Space.
+## Character Stats
+![](https://github.com/A-Guy-Named-Guy/For-Friday-PsychEngine-0.6.3/blob/master/docs/img/characterStats.PNG)
+* Character attributes are soft-coded, allowing for new or existing characters to be tweaked
+* On top of number-stats, a few attributes like having unblockables on note attacks or which special is used are also determined here
+* Sounds, too, are established here, and can be modified to have variable volume and use multiple alterations of the same sound
+* (For example, the "whiff" sound file has 1-4 alternate "whiff" files, like "whiff1.ogg" and "whiff2.ogg")
