@@ -27,7 +27,7 @@ _____________________________________
 * This is subject to change! But most likely will come with an official release of some original content using this system far in the future
 
 ## Charting-Based Combat
-![]([img/characterMenuEffects.PNG](https://github.com/A-Guy-Named-Guy/For-Friday-PsychEngine-0.6.3/blob/master/docs/img/characterMenuEffects.png))
+![](https://github.com/A-Guy-Named-Guy/For-Friday-PsychEngine-0.6.3/blob/master/docs/img/characterMenuEffects.png)
 * You can now chart "Event" notes, which are bookmarks that trigger specific actions that usually were hardcoded on the vanilla version of the game.
 * Your song's BPM can now have decimal values
 * You can manually adjust a Note's strum time if you're really going for milisecond precision
