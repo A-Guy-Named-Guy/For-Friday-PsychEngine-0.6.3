@@ -1,0 +1,61 @@
+ToDo:
+Other
+	Singing victory after defeating Shrub?
+		Training Hard, defeated Shrub at last minute
+
+
+Porting To-Do
+	- Redo ReadMe
+		- Also delete export file after push
+	- Mod Page Notes
+		- Lua
+			- Not thoroughly tested for, mileage may vary
+				- Several elements were softcoded for added development convenience and to expand general modability,
+				- But the core intention for this mod is to be hard-coded
+	- Tutorial
+		-Bugs
+			- Disabling debug menu causes music to start a new instance
+				- Pause-menu in general issue
+	- Character Editor Expansion
+		- Bugs
+			- Loop Crash
+				- Vanilla bug
+			- Scaling
+				- Combat animations are not natively implemented in a way that allows clean scaling
+					- Has to do with the sprite sheets being built on really big canvases
+						- Positions weren't offset, etc. Animations shift around wrong
+
+	- defaultPopup.xml
+		- For no apparent reason this won't allow compilation without deleting it
+
+- Gamebanana
+The For Friday Combat System
+On top of the rhythm gameplay signature of Friday Night Funkin', For Friday expands upon each song with a nuanced offense to defend from against the opponent, as well as a versatile toolkit at your own disposal to go on the offensive, or make moves to improve your survival.
+
+The kinds of actions you can make have widened greatly, from free-form attacks that can be performed at any moment (though most beneficial when made alongside a singing note!), and a unique "Special" that provides each character a unique tool that ranges from a useful option, to a pillar of the character's playstyle. It's up to you to find out how best to approach each fight!
+
+How It Works
+You and your opponent have a tri-directional guard, controlled by default using the same keys as the ones you use to hit singing arrows normally.
+
+The opponent will throw an attack whenever the hit a "Combat" note. Match your current guard direction to the attack before the attack occurs to defend.
+
+The left, up, and right directions are all attacks, however, the blue down arrow is a "Special" attack, which varies from character to character. For example, the Shrub performs a "Bash", which when landed allows him a guaranteed attack if he throws one during the vulnerability window. You can defend against this attack, and most other special attacks, by pressing the default down singing note key.
+
+However! Know that specials are not limited to just offense! When playing as the Shrub and fighting Boyfriend instead, Boyfriend's special is a "Pose", where he throws a peace sign. When Boyfriend performs this move, he heals some health back. The counter for this move is to make use of Shrub's ability to use the bash!
+
+So that begs the question: How do you defeat the opponent? There are two additional inputs: Attacking, which is bound to "CTRL" by default, and the "Special" input, which is bound to SPACE. Attacks and specials are allowed to be performed at any time, but typically consume some stamina and may only be advantageous in the right situation.
+
+What "stamina" is referring to is actually a repurpose of what is normally health. That bar you build up by singing is used as a resource to perform actions, and on top of usual sings and misses gets depleted heavily when hit by an attack. Some moves put a lot of pressure on managing this resource! Boyfriend's attacks depend greatly on throwing them alongside a sing note, thus they take a much heavier stamina toll when thrown without a note. Not to mention Boyfriend still dies upon running out as usual, so be careful not to go overboard!
+
+I nearly went on for several paragraphs on what other information there is, but I'll leave this here. This is all only scratching the surface of what awaits in the mod itself, so give it a try if you're interested!
+
+A Combat Foundation
+This system was designed for a future mod that I wished to use this for. Having taken over two years to complete and polish, extensive steps have been taken to make this system as developer-friendly as possible.
+
+So, if you're interested at all in making a mod using this system? By all means! The source code is labelled for every change made outside of its "forfriday" source files, and all the new elements like character effects, combat stats, and more have been soft-coded to the extend that even Psych-Engine modding is possible.
+
+I will stress that I recommend source-coding the most! Admittedly I'm biased since I'm most familiar with it now, and not so much the soft-coding aspects, but the potential for unique enemy behaviors and character tools is near endless, as how enemy specials can interact with the player's own special abilities and how the player goes about offense has potential to vary drastically, or even entirely new systems like the posture system.
+
+Also, though there is support for using extra features of the mod in a soft-coded format for Psych mods, Lua support is a bit light, far as I understand it. No Lua functions were added, though I think the current lua functions and options still work fine. Lua support subject to change later down the line, once the full development of a followup project is complete.
+
+What's Next?

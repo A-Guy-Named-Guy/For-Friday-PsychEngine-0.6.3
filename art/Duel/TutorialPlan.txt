@@ -1,0 +1,60 @@
+Glossary
+
+	'Guard Direction'
+		'Each character, player or enemy, can enter a state of guarding one of three directions: Left, Up, and Right.\n
+	'Guard Widget'
+		'The official term for the tri-arrow graphic that shows the guard direction of a character.\n
+		It also shows other information, such as the duration of a guard if temporary, upcoming attacks, properties on attacks, etc.'
+	'Reflex/Static Guard'
+		'If a character\'s guarding state lasts temporarily before returning to no guard active, the character has a \"Reflex Guard\".\n
+		If the character\'s guard stays active indefinitely, they have a \"Static Guard\".'
+	'Sing Guard'
+		'When a rhythm note is successfully hit with a positive rating (A 'Good' or 'Sick' in the vanilla game), this effect occurs.\n
+		Sing Guard is effectively an all-guard that blocks any incoming attacks (except unblockables) for some time after hitting a note.\n'
+	'Rhythm Note'
+		'A term used most likely just for this combat system that refers to standard singing notes.\n
+		It is intended to differentiate between normal notes and combat notes, such as attack or special notes.'
+	'Combat Health'
+		'The health of a character that depletes only by getting hit with an attack.\n
+		It is described this way to differentiate it clearly from the health that is now used as a stamina bar.'
+	'Stamina'
+		'Formerly measuring the player's health by measuring performance on hitting notes, it is now used as a resource for attacking.\n
+		Depletion of this value as a lose condition varies from character to character.'
+	'Block'
+		'If the player's guard direction matches the enemy's attack direction, the attack is block.\n
+		This term is used in any case of defending an attack, despite some characters animation-wise defending via dodging instead.'
+	'Parry'
+		'If the attack input is pressed shortly before defending an attack, the attack is parried.\n
+		Like blocking, this term is used even if a character does not defend with their weapon.\n'
+	'Bash'
+		'Bashes are a non-directional form of offense that often guarantees a followup attack if the attack is performed shortly after.\n
+		Bashes can vary in this function. For example, some bashes can deal their damage directly instead of relying on followups.'
+	'Sing/Combat Victory'
+		'There are two victory conditions: A \"Sing\" victory, and a \"Combat\" victory.\n
+		Sing victories are the default win condition of simply reaching the end of a song. This is the only victory possible if combat is disabled.\n
+		Combat victories require that the opponent's health be reduced to 0, or otherwise defeated in some shape or form.'
+
+Training Shrub Dialogue:
+
+	'Hello! This is A Guy Named Guy, presenting For Friday combat system.
+
+	This week serves as a foundational tutorial that any other mods using this system can rely on to teach the fundamentals.
+
+	Each song will start with a screen describing what mechanics, concepts, characters, etc. will be introduced.
+
+	You can always check the song-specific info along with all other tutorial screens in the "Help" option of the pause menu.
+
+	Without further ado, here is a look at the important fundamentals, and what specific tools Boyfriend has as a character.
+	'
+
+Training Shrub Dialogue 2:
+
+	For this song, you only need to be concerned with surviving to the end. Defeating the opponent is not universally required.
+
+	For this song "Training", you only get a minor health advantage on start of the next song, "Trial".
+
+	This song is intended to be a safe space to get to grips with offense and defense. You'll get a chance to restart at the end if you wish.
+
+	And finally, one more reminder that the "Help" option in the pause menu is great to check if you have any questions.
+
+	From here on this tutorial will no longer play on restart. Let's begin.
