@@ -1,6 +1,11 @@
 # The For Friday Combat Foundation
 "For Friday" is a combat system designed to set a foundation to support a full system of combat for the game Friday Night Funkin'
 ## Installation:
+NOTE:
+If you're here to play the game itself, NOT source mod the thing, go to this link to download the actual mod: https://gamebanana.com/mods/edit/494017
+
+This is just the source code for that mod, which is open for anyone to use, but does not innately contain the compiled game.
+
 To put it shortly, this current engine uses the 0.6.3 Psych Engine, so installation instructions are identical to that version's requirements.
 The main reason this is version 0.6.3 instead of a more recent 0.7 version is because the later versions are much more difficult to get to compile, and are generally less stable for source modding.
 Even the main dev has admitted this, though I'm unsure if this has change as of recent.
