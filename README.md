@@ -128,6 +128,7 @@ But, I have some ideas.
 Ideas that MAY or may not work. Don't take this as gospel, this is spitballing some concepts, and the extent to which this needs changes to make work also qualifies this all as making a whole new mechanic.
 
 * Rhythm
+  
 First off, biggest concern should be rhythm. Ideally in this game you want to act according to the beat, so however way this should work should encourage acting on time with the music.
 The important thing, discussed later on, is that attacking whenever with no regard for anything else is a major design issue that needs to be worked around.
 For now though, given opponent's guard direction is made to only matter when they sing, designing something around attacking when they hit a note is a good start.
@@ -142,6 +143,7 @@ But unless you impose some kind of special case, the opponent's guard lingers fr
 So this isn't a good character. Not yet. Because basically, what was created is an offense that's super precise, and without any counter measures, easy to abuse.
 
 * Exploitation
+  
 Accounting all this direction-context is really hard, and becomes near worthless in a song fast enough where just doing the same direction over and over and inevitably hitting at one point or another is a far easier strat.
 
 Thus, you'll need to balance one way or another to mitigate the mono-direction issue. Players are gonna take the path of least resistance if available.
