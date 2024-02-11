@@ -1403,6 +1403,11 @@ class PlayState extends MusicBeatState
 		}
 		#end
 
+		// Combat change
+		// This is done immediately before if dialogue shows up just because that's the sole reason this isn't done after along with other combat stuffs
+		if (!SONG.disableCombat)
+			Combat.disableControls = false;
+
 		var daSong:String = Paths.formatToSongPath(curSong);
 		if (isStoryMode && !seenCutscene)
 		{
@@ -4739,6 +4744,7 @@ class PlayState extends MusicBeatState
 			// So just bypass all this if it's not isStoryMode. That second isStoryMode check in the function itself isn't needed but nothing hurts if you leave it
 			if (isStoryMode)
 			{
+				Combat.disableControls = true;
 				openSubState(new VictoryResultSubState(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y, PlayState.SONG.song, storyDifficulty,
 					function()
 					{
@@ -5591,9 +5597,8 @@ class PlayState extends MusicBeatState
 					// The combatNoteTypes prevents animations interrupts on the combat notes
 				// The rest is essentially to make combat animations fully play out during sustain notes
 				else if (!Combat.combatNoteTypes.contains(note.noteType)
-					&& ((note.isSustainNote && boyfriend.animation.curAnim.name.startsWith('combat') && boyfriend.animation.finished)
-						|| !boyfriend.animation.curAnim.name.startsWith('combat')
-						|| !note.isSustainNote))
+					&& ((boyfriend.animation.curAnim.name.startsWith('combat') && boyfriend.animation.finished)
+						|| !boyfriend.animation.curAnim.name.startsWith('combat')))
 				{
 					boyfriend.playAnim(animToPlay + note.animSuffix, true);
 					boyfriend.holdTimer = 0;

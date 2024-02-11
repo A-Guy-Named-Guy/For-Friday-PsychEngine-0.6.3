@@ -155,6 +155,9 @@ class Combat extends PlayState
 		{
 			trace('start combat new');
 			trace(stepTimerCrochet);
+			FlxG.watch.addQuick("noteAttack", noteAttack);
+			FlxG.watch.addQuick("hasParried", hasParried);
+			FlxG.watch.addQuick("bufferNoteAttack", bufferNoteAttack);
 
 			playerGuard = new FlxTypedGroup<FlxSprite>();
 			enemyGuard = new FlxTypedGroup<FlxSprite>();
@@ -488,6 +491,7 @@ class Combat extends PlayState
 											}
 
 											hasParried = false;
+											FlxG.watch.addQuick("hasParried", hasParried);
 
 											cancelStates();
 
@@ -1020,6 +1024,8 @@ class Combat extends PlayState
 
 		bufferNoteAttack = false;
 
+		FlxG.watch.addQuick("bufferNoteAttack", bufferNoteAttack);
+
 		if (specialInitiation == 'attackNote')
 			isSpecialAttackNote = true;
 
@@ -1063,9 +1069,10 @@ class Combat extends PlayState
 
 						#if ACHIEVEMENTS_ALLOWED
 						var achieve:String = PlayState.instance.checkForAchievement(['recover_tech']);
-						if (!Achievements.isAchievementUnlocked('recover_tech') && achieve != null)
+						if (achieve != null)
 						{
 							PlayState.instance.startAchievement(achieve);
+							Achievements.unlockAchievement(achieve);
 						}
 						#end
 					}
@@ -1113,7 +1120,7 @@ class Combat extends PlayState
 
 		var soonestNote:Note = getSoonestNote('bufferCheck', true);
 
-		if (soonestNote != null && !noteAttack && !hasSustainAttacked)
+		if (soonestNote != null && (!noteAttack || soonestNote.isSustainNote) && !hasSustainAttacked)
 		{
 			if (soonestNote.noteType == 'attack')
 				bufferNoteAttack = false;
@@ -1122,6 +1129,8 @@ class Combat extends PlayState
 				bufferNoteAttack = true;
 				allowParryAttack = true;
 			}
+
+			FlxG.watch.addQuick("bufferNoteAttack", bufferNoteAttack);
 
 			executeAttack = false;
 		}
@@ -1134,6 +1143,7 @@ class Combat extends PlayState
 				if (noteToParry.noteData == PlayState.instance.boyfriend.guardPosition)
 				{
 					hasParried = true;
+					FlxG.watch.addQuick("hasParried", hasParried);
 					if (!allowParryAttack || !hasSustainAttacked)
 						executeAttack = false;
 					else
@@ -1192,6 +1202,7 @@ class Combat extends PlayState
 					PlayState.instance.health -= (PlayState.instance.boyfriend.staminaCost * 1.5 * localStaminaModifier);
 
 					hasParried = false;
+					FlxG.watch.addQuick("hasParried", hasParried);
 
 					attackRecovery = true;
 					if (attackRecoveryTimer.active)
@@ -1474,6 +1485,8 @@ class Combat extends PlayState
 
 		bufferNoteAttack = false;
 		hasStartedAttack = false;
+
+		FlxG.watch.addQuick("bufferNoteAttack", bufferNoteAttack);
 	}
 
 	public function noteGoodHitCombat(note:Note):Void
@@ -1486,24 +1499,24 @@ class Combat extends PlayState
 		manuallySwitchedGuard = false;
 
 		noteAttack = true;
+		FlxG.watch.addQuick("noteAttack", noteAttack);
 
 		var duration:Float = stepTimerCrochet / 2;
 		var nextNote:Note = getSoonestNote('any', true, true);
 		// The "noteGoodHit" function in PlayState seems to be executed every 2 steps,
 		// ...but if the noteAttack window is as long as this, it causes weird behavior
 		// Thus why this extra duration is narrowed down to only hitting a sustain note
-		//
-		// The 1.1 multiplier is to *just* tilt the duration long enough to not let the timer run out before the next note hit function call
 		if (nextNote != null && nextNote.isSustainNote)
-			duration = stepTimerCrochet * 1.1;
+			duration = stepTimerCrochet * 2.25;
 
 		if (noteAttackTimer.active)
-			noteAttackTimer.reset();
+			noteAttackTimer.reset(duration);
 		else
 			noteAttackTimer = new FlxTimer().start(duration, function(tmr:FlxTimer)
 			{
 				noteAttack = false;
 				trace(noteAttackTimer.time);
+				FlxG.watch.addQuick("noteAttack", noteAttack);
 			});
 
 		// You might notice the similarities to noteAttack
@@ -2015,9 +2028,10 @@ class Combat extends PlayState
 
 		#if ACHIEVEMENTS_ALLOWED
 		var achieve:String = PlayState.instance.checkForAchievement(['bf_pain', 'shrub_pain']);
-		if (!Achievements.isAchievementUnlocked('recover_tech') && achieve != null)
+		if (achieve != null)
 		{
 			PlayState.instance.startAchievement(achieve);
+			Achievements.unlockAchievement(achieve);
 		}
 		#end
 	}

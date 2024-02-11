@@ -45,7 +45,13 @@ class CombatDialogue extends FlxSpriteGroup
 	var dialogueCounter:Int = 0;
 	var dialogueList:Array<String> = [];
 
-	public static var songDialogueExclusions:Array<String> = ['trial-hard', 'dominion-hard', 'dominion-reversal-hard'];
+	public static var songDialogueExclusions:Array<String> = [
+		'trial-hard',
+		'dominion-easy',
+		'dominion-hard',
+		'dominion-reversal-easy',
+		'dominion-reversal-hard'
+	];
 	public static var songDialogueMap:Map<String, Array<String>> = [
 		'training' => [
 			'Hello! This is A Guy Named Guy, presenting the For Friday combat system!',
