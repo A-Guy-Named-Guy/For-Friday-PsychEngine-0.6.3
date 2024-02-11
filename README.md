@@ -2,7 +2,9 @@
 "For Friday" is a combat system designed to set a foundation to support a full system of combat for the game Friday Night Funkin'
 ## Installation:
 NOTE:
-If you're here to play the game itself, NOT source mod the thing, go to this link to download the actual mod: https://gamebanana.com/mods/edit/494017
+
+If you're here to play the game itself, NOT source mod the thing,
+go to this link to download the actual mod: https://gamebanana.com/mods/edit/494017
 
 This is just the source code for that mod, which is open for anyone to use, but does not innately contain the compiled game.
 
