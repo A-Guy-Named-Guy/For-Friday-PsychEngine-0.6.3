@@ -43,7 +43,7 @@ class Combat extends PlayState
 
 	public var combatMechanics:Bool = true;
 	public var characterDeathByStamina:Bool = true;
-	public var noteAttack:Bool = false;
+	public var hasHitNote:Bool = false;
 	public var hasParried:Bool = false;
 	public var isDodge:Bool = false;
 
@@ -71,7 +71,6 @@ class Combat extends PlayState
 	var singGuard:Bool = false;
 	var attackRecovery:Bool = false;
 	var inChain:Bool = false;
-	var allowParryAttack:Bool = false;
 	var enemyWasBashed:Bool = false;
 	var hasSustainAttacked:Bool = false;
 	var combatNoteData:Int = 0;
@@ -105,7 +104,7 @@ class Combat extends PlayState
 
 	var attackRecoveryTimer:FlxTimer = new FlxTimer();
 	var enemyPassiveGuardTimer:FlxTimer = new FlxTimer();
-	var noteAttackTimer:FlxTimer = new FlxTimer();
+	var hasHitNoteTimer:FlxTimer = new FlxTimer();
 	var playerWasBashedTimer:FlxTimer = new FlxTimer();
 	var enemyWasBashedTimer:FlxTimer = new FlxTimer();
 	var attackDelayTimer:FlxTimer = new FlxTimer();
@@ -155,7 +154,7 @@ class Combat extends PlayState
 		{
 			trace('start combat new');
 			trace(stepTimerCrochet);
-			FlxG.watch.addQuick("noteAttack", noteAttack);
+			FlxG.watch.addQuick("hasHitNote", hasHitNote);
 			FlxG.watch.addQuick("hasParried", hasParried);
 			FlxG.watch.addQuick("bufferNoteAttack", bufferNoteAttack);
 
@@ -562,7 +561,7 @@ class Combat extends PlayState
 					// This is here to provide a buffer before the attack is thrown to give some time to actually press the guard button before the attack is thrown
 					attackDelay = true;
 					if (instantSingAttack)
-						executeAttack();
+						performAttack();
 					else
 					{
 						if (attackDelayTimer.active)
@@ -570,7 +569,7 @@ class Combat extends PlayState
 						else
 							attackDelayTimer.start(0.05, function(tmr:FlxTimer)
 							{
-								executeAttack();
+								performAttack();
 							});
 					}
 
@@ -1017,8 +1016,64 @@ class Combat extends PlayState
 		}
 	}
 
+	function performAttack():Void
+	{
+		var executeAttack:Bool = true;
+		attackDelay = false;
+		attackDelayTimer.cancel();
+
+		var soonestNote:Note = getSoonestNote('bufferCheck', true);
+
+		if (soonestNote != null && !hasHitNote)
+		{
+			if (soonestNote.noteType == 'attack')
+				bufferNoteAttack = false;
+			else
+			{
+				bufferNoteAttack = true;
+			}
+
+			FlxG.watch.addQuick("bufferNoteAttack", bufferNoteAttack);
+
+			return;
+		}
+
+		if (!PlayState.instance.dad.isBashed)
+		{
+			var noteToParry:Note = getSoonestNote('isCombatNote');
+
+			if (noteToParry != null && noteToParry.noteData == PlayState.instance.boyfriend.guardPosition)
+			{
+				hasParried = true;
+				FlxG.watch.addQuick("hasParried", hasParried);
+
+				executeAttack = false;
+			}
+		}
+
+		if (executeAttack || hasHitNote)
+		{
+			if (characterDeathByStamina && !debugGodMode)
+			{
+				if (PlayState.instance.health > (PlayState.instance.boyfriend.staminaCost * 3)
+					&& PlayState.instance.health <= (PlayState.instance.boyfriend.staminaCost * 4))
+					FlxG.sound.play('shared:assets/shared/sounds/oos.wav', 0.4);
+				else if (PlayState.instance.health > (PlayState.instance.boyfriend.staminaCost * 2)
+					&& PlayState.instance.health <= (PlayState.instance.boyfriend.staminaCost * 3))
+					FlxG.sound.play('shared:assets/shared/sounds/oos.wav', 0.7);
+				else if (PlayState.instance.health <= (PlayState.instance.boyfriend.staminaCost * 2))
+					FlxG.sound.play('shared:assets/shared/sounds/oos.wav', 1);
+			}
+
+			evaluateAttack();
+		}
+	}
+
 	function evaluateAttack(specialInitiation:String = 'none'):Void
 	{
+		attackDelayTimer.cancel();
+		attackDelay = false;
+
 		var isSpecialAttackNote:Bool = false;
 		var localStaminaModifier:Float = 1;
 
@@ -1110,72 +1165,6 @@ class Combat extends PlayState
 		cancelStates();
 	}
 
-	function executeAttack():Void
-	{
-		var executeAttack:Bool = true;
-		attackDelay = false;
-		attackDelayTimer.cancel();
-
-		allowParryAttack = false;
-
-		var soonestNote:Note = getSoonestNote('bufferCheck', true);
-
-		if (soonestNote != null && (!noteAttack || soonestNote.isSustainNote) && !hasSustainAttacked)
-		{
-			if (soonestNote.noteType == 'attack')
-				bufferNoteAttack = false;
-			else
-			{
-				bufferNoteAttack = true;
-				allowParryAttack = true;
-			}
-
-			FlxG.watch.addQuick("bufferNoteAttack", bufferNoteAttack);
-
-			executeAttack = false;
-		}
-
-		if (!PlayState.instance.dad.isBashed)
-		{
-			var noteToParry:Note = getSoonestNote('isCombatNote');
-
-			if (noteToParry != null)
-				if (noteToParry.noteData == PlayState.instance.boyfriend.guardPosition)
-				{
-					hasParried = true;
-					FlxG.watch.addQuick("hasParried", hasParried);
-					if (!allowParryAttack || !hasSustainAttacked)
-						executeAttack = false;
-					else
-						executeAttack = true;
-				}
-		}
-
-		if (executeAttack || noteAttack)
-		{
-			if (characterDeathByStamina)
-			{
-				if (!debugGodMode)
-				{
-					if (PlayState.instance.health > (PlayState.instance.boyfriend.staminaCost * 3)
-						&& PlayState.instance.health <= (PlayState.instance.boyfriend.staminaCost * 4))
-						FlxG.sound.play('shared:assets/shared/sounds/oos.wav', 0.4);
-					else if (PlayState.instance.health > (PlayState.instance.boyfriend.staminaCost * 2)
-						&& PlayState.instance.health <= (PlayState.instance.boyfriend.staminaCost * 3))
-						FlxG.sound.play('shared:assets/shared/sounds/oos.wav', 0.7);
-					else if (PlayState.instance.health <= (PlayState.instance.boyfriend.staminaCost * 2))
-						FlxG.sound.play('shared:assets/shared/sounds/oos.wav', 1);
-				}
-			}
-
-			evaluateAttack();
-		}
-		else if (debugAttackTrigger)
-		{
-			trace('failed in ATTACK_P');
-		}
-	}
-
 	function playerAttack(?localStaminaModifier:Float = 1):Void
 	{
 		if (attackDelay)
@@ -1184,20 +1173,20 @@ class Combat extends PlayState
 			attackDelay = false;
 		}
 
-		if (!attackRecovery || noteAttack)
+		if (!attackRecovery || hasHitNote)
 		{
-			if ((!attackRecovery && !hasParried) || noteAttack)
+			if ((!attackRecovery && !hasParried) || hasHitNote)
 			{
 				// Sustain notes trigger hasSustainAttacked to remove unblockable effects if more than one attack is thrown
 				if (hasSustainAttacked)
 				{
-					noteAttack = false;
-					noteAttackTimer.cancel();
+					hasHitNote = false;
+					hasHitNoteTimer.cancel();
 				}
 
 				// attackRecovery creates a delay after throwing an attack so you can't spam attacks abnormally quickly
 				// Intentionally bypassed by unblockable shenanigans, you want note unblockables to be as fast as the charting allows
-				if (!attackRecovery && !noteAttack)
+				if (!attackRecovery && !hasHitNote)
 				{
 					PlayState.instance.health -= (PlayState.instance.boyfriend.staminaCost * 1.5 * localStaminaModifier);
 
@@ -1221,7 +1210,7 @@ class Combat extends PlayState
 						playerGuardActive = false;
 					}
 				}
-				else if (noteAttack)
+				else if (hasHitNote)
 				{
 					PlayState.instance.health -= PlayState.instance.boyfriend.staminaCost * localStaminaModifier;
 
@@ -1237,11 +1226,11 @@ class Combat extends PlayState
 				moveCharacterToFront();
 
 				PlayState.instance.boyfriend.playAnim(appendDirection('combatAttack', playerAttackPosition)
-					+ (noteAttack && PlayState.instance.boyfriend.hasUnblockableNoteAttacks ? 'unblockable' : ''),
+					+ (hasHitNote && PlayState.instance.boyfriend.hasUnblockableNoteAttacks ? 'unblockable' : ''),
 					true);
 
 				if (!PlayState.instance.boyfriend.hasUnblockableNoteAttacks)
-					noteAttack = false;
+					hasHitNote = false;
 
 				if (enemyPostureMechanic)
 				{
@@ -1253,7 +1242,7 @@ class Combat extends PlayState
 				}
 
 				if ((PlayState.instance.boyfriend.guardPosition == PlayState.instance.dad.guardPosition || enemyPassiveGuard)
-					&& !noteAttack
+					&& !hasHitNote
 					&& !enemyGuardDown
 					&& !PlayState.instance.dad.isBashed)
 				{
@@ -1301,7 +1290,7 @@ class Combat extends PlayState
 					{
 						PlayState.instance.boyfriend.playSoundEffect('strike');
 
-						if (noteAttack)
+						if (hasHitNote)
 							reduceHealth(PlayState.instance.dad, PlayState.instance.boyfriend.baseDamage * 1.5);
 						else
 							reduceHealth(PlayState.instance.dad, PlayState.instance.boyfriend.baseDamage);
@@ -1324,19 +1313,15 @@ class Combat extends PlayState
 					enemyWasBashedTimer.cancel();
 					PlayState.instance.dad.isBashed = false;
 
-					noteAttackTimer.cancel();
-					noteAttack = false;
+					hasHitNoteTimer.cancel();
+					hasHitNote = false;
 				}
 
 				updateGuardUI(enemyGuard, 'neutral');
 			}
-			else if (debugAttackTrigger)
-				trace('attackRecovery, hasParried, or noteAttack failed');
 
 			cancelStates();
 		}
-		else if (debugAttackTrigger)
-			trace('attackRecovery or noteAttack failed');
 	}
 
 	function enemyAttackLand():Void
@@ -1498,29 +1483,28 @@ class Combat extends PlayState
 			PlayState.instance.boyfriend.guardPosition = note.noteData;
 		manuallySwitchedGuard = false;
 
-		noteAttack = true;
-		FlxG.watch.addQuick("noteAttack", noteAttack);
+		hasHitNote = true;
+		FlxG.watch.addQuick("hasHitNote", hasHitNote);
 
 		var duration:Float = stepTimerCrochet / 2;
-		var nextNote:Note = getSoonestNote('any', true, true);
-		// The "noteGoodHit" function in PlayState seems to be executed every 2 steps,
-		// ...but if the noteAttack window is as long as this, it causes weird behavior
-		// Thus why this extra duration is narrowed down to only hitting a sustain note
-		if (nextNote != null && nextNote.isSustainNote)
-			duration = stepTimerCrochet * 2.25;
-
-		if (noteAttackTimer.active)
-			noteAttackTimer.reset(duration);
-		else
-			noteAttackTimer = new FlxTimer().start(duration, function(tmr:FlxTimer)
+		/*var nextNote:Note = getSoonestNote('any', true, true);
+			if (nextNote != null && nextNote.isSustainNote)
 			{
-				noteAttack = false;
-				trace(noteAttackTimer.time);
-				FlxG.watch.addQuick("noteAttack", noteAttack);
+				duration = stepTimerCrochet * 2.25;
+		}*/
+
+		if (hasHitNoteTimer.active)
+			hasHitNoteTimer.reset(duration);
+		else
+			hasHitNoteTimer = new FlxTimer().start(duration, function(tmr:FlxTimer)
+			{
+				hasHitNote = false;
+				trace(hasHitNoteTimer.time);
+				FlxG.watch.addQuick("hasHitNote", hasHitNote);
 			});
 
-		// You might notice the similarities to noteAttack
-		// Remember that noteAttack can get cleared due to various circumstances, so having this separate variable/timer is important
+		// You might notice the similarities to hasHitNote
+		// Remember that hasHitNote can get cleared due to various circumstances, so having this separate variable/timer is important
 		instantSingAttack = true;
 		if (instantSingAttackTimer.active)
 			instantSingAttackTimer.reset();
@@ -1561,7 +1545,7 @@ class Combat extends PlayState
 		switch (note.noteType)
 		{
 			case '' | 'normal':
-				if (bufferNoteAttack)
+				if (bufferNoteAttack || attackDelay)
 				{
 					evaluateAttack();
 				}
@@ -1843,7 +1827,7 @@ class Combat extends PlayState
 	 * 
 	 * This function's defaults check for enemy combat notes.
 	 *
-	 * @param noteCheck 'any' to check any note, 'indicateNote' checks the note's indicateNote range, 'isCombatNote' checks isCombatNote range, otherwise compares noteType to noteCheck string.
+	 * @param noteCheck 'any' to check any note, 'indicateNote' checks the note's indicateNote range, 'isCombatNote' checks isCombatNote range, 'bufferCheck' checks the range to buffer a player note attack, otherwise compares noteType to noteCheck string.
 	 * @param mustPress Put in place of daNote.mustPress; true checks player notes, false checks opponent's
 	 * @param ignoreFirst Gets the *second* soonest note, for comparing to a note right on hit, like in "noteGoodHitCombat", which would otherwise just pick up the same note that was hit
 	**/
@@ -2004,7 +1988,7 @@ class Combat extends PlayState
 	/**
 	 * Returns true if PlayState.instance and PlayState.instance.COMBAT is not null
 	 * 
-	 * Used for preventing crashes from referencing combat variables, such as the noteAttack bool.
+	 * Used for preventing crashes from referencing combat variables, such as the hasHitNote bool.
 	 * 
 	 * It also prevents referencing PlayState.instance in general if in the animation test state
 	 */

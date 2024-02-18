@@ -1,0 +1,11 @@
+Version 1.0.1
+
+- Attack Input changes
+	- Fixed attack inputs being dropped on attacking to a singing note synced with an enemy attack
+		- This was a very stubborn issue throughout development, with several red-herring fixes
+		- Confident it should be fixed now
+	- Fixed note attacks not switching guard direction
+		- This was related to an aforementioned red-herring fix
+		- Simple-short of it is that an unnecessary step was cut out that now makes things work more consistently
+- Source Code
+ 	- Renamed and rearranged a couple things in the Combat file
