@@ -1,0 +1,34 @@
+{
+	"tutorial_text": [
+		{
+			"text": "BASHING\n\nThe bash is a versatile maneuver, with merits both offensively and defensively.\n\nBashes inflict a period of stun that lasts roughly four beats.\n\nWhile under this effect, attacking is not possible, nor any attempts to defend.\n\n\n\nBASH STUN\n\nAttacking the enemy during bash stun will bypass their guard and end the stun effect early.\n\nAny special attacks the enemy performs will cut any ongoing bash stun time in half.\n\n\n\nPOSTURE BREAK\n\nWhen the enemy's posture is full, an attack during bash stun will deal critical damage, and reduce posture by a moderate amount.",
+			"position": [0, 100],
+			"size": 16,
+			"screenCenterX": false,
+			"screenCenterY": false
+		}
+	],
+
+	"images": [
+		{
+			"image": "notes/indicator",
+			"position": [
+				850,
+				450
+			],
+			"no_antialiasing": false,
+			"flip_x": false,
+			"scale": 1,
+			"screenCenterX": true,
+			"screenCenterY": false,
+			"animation":
+				{
+					"loop": false,
+					"fps": 24,
+					"anim": "indicator bash",
+					"indices": [],
+					"name": "indicator bash"
+				}
+		}
+	]
+}

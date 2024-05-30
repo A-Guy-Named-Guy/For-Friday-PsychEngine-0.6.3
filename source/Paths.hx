@@ -234,6 +234,14 @@ class Paths
 		return inst;
 	}
 
+	// Combat change
+	inline static public function songFile(song:String, fileName:String)
+	{
+		var songKey:String = '${formatToSongPath(song)}/$fileName';
+		var songFile = returnSound('songs', songKey);
+		return songFile;
+	}
+
 	inline static public function image(key:String, ?library:String):FlxGraphic
 	{
 		// streamlined the assets process more

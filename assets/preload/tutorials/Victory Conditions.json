@@ -1,7 +1,7 @@
 {
 	"tutorial_text": [
 		{
-			"text": "VICTORY\n\nThere are two classes of victory: \"Singing\" and \"Combat\" victory.\n\n\n\nSING VICTORY\n\nA sing victory is the default victory, as it only requires surviving to the end of a song.\n\n\n\nCOMBAT VICTORY\n\nA combat victory, meanwhile, requires the opponent's health to be reduced to 0 by the conclusion of the fight.\n\n\n\nVictories may be restricted or required per song. On a song that disallows combat, only a sing victory is possible,\n\nwhile some songs will force failure if the opponent is not defeated.\n\nAny song that ends in story mode will give a chance to restart the song for an alternative victory condition, and\n\nalso a note for if an ending has a particular effect, such as a required combat victory or an alternate ending.",
+			"text": "SING VICTORY\n\nA sing victory is the default victory, as it only requires surviving to the end of a song.\n\n\n\nCOMBAT VICTORY\n\nA combat victory, meanwhile, requires the opponent's health to be reduced to 0 by the conclusion of the fight.\n\n\n\nVICTORY RESTRICTIONS\n\nOn a song that disallows combat, only a sing victory is possible,\n\nwhile some songs will force failure if the opponent is not defeated by the song's end.\n\n\n\nSTORY MODE\n\nAny song that ends in story mode will give a chance to restart the song for an alternative victory condition,\n\nalso noting if an ending has a particular effect, such as a required combat victory or other alternate ending.",
 			"position": [15, 76],
 			"size": 16,
 			"screenCenterX": false,

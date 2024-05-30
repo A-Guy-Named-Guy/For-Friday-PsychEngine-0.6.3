@@ -2,12 +2,13 @@
 	"tutorial_list": [
 		"Current Song Tutorial",
 		"Fundamentals",
+		"Victory Conditions",
 		"Characters",
 		"Attack Types",
 		"Special Attacks",
 		"Parrying",
 		"Posture",
-		"Victory Conditions",
+		"Bash Mechanic",
 		"Kill Note",
 		"Pressing Attack Notes",
 		"Unblockable As Parry Telegraph"
@@ -32,6 +33,10 @@
 		{
 			"song": "training-reverse",
 			"pages": ["Posture", "shrub"]
+		},
+		{
+			"song": "trial-reverse",
+			"pages": ["Bash Mechanic"]
 		},
 		{
 			"song": "dominion-reversal",

@@ -1,6 +1,7 @@
 package;
 
 import Section.SwagSection;
+import forfriday.Chart.SwagChart;
 import haxe.Json;
 import haxe.format.JsonParser;
 import lime.utils.Assets;
@@ -32,6 +33,15 @@ typedef SwagSong =
 
 	// Combat change
 	var disableCombat:Bool;
+	var endSongOnDefeat:Bool;
+
+	// var loopBeatStart:Float;
+	var activeChart:String;
+	var chartArray:Array<SwagChart>;
+
+	var useIntroChart:Bool;
+	var skipCountdown:Bool;
+	var skipIntroOnRestart:Bool;
 	// End
 }
 
@@ -53,14 +63,23 @@ class Song
 	// Combat changes
 	public var noteType:String = '';
 	public var disableCombat:Bool = true;
+	public var endSongOnDefeat:Bool = false;
 
-	// Combat change
+	public var activeChart:String = 'Inst';
+	public var chartArray:Array<SwagChart>;
+
+	public var useIntroChart:Bool = false;
+	public var skipCountdown:Bool = false;
+	public var skipIntroOnRestart:Bool = false;
+
 	// SONG.song, which is used to save highscore information in vanilla code, saves to the name of the song itself rather than the name of the json.
 	// This variable stores the name of the json so checks for setting save info to the right name can be done
 	// Without this, stuff like training-reversed would only be saved to training, which would overwrite the actual training song's data
 	public static var jsonName:String = '';
 	// jsonName has the -easy and -hard pruned out, so this variable is intended for reading the full name of the json
 	public static var jsonFullName:String = '';
+
+	// End of changes
 
 	private static function onLoadJson(songJson:Dynamic) // Convert old charts to newest format
 	{
@@ -70,6 +89,10 @@ class Song
 			songJson.player3 = null;
 		}
 
+		// Combat change
+		// SwagSong notes code
+		//
+		// Records events
 		if (songJson.events == null)
 		{
 			songJson.events = [];
@@ -98,6 +121,11 @@ class Song
 
 	public function new(song, notes, bpm)
 	{
+		// Combat change
+		// SwagSong notes code
+		//
+		// Not sure if notes from Song is ever used?
+		// Maybe it does, but changing inline of notes variable didn't change the things that were hoped for
 		this.song = song;
 		this.notes = notes;
 		this.bpm = bpm;
@@ -172,4 +200,139 @@ class Song
 		swagShit.validScore = true;
 		return swagShit;
 	}
+
+	// Combat change
+	// Having these functions in the Song class seems to make the most sense
+	public static function retrieveNotesFromChartArray(curChartName:String, song:SwagSong):Array<SwagSection>
+	{
+		var sectionCount:Int = 0;
+
+		var returnNotes:Array<SwagSection> = [];
+
+		for (i in 0...song.chartArray.length)
+		{
+			if (song.chartArray[i].chartName != curChartName)
+				continue;
+
+			// Combat change note
+			// There's not a perfect spot to explain this so I'll put this here
+			//
+			// Trying to store the song.chartArray in any capacity
+			// (Like trying to write it to a variable)
+			// Destroys the sectionNotes information
+			// Thus the i in ... method is used instead of section in x
+			for (ii in 0...song.chartArray[i].chartNotes.length)
+			{
+				var sec:SwagSection = newSection(song.chartArray[i].chartNotes[ii], song);
+
+				if (returnNotes[sectionCount] == null)
+					returnNotes.insert(sectionCount, sec);
+
+				returnNotes[sectionCount] = sec;
+
+				++sectionCount;
+			}
+
+			break;
+		}
+
+		return returnNotes;
+	}
+
+	static function newSection(section:SwagSection = null, song:SwagSong):SwagSection
+	{
+		var sec = null;
+
+		if (section != null)
+			sec = {
+				sectionBeats: section.sectionBeats,
+				bpm: section.bpm,
+				changeBPM: section.changeBPM,
+				mustHitSection: section.mustHitSection,
+				gfSection: section.gfSection,
+				sectionNotes: section.sectionNotes,
+				typeOfSection: section.typeOfSection,
+				altAnim: section.altAnim
+			};
+		else
+			sec = {
+				sectionBeats: 4,
+				bpm: song.bpm,
+				changeBPM: false,
+				mustHitSection: true,
+				gfSection: false,
+				sectionNotes: [],
+				typeOfSection: 0,
+				altAnim: false
+			};
+
+		return sec;
+	}
+
+	public static function getChartByName(name:String, song:SwagSong):SwagChart
+	{
+		if (song.chartArray == null)
+			return null;
+
+		for (chart in song.chartArray)
+		{
+			if (chart.chartName == name)
+				return chart;
+		}
+
+		return null;
+	}
+
+	public static function retrieveNameInChartList(name:String, song:SwagSong):String
+	{
+		if (song.chartArray == null)
+			return null;
+
+		for (chart in song.chartArray)
+		{
+			if (chart.chartName == name)
+				return chart.chartName;
+		}
+
+		return null;
+	}
+
+	public static function appendUpcomingChart(upcomingChart:SwagChart, currentChart:SwagChart, currentNotes:Array<SwagSection>):Void
+	{
+		var noteTimeModifier:Float = 0;
+		var sectionCount:Int = 0;
+
+		for (section in currentChart.chartNotes)
+		{
+			if (section != null)
+			{
+				++sectionCount;
+
+				if (sectionCount > {currentChart.lengthOfChartInSections == 0 ? currentChart.chartNotes.length : currentChart.lengthOfChartInSections;})
+					break;
+
+				noteTimeModifier += ((section.bpm / 60) * 1000 * section.sectionBeats);
+			}
+		}
+
+		var sectionsToAdd:Array<SwagSection> = [];
+
+		for (i in 0...1)
+		{
+			sectionsToAdd.push(upcomingChart.chartNotes[i]);
+		}
+
+		for (section in sectionsToAdd)
+		{
+			if (section != null)
+			{
+				for (i in 0...section.sectionNotes.length)
+					section.sectionNotes[i][0] += noteTimeModifier;
+
+				currentNotes.push(section);
+			}
+		}
+	}
+
+	// End of changes
 }

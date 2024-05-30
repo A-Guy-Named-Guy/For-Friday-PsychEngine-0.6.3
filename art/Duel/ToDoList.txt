@@ -5,8 +5,16 @@ Other
 
 
 Porting To-Do
-	- Redo ReadMe
-		- Also delete export file after push
+	- Bugs
+		- Crash after dom-rev-reversal
+			- Fixed
+		- Shrub chain bash lasts into later notes
+			- Fixed
+		- Longer attack animations don't get interrupted properly when singing
+			- Fixed
+		- Change special attacks from clearing bashes to shortening the timer
+			- Fixed(?)/Added
+		- Recheck dialogue/tutorials
 	- Mod Page Notes
 		- Lua
 			- Not thoroughly tested for, mileage may vary

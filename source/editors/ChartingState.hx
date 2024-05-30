@@ -35,6 +35,7 @@ import flixel.ui.FlxButton;
 import flixel.ui.FlxSpriteButton;
 import flixel.util.FlxColor;
 import flixel.util.FlxSort;
+import forfriday.Chart.SwagChart;
 import haxe.Json;
 import haxe.format.JsonParser;
 import haxe.io.Bytes;
@@ -63,6 +64,7 @@ class ChartingState extends MusicBeatState
 	// New note types (attack, wind, shortwind)
 	public static var noteTypeList:Array<String> = // Used for backwards compatibility with 0.1 - 0.3.2 charts, though, you should add your hardcoded custom note types here too.
 		[
+			// Combat change
 			// So the "normal" note is just blank in the vanilla setup
 			// However, because some extra values are attached to notes (isUnblockable and isDeathNote), those values end up getting read as a note type
 			// Therefore, default notes need to have a defined type now to fill in the gap
@@ -235,6 +237,9 @@ class ChartingState extends MusicBeatState
 	var check_isDeathNote:FlxUICheckBox;
 	var curRenderedCombatNoteBools:FlxTypedGroup<FlxSprite>;
 
+	var chartText:FlxText;
+	var curChartValue:Int = 0;
+
 	// End changes
 
 	override function create()
@@ -260,7 +265,14 @@ class ChartingState extends MusicBeatState
 				stage: 'stage',
 				validScore: false,
 				// Combat change
-				disableCombat: true
+				disableCombat: true,
+				endSongOnDefeat: false,
+				// loopBeatStart: 0,
+				activeChart: 'Inst',
+				chartArray: [newChart('Inst', 'Inst'), newChart('Intro', 'Intro'), newChart('Outro', 'Outro')],
+				useIntroChart: false,
+				skipCountdown: false,
+				skipIntroOnRestart: false
 				// End
 			};
 			addSection();
@@ -314,6 +326,12 @@ class ChartingState extends MusicBeatState
 		nextRenderedSustains = new FlxTypedGroup<FlxSprite>();
 		nextRenderedNotes = new FlxTypedGroup<Note>();
 
+		// Combat change
+		// SwagSong notes code
+		//
+		// Just a default starting point
+
+		trace(curSec);
 		if (curSec >= _song.notes.length)
 			curSec = _song.notes.length - 1;
 
@@ -371,6 +389,8 @@ class ChartingState extends MusicBeatState
 			{name: "Note", label: 'Note'},
 			{name: "Events", label: 'Events'},
 			{name: "Charting", label: 'Charting'},
+			// Combat change
+			{name: "Params", label: 'Params'}
 		];
 
 		UI_box = new FlxUITabMenu(null, tabs, true);
@@ -412,6 +432,8 @@ class ChartingState extends MusicBeatState
 		addNoteUI();
 		addEventsUI();
 		addChartingUI();
+		// Combat change
+		addParamsUI();
 		updateHeads();
 		updateWaveform();
 		// UI_box.selected_tab = 4;
@@ -433,6 +455,45 @@ class ChartingState extends MusicBeatState
 		zoomTxt = new FlxText(10, 10, 0, "Zoom: 1 / 1", 16);
 		zoomTxt.scrollFactor.set();
 		add(zoomTxt);
+
+		// Combat changes
+		if (_song.chartArray == null || _song.chartArray == [])
+		{
+			_song.chartArray = [];
+
+			_song.chartArray.push(newChart('Inst', 'Inst'));
+			saveNotesToChartArray('Inst');
+			_song.chartArray.push(newChart('Intro', 'Intro'));
+			_song.chartArray.push(newChart('Outro', 'Outro'));
+		}
+		else
+			writeNotesFromChartArray('Inst', false);
+
+		_song.activeChart = _song.chartArray[curChartValue].chartName;
+		chartText = new FlxText(10, 40, 0, 'Current Chart:\n${_song.activeChart}', 16);
+		chartText.scrollFactor.set();
+		add(chartText);
+
+		var chartLeftButton:FlxButton = new FlxButton(10, 90, '<', function()
+		{
+			changeSelectedChart(-1);
+		});
+		chartLeftButton.setGraphicSize(Std.int(chartLeftButton.height), Std.int(chartLeftButton.height));
+		chartLeftButton.updateHitbox();
+		chartLeftButton.label.size = 12;
+		setAllLabelsOffset(chartLeftButton, -30, 0);
+		add(chartLeftButton);
+
+		var chartRightButton:FlxButton = new FlxButton(40, 90, '>', function()
+		{
+			changeSelectedChart(1);
+		});
+		chartRightButton.setGraphicSize(Std.int(chartLeftButton.width), Std.int(chartLeftButton.height));
+		chartRightButton.updateHitbox();
+		chartRightButton.label.size = 12;
+		setAllLabelsOffset(chartRightButton, -30, 0);
+		add(chartRightButton);
+		// End of changes
 
 		updateGrid();
 		super.create();
@@ -522,6 +583,12 @@ class ChartingState extends MusicBeatState
 		{
 			openSubState(new Prompt('This action will clear current progress.\n\nProceed?', 0, function()
 			{
+				// Combat change
+				// SwagSong notes code
+				//
+				// Clearing note data
+				// Make sure to clear whatever other things are necessary
+
 				for (sec in 0..._song.notes.length)
 				{
 					_song.notes[sec].sectionNotes = [];
@@ -715,19 +782,6 @@ class ChartingState extends MusicBeatState
 		tab_group_song.add(player1DropDown);
 		tab_group_song.add(stageDropDown);
 
-		// Combat change
-		// Null static values default to false (since static values can't be null)
-		// so for combat to be enabled by default the combat mechanic value of a song is the reverse of combatMechanics actually being true or not
-		var disableCombatCheckbox = new FlxUICheckBox(noteSkinInputText.x + noteSkinInputText.width + 20, noteSkinInputText.y, null, null,
-			"Disable Combat Mechanics", 100);
-		disableCombatCheckbox.checked = _song.disableCombat;
-		disableCombatCheckbox.callback = function()
-		{
-			_song.disableCombat = disableCombatCheckbox.checked;
-		};
-		tab_group_song.add(disableCombatCheckbox);
-		// End of changes
-
 		UI_box.addGroup(tab_group_song);
 
 		FlxG.camera.follow(camPos);
@@ -747,6 +801,11 @@ class ChartingState extends MusicBeatState
 	{
 		var tab_group_section = new FlxUI(null, UI_box);
 		tab_group_section.name = 'Section';
+
+		// Combat change
+		// SwagSong notes code
+		//
+		// Starting points
 
 		check_mustHitSection = new FlxUICheckBox(10, 15, null, null, "Must hit section", 100);
 		check_mustHitSection.name = 'check_mustHit';
@@ -781,6 +840,11 @@ class ChartingState extends MusicBeatState
 		}
 		stepperSectionBPM.name = 'section_bpm';
 		blockPressWhileTypingOnStepper.push(stepperSectionBPM);
+
+		// Combat change
+		// SwagSong notes code
+		//
+		// Not much to worry about here
 
 		var check_eventsSec:FlxUICheckBox = null;
 		var check_notesSec:FlxUICheckBox = null;
@@ -1503,6 +1567,65 @@ class ChartingState extends MusicBeatState
 		UI_box.addGroup(tab_group_chart);
 	}
 
+	// Combat change
+	function addParamsUI()
+	{
+		var tab_group_params = new FlxUI(null, UI_box);
+		tab_group_params.name = "Params";
+
+		// Null static values default to false (since static values can't be null)
+		// so for combat to be enabled by default the combat mechanic value of a song is the reverse of combatMechanics actually being true or not
+		var disableCombatCheckbox = new FlxUICheckBox(10, 15, null, null, "Disable Combat Mechanics", 100);
+		disableCombatCheckbox.checked = _song.disableCombat;
+		disableCombatCheckbox.callback = function()
+		{
+			_song.disableCombat = disableCombatCheckbox.checked;
+		};
+
+		var endSongOnDefeatCheckbox = new FlxUICheckBox(10, 50, null, null, "Loop Until Defeat (Requires Combat)", 100);
+		endSongOnDefeatCheckbox.checked = _song.endSongOnDefeat;
+		endSongOnDefeatCheckbox.callback = function()
+		{
+			_song.endSongOnDefeat = endSongOnDefeatCheckbox.checked;
+		};
+
+		var useIntroChartCheckbox = new FlxUICheckBox(10, 85, null, null, "Enable Intro Chart", 100);
+		useIntroChartCheckbox.checked = _song.useIntroChart;
+		useIntroChartCheckbox.callback = function()
+		{
+			_song.useIntroChart = useIntroChartCheckbox.checked;
+		};
+
+		var skipIntroOnRestartCheckbox = new FlxUICheckBox(120, 85, null, null, "Skip Intro Chart On Restart/Game Over", 100);
+		skipIntroOnRestartCheckbox.checked = _song.skipIntroOnRestart;
+		skipIntroOnRestartCheckbox.callback = function()
+		{
+			_song.skipIntroOnRestart = skipIntroOnRestartCheckbox.checked;
+		};
+
+		var skipCountdownCheckbox = new FlxUICheckBox(10, 120, null, null, "Skip Countdown", 100);
+		skipCountdownCheckbox.checked = _song.skipIntroOnRestart;
+		skipCountdownCheckbox.callback = function()
+		{
+			_song.skipIntroOnRestart = skipCountdownCheckbox.checked;
+		};
+
+		// var loopStartStepper:FlxUINumericStepper = new FlxUINumericStepper(145, 52, 1, 0, 0, 999, 0);
+		// loopStartStepper.name = 'loop_start_beat';
+		// blockPressWhileTypingOnStepper.push(loopStartStepper);
+
+		// tab_group_params.add(new FlxText(loopStartStepper.x, loopStartStepper.y - 15, 0, 'Beat Where Loop Starts:'));
+		tab_group_params.add(disableCombatCheckbox);
+		tab_group_params.add(endSongOnDefeatCheckbox);
+		tab_group_params.add(useIntroChartCheckbox);
+		tab_group_params.add(skipCountdownCheckbox);
+		tab_group_params.add(skipIntroOnRestartCheckbox);
+		// tab_group_params.add(loopStartStepper);
+		UI_box.addGroup(tab_group_params);
+	}
+
+	// End of changes
+
 	function loadSong():Void
 	{
 		if (FlxG.sound.music != null)
@@ -1563,6 +1686,11 @@ class ChartingState extends MusicBeatState
 
 	override function getEvent(id:String, sender:Dynamic, data:Dynamic, ?params:Array<Dynamic>)
 	{
+		// Combat change
+		// SwagSong notes code
+		//
+		// Click events
+
 		if (id == FlxUICheckBox.CLICK_EVENT)
 		{
 			var check:FlxUICheckBox = cast sender;
@@ -1608,6 +1736,11 @@ class ChartingState extends MusicBeatState
 				Conductor.mapBPMChanges(_song);
 				Conductor.changeBPM(nums.value);
 			}
+				// Combat change
+				// else if (wname == 'loop_start_beat')
+				// {
+				//	_song.loopBeatStart = nums.value;
+			// }
 			else if (wname == 'note_susLength')
 			{
 				if (curSelectedNote != null && curSelectedNote[2] != null)
@@ -1680,6 +1813,11 @@ class ChartingState extends MusicBeatState
 
 	function sectionStartTime(add:Int = 0):Float
 	{
+		// Combat change
+		// SwagSong notes code
+		//
+		// Seems to set the song to the current section
+
 		var daBPM:Float = _song.bpm;
 		var daPos:Float = 0;
 		for (i in 0...curSec + add)
@@ -1729,6 +1867,11 @@ class ChartingState extends MusicBeatState
 		{
 			if (Math.ceil(strumLine.y) >= gridBG.height)
 			{
+				// Combat change
+				// SwagSong notes code
+				//
+				// Adds upcoming section
+
 				if (_song.notes[curSec + 1] == null)
 				{
 					addSection();
@@ -2148,6 +2291,11 @@ class ChartingState extends MusicBeatState
 				changeSection(curSec + shiftThing);
 			if (FlxG.keys.justPressed.A)
 			{
+				// Combat change
+				// SwagSong notes code
+				//
+				// Changes section math
+
 				if (curSec <= 0)
 				{
 					changeSection(_song.notes.length - 1);
@@ -2232,6 +2380,12 @@ class ChartingState extends MusicBeatState
 		var playedSound:Array<Bool> = [false, false, false, false]; // Prevents ouchy GF sex sounds
 		curRenderedNotes.forEachAlive(function(note:Note)
 		{
+			// Combat change
+			// SwagSong notes code
+			//
+			// This looks like a lot of core note management
+			// Doesn't look like anything that would mess with chart chunks?
+
 			note.alpha = 1;
 			if (curSelectedNote != null)
 			{
@@ -2355,6 +2509,14 @@ class ChartingState extends MusicBeatState
 
 	function reloadGridLayer()
 	{
+		// Combat change
+		// Engine fix
+		// Fixes a memory leak, since just clearing the gridLayer doesn't free the memory back up
+		gridLayer.forEach(function(spr:FlxSprite)
+		{
+			spr.destroy();
+		});
+
 		gridLayer.clear();
 		gridBG = FlxGridOverlay.create(GRID_SIZE, GRID_SIZE, GRID_SIZE * 9, Std.int(GRID_SIZE * getSectionBeats() * 4 * zoomList[curZoom]));
 
@@ -2711,6 +2873,12 @@ class ChartingState extends MusicBeatState
 
 	function changeSection(sec:Int = 0, ?updateMusic:Bool = true):Void
 	{
+		// Combat change
+		// SwagSong notes code
+		//
+		// See function names
+		// Goes for pretty much all functions on unless noted otherwise
+
 		if (_song.notes[sec] != null)
 		{
 			curSec = sec;
@@ -2856,6 +3024,35 @@ class ChartingState extends MusicBeatState
 
 	function updateGrid():Void
 	{
+		// Combat change
+		// Engine fix
+		// This wasn't done before, so a memory leak occured each time the section was changed
+		curRenderedNotes.forEach(function(note:Note)
+		{
+			note.destroy();
+		});
+		curRenderedSustains.forEach(function(spr:FlxSprite)
+		{
+			spr.destroy();
+		});
+		curRenderedNoteType.forEach(function(txt:FlxText)
+		{
+			txt.destroy();
+		});
+		nextRenderedNotes.forEach(function(note:Note)
+		{
+			note.destroy();
+		});
+		nextRenderedSustains.forEach(function(spr:FlxSprite)
+		{
+			spr.destroy();
+		});
+		curRenderedCombatNoteBools.forEach(function(spr:FlxSprite)
+		{
+			spr.destroy();
+		});
+		// End of changes
+
 		curRenderedNotes.clear();
 		curRenderedSustains.clear();
 		curRenderedNoteType.clear();
@@ -3083,6 +3280,11 @@ class ChartingState extends MusicBeatState
 
 	private function addSection(sectionBeats:Float = 4):Void
 	{
+		// Combat change
+		// SwagSong notes code
+		//
+		// This adds sections, and looks important!
+
 		var sec:SwagSection = {
 			sectionBeats: sectionBeats,
 			bpm: _song.bpm,
@@ -3096,6 +3298,163 @@ class ChartingState extends MusicBeatState
 
 		_song.notes.push(sec);
 	}
+
+	// Combat change
+	// New functions
+	// Unlike addSection, this one returns a SwagSection instead of adding one to notes
+	function newSection(section:SwagSection = null):SwagSection
+	{
+		var sec = null;
+
+		if (section != null)
+			sec = {
+				sectionBeats: section.sectionBeats,
+				bpm: section.bpm,
+				changeBPM: section.changeBPM,
+				mustHitSection: section.mustHitSection,
+				gfSection: section.gfSection,
+				sectionNotes: section.sectionNotes,
+				typeOfSection: section.typeOfSection,
+				altAnim: section.altAnim
+			};
+		else
+			sec = {
+				sectionBeats: 4,
+				bpm: _song.bpm,
+				changeBPM: false,
+				mustHitSection: true,
+				gfSection: false,
+				sectionNotes: [],
+				typeOfSection: 0,
+				altAnim: false
+			};
+
+		return sec;
+	}
+
+	// Combat changes
+	// New chart-switching functions
+	function changeSelectedChart(change:Int = 0)
+	{
+		saveNotesToChartArray(_song.activeChart);
+
+		curChartValue += change;
+		if (curChartValue > _song.chartArray.length - 1)
+			curChartValue = 0;
+		if (curChartValue < 0)
+			curChartValue = _song.chartArray.length - 1;
+
+		_song.activeChart = _song.chartArray[curChartValue].chartName;
+		chartText.text = 'Current Chart:\n${_song.activeChart}';
+
+		writeNotesFromChartArray(_song.activeChart, true);
+
+		reloadGridLayer();
+		updateSectionUI();
+	}
+
+	// Same as retrieve version in the Song class,
+	// but !currentChartExists with the clearSong variable in the middle's easier to manage by just having this separate function
+	function writeNotesFromChartArray(curChartName:String, switchingCharts:Bool = false):Void
+	{
+		var currentChartExists:Bool = false;
+
+		for (i in 0..._song.chartArray.length)
+			if (_song.chartArray[i].chartName == curChartName)
+			{
+				currentChartExists = true;
+				break;
+			}
+
+		if (!currentChartExists)
+		{
+			var chart:SwagChart = newChart(curChartName, curChartName);
+			_song.chartArray.push(chart);
+		}
+
+		if (switchingCharts)
+			clearSong();
+
+		for (i in 0..._song.chartArray.length)
+		{
+			if (_song.chartArray[i].chartName == curChartName)
+			{
+				var sectionCount:Int = 0;
+
+				for (ii in 0..._song.chartArray[i].chartNotes.length)
+				{
+					var sec:SwagSection = newSection(_song.chartArray[i].chartNotes[ii]);
+
+					if (_song.notes[sectionCount] == null)
+						_song.notes.insert(sectionCount, sec);
+
+					_song.notes[sectionCount] = sec;
+
+					++sectionCount;
+				}
+
+				break;
+			}
+		}
+	}
+
+	function saveNotesToChartArray(curChartName:String):Void
+	{
+		var currentChartExists:Bool = false;
+
+		if (_song.chartArray == null)
+			_song.chartArray = [];
+
+		for (i in 0..._song.chartArray.length)
+		{
+			if (_song.chartArray[i].chartName == Song.retrieveNameInChartList(_song.activeChart, _song))
+			{
+				currentChartExists = true;
+				break;
+			}
+		}
+
+		if (!currentChartExists && _song.notes.length > 0)
+		{
+			_song.chartArray.push(newChart(curChartName, curChartName));
+		}
+
+		for (i in 0..._song.chartArray.length)
+		{
+			if (_song.chartArray[i].chartName == Song.retrieveNameInChartList(_song.activeChart, _song))
+			{
+				var sectionCount:Int = 0;
+
+				for (ii in 0..._song.notes.length)
+				{
+					var sec:SwagSection = newSection(_song.notes[ii]);
+
+					if (_song.chartArray[i].chartNotes[sectionCount] == null)
+						_song.chartArray[i].chartNotes.insert(sectionCount, sec);
+
+					_song.chartArray[i].chartNotes[sectionCount] = sec;
+
+					++sectionCount;
+				}
+
+				break;
+			}
+		}
+	}
+
+	function newChart(chartName:String, songFileName:String):SwagChart
+	{
+		var chart:SwagChart = {
+			chartName: chartName,
+			songFileName: songFileName,
+			chartNotes: [],
+			lengthOfChartInSections: 0
+		};
+
+		return chart;
+	}
+
+	// End of changes
 
 	function selectNote(note:Note):Void
 	{
@@ -3198,6 +3557,9 @@ class ChartingState extends MusicBeatState
 
 	function clearSong():Void
 	{
+		// Combat change
+		// SwagSong notes code
+
 		for (daSection in 0..._song.notes.length)
 		{
 			_song.notes[daSection].sectionNotes = [];
@@ -3223,6 +3585,11 @@ class ChartingState extends MusicBeatState
 			noteData = data;
 		if (type != null)
 			daType = type;
+
+		// Combat change
+		// SwagSong notes code
+		//
+		// Adding notes, probably will be important
 
 		if (noteData > -1)
 		{

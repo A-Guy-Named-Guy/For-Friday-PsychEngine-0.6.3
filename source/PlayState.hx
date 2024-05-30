@@ -81,6 +81,14 @@ import sys.io.File;
 import vlc.MP4Handler;
 #end
 
+// Combat change
+typedef CachedChart =
+{
+	var name:String;
+	var unspawnNotes:Array<Note>;
+	var eventNotes:Array<EventNote>;
+}
+
 class PlayState extends MusicBeatState
 {
 	// Combat changes
@@ -107,6 +115,12 @@ class PlayState extends MusicBeatState
 	{
 		return FlxSort.byValues(FlxSort.ASCENDING, Obj1.zDepth, Obj2.zDepth);
 	}
+
+	var usingChartSwitches:Bool = false;
+	var cachedChartArray:Array<CachedChart> = [];
+
+	var distributingChart:Bool = false;
+	var distributedChartCount:Int = 0;
 
 	// End of changes
 	public static var STRUM_X = 42;
@@ -1213,7 +1227,20 @@ class PlayState extends MusicBeatState
 
 		// startCountdown();
 
-		generateSong(SONG.song);
+		// Combat changes
+		if (SONG.useIntroChart)
+			SONG.activeChart = 'Intro';
+		else
+			SONG.activeChart = 'Inst';
+
+		if (SONG.chartArray != null
+			&& (SONG.activeChart != 'Inst' || (SONG.activeChart == 'Inst' && Song.getChartByName('Inst', SONG).chartNotes == SONG.notes)))
+			generateSong(SONG.activeChart);
+		else
+			generateSong(SONG.song);
+
+		cacheNoteCharts();
+		// End of changes
 
 		// After all characters being loaded, it makes then invisible 0.01s later so that the player won't freeze when you change characters
 		// add(strumLine);
@@ -1404,7 +1431,7 @@ class PlayState extends MusicBeatState
 		#end
 
 		// Combat change
-		// This is done immediately before if dialogue shows up just because that's the sole reason this isn't done after along with other combat stuffs
+		// Needed to prevent inputs during dialogue, mainly
 		if (!SONG.disableCombat)
 			Combat.disableControls = false;
 
@@ -1624,9 +1651,9 @@ class PlayState extends MusicBeatState
 			dad.healthColorArray = [255, 0, 0];
 			reloadHealthBarColors();
 
-			Combat.needCombatVictory = WeekData.getCurrentWeek().needCombatVictory;
-			Combat.singVictoryDisabled = WeekData.getCurrentWeek().singVictoryDisabled;
-			Combat.combatVictoryDisabled = WeekData.getCurrentWeek().combatVictoryDisabled;
+			// Combat.needCombatVictory = WeekData.getCurrentWeek().needCombatVictory;
+			// Combat.singVictoryDisabled = WeekData.getCurrentWeek().singVictoryDisabled;
+			// Combat.combatVictoryDisabled = WeekData.getCurrentWeek().combatVictoryDisabled;
 		}
 		// End of changes
 	}
@@ -2763,9 +2790,27 @@ class PlayState extends MusicBeatState
 		previousFrameTime = FlxG.game.ticks;
 		lastReportedPlayheadPosition = 0;
 
-		FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
+		// Combat change
+		FlxG.sound.playMusic(getMusicFile(), 1, false);
+		// FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
+		// End of changes
+
 		FlxG.sound.music.pitch = playbackRate;
-		FlxG.sound.music.onComplete = finishSong.bind();
+		// Combat changes
+		// Adding different onCompletes in addition to finishSong
+		if (SONG.activeChart == 'Intro')
+		{
+			FlxG.sound.music.onComplete = onIntroComplete.bind();
+			usingChartSwitches = true;
+		}
+		else if (PlayState.SONG.endSongOnDefeat)
+		{
+			FlxG.sound.music.onComplete = loopSong.bind();
+			usingChartSwitches = true;
+		}
+		else
+			FlxG.sound.music.onComplete = finishSong.bind();
+		// End of changes
 		vocals.play();
 
 		if (startOnTime > 0)
@@ -2809,45 +2854,76 @@ class PlayState extends MusicBeatState
 	private var noteTypeMap:Map<String, Bool> = new Map<String, Bool>();
 	private var eventPushedMap:Map<String, Bool> = new Map<String, Bool>();
 
-	private function generateSong(dataPath:String):Void
+	// Combat change
+	// eneratingFromLoop check skips parts where things (mostly sounds) can get duplicated by accident
+	private function generateSong(dataPath:String, generatingFromLoop = false):Void
 	{
-		// FlxG.log.add(ChartParser.parse());
-		songSpeedType = ClientPrefs.getGameplaySetting('scrolltype', 'multiplicative');
-
-		switch (songSpeedType)
-		{
-			case "multiplicative":
-				songSpeed = SONG.speed * ClientPrefs.getGameplaySetting('scrollspeed', 1);
-			case "constant":
-				songSpeed = ClientPrefs.getGameplaySetting('scrollspeed', 1);
-		}
+		// Combat changes
+		// generatingFromLoop check and extracted var songData = SONG;
 
 		var songData = SONG;
-		Conductor.changeBPM(songData.bpm);
 
-		curSong = songData.song;
+		if (!generatingFromLoop)
+		{
+			// FlxG.log.add(ChartParser.parse());
+			songSpeedType = ClientPrefs.getGameplaySetting('scrolltype', 'multiplicative');
 
-		if (SONG.needsVoices)
-			vocals = new FlxSound().loadEmbedded(Paths.voices(PlayState.SONG.song));
-		else
-			vocals = new FlxSound();
+			switch (songSpeedType)
+			{
+				case "multiplicative":
+					songSpeed = SONG.speed * ClientPrefs.getGameplaySetting('scrollspeed', 1);
+				case "constant":
+					songSpeed = ClientPrefs.getGameplaySetting('scrollspeed', 1);
+			}
 
-		vocals.pitch = playbackRate;
-		FlxG.sound.list.add(vocals);
-		FlxG.sound.list.add(new FlxSound().loadEmbedded(Paths.inst(PlayState.SONG.song)));
+			// Combat change
+			// Extracting this songData variable
+			// var songData = SONG;
 
-		notes = new FlxTypedGroup<Note>();
-		add(notes);
+			Conductor.changeBPM(songData.bpm);
+
+			curSong = songData.song;
+
+			if (SONG.needsVoices)
+				vocals = new FlxSound().loadEmbedded(Paths.voices(PlayState.SONG.song));
+			else
+				vocals = new FlxSound();
+
+			vocals.pitch = playbackRate;
+			// Combat change?
+			// I'm not sure what was changed here so I think this combat change note here is a mistake
+			// So, ignore this one probably?
+			FlxG.sound.list.add(vocals);
+			FlxG.sound.list.add(new FlxSound().loadEmbedded(Paths.inst(PlayState.SONG.song)));
+
+			notes = new FlxTypedGroup<Note>();
+			add(notes);
+		}
 
 		var noteData:Array<SwagSection>;
 
+		songData.notes = SONG.notes;
+
 		// NEW SHIT
-		noteData = songData.notes;
+
+		// Combat change
+		if (dataPath != SONG.song)
+		{
+			noteData = Song.retrieveNotesFromChartArray(dataPath, SONG);
+		}
+		else
+			noteData = songData.notes;
 
 		var playerCounter:Int = 0;
 
 		var daBeats:Int = 0; // Not exactly representative of 'daBeats' lol, just how much it has looped
 
+		// Combat change
+		// SwagSong notes code
+		//
+		// This chunk determines what events exist in a chart, and assign their times accordingly
+		//
+		// This is a possible breakpoint in the new chart chunks, so be sure to look into this
 		var songName:String = Paths.formatToSongPath(SONG.song);
 		var file:String = Paths.json(songName + '/events');
 		#if MODS_ALLOWED
@@ -2876,6 +2952,12 @@ class PlayState extends MusicBeatState
 			}
 		}
 
+		// Combat change
+		// SwagSong notes code
+		//
+		// This creates every note for the upcoming chart
+		//
+		// This is the big kahuna for gameplay, so definitely come back here later
 		for (section in noteData)
 		{
 			for (songNotes in section.sectionNotes)
@@ -2960,7 +3042,9 @@ class PlayState extends MusicBeatState
 						swagNote.x += FlxG.width / 2 + 25;
 					}
 				}
-				if (!noteTypeMap.exists(swagNote.noteType))
+				// Combat change
+				// noteTypeMap != null
+				if (noteTypeMap != null && !noteTypeMap.exists(swagNote.noteType))
 				{
 					noteTypeMap.set(swagNote.noteType, true);
 				}
@@ -3527,7 +3611,7 @@ class PlayState extends MusicBeatState
 		// I used these for debugging some stuff
 		// Up to you if you want to use these or not
 		#if debug
-		if (FlxG.keys.justPressed.TWO)
+		if (FlxG.keys.justPressed.FOUR)
 			dad.combatHealth = 0;
 		if (FlxG.keys.justPressed.THREE)
 		{
@@ -3660,6 +3744,11 @@ class PlayState extends MusicBeatState
 			trace("RESET = True");
 		}
 		doDeathCheck();
+
+		// Combat change
+
+		if (distributingChart)
+			generateDistributedChart();
 
 		if (unspawnNotes[0] != null)
 		{
@@ -4520,6 +4609,10 @@ class PlayState extends MusicBeatState
 
 	function moveCameraSection():Void
 	{
+		// Combat change
+		// SwagSong notes code
+		//
+		// Just the code for camera focus, so this shouldn't cause issues
 		if (SONG.notes[curSection] == null)
 			return;
 
@@ -5470,6 +5563,10 @@ class PlayState extends MusicBeatState
 		{
 			var altAnim:String = note.animSuffix;
 
+			// Combat change
+			// SwagSong notes code
+			//
+			// The only instance where .notes is used is for the -alt anim system
 			if (SONG.notes[curSection] != null)
 			{
 				if (SONG.notes[curSection].altAnim && !SONG.notes[curSection].gfSection)
@@ -5597,8 +5694,9 @@ class PlayState extends MusicBeatState
 					// The combatNoteTypes prevents animations interrupts on the combat notes
 				// The rest is essentially to make combat animations fully play out during sustain notes
 				else if (!Combat.combatNoteTypes.contains(note.noteType)
-					&& ((boyfriend.animation.curAnim.name.startsWith('combat') && boyfriend.animation.finished)
-						|| !boyfriend.animation.curAnim.name.startsWith('combat')))
+					&& ((note.isSustainNote && boyfriend.animation.curAnim.name.startsWith('combat') && boyfriend.animation.finished)
+						|| !boyfriend.animation.curAnim.name.startsWith('combat')
+						|| !note.isSustainNote))
 				{
 					boyfriend.playAnim(animToPlay + note.animSuffix, true);
 					boyfriend.holdTimer = 0;
@@ -5912,6 +6010,7 @@ class PlayState extends MusicBeatState
 		}
 		FlxAnimationController.globalSpeed = 1;
 		FlxG.sound.music.pitch = 1;
+
 		super.destroy();
 	}
 
@@ -5944,6 +6043,7 @@ class PlayState extends MusicBeatState
 		setOnLuas('curStep', curStep);
 		callOnLuas('onStepHit', []);
 
+		// Combat change
 		if (COMBAT != null)
 			COMBAT.combatStepHit();
 	}
@@ -6070,6 +6170,11 @@ class PlayState extends MusicBeatState
 	{
 		super.sectionHit();
 
+		// Combat change
+		// SwagSong notes code
+		//
+		// See sectionHit in MusicBeatState
+		// This also does a lot of lua stuff, so be sure to look into that
 		if (SONG.notes[curSection] != null)
 		{
 			if (generatedMusic && !endingSong && !isCameraOnForcedPos)
@@ -6335,6 +6440,313 @@ class PlayState extends MusicBeatState
 		return null;
 	}
 	#end
+
+	// Combat changes
+	// Combat functions
+	function cacheNoteCharts():Void
+	{
+		if (SONG.chartArray == null)
+			return;
+
+		for (chart in SONG.chartArray)
+		{
+			var cachedChart:CachedChart = {
+				name: chart.chartName,
+				unspawnNotes: [],
+				eventNotes: []
+			}
+
+			for (i in 0...chart.chartNotes.length)
+			{
+				for (note in chart.chartNotes[i].sectionNotes)
+					generateNote(note, cachedChart.unspawnNotes, chart.chartNotes[i]);
+			}
+
+			cachedChartArray.push(cachedChart);
+		}
+	}
+
+	/*function cacheChartSongs():Void
+	{
+		if (SONG.chartArray == null)
+			return;
+
+		cachedSongArray = new Array<FlxSound>();
+
+		for (i in 0...SONG.chartArray.length)
+		{
+			var shouldLoop:Bool = false;
+			if (SONG.chartArray[i].chartName == 'Inst')
+				shouldLoop = true;
+
+			var cachedSong = new FlxSound().loadEmbedded(getMusicFile(false, SONG.chartArray[i].songFileName), shouldLoop, !shouldLoop);
+
+			switch (SONG.chartArray[i].chartName)
+			{
+				case 'Intro':
+					cachedSong.onComplete = onIntroComplete.bind();
+				case 'Inst':
+					cachedSong.onComplete = loopSong.bind();
+				case 'Outro':
+					cachedSong.onComplete = finishSong.bind();
+			}
+
+			cachedSongArray.push(cachedSong);
+		}
+
+}*/
+	// Generating an entire song at once tends to cause a lagspike,
+	// And there's not really a better way to just copy a note over without just referring to the original note object
+	//
+	// Thus, the compromise is to just generate a song section-by-section in advance
+	// This should be done on an occurring song to restore the cached list
+	// Since, as mentioned above, otherwise the destroyed main notes destroy the cached notes
+
+	function generateDistributedChart():Void
+	{
+		var chartToCache:forfriday.Chart.SwagChart = null;
+
+		for (chart in SONG.chartArray)
+		{
+			if (chart.chartName != SONG.activeChart)
+				continue;
+
+			if (distributedChartCount > chart.chartNotes.length)
+				break;
+
+			chartToCache = chart;
+
+			break;
+		}
+
+		if (chartToCache == null)
+			return;
+
+		for (chart in cachedChartArray)
+		{
+			if (chart.name != SONG.activeChart)
+				continue;
+
+			var section:SwagSection = chartToCache.chartNotes[distributedChartCount];
+
+			if (section == null)
+				continue;
+
+			for (songNotes in section.sectionNotes)
+				generateNote(songNotes, chart.unspawnNotes, section);
+
+			/*for (event in SONG.events) // Event Notes
+			{
+				for (i in 0...event[1].length)
+				{
+					var newEventNote:Array<Dynamic> = [event[0], event[1][i][0], event[1][i][1], event[1][i][2]];
+					var subEvent:EventNote = {
+						strumTime: newEventNote[0] + ClientPrefs.noteOffset,
+						event: newEventNote[1],
+						value1: newEventNote[2],
+						value2: newEventNote[3]
+					};
+					subEvent.strumTime -= eventNoteEarlyTrigger(subEvent);
+					curEventsCache.push(subEvent);
+					eventPushed(subEvent);
+				}
+		}*/
+
+			// if (curEventsCache.length > 1)
+			//	curEventsCache.sort(sortByTime);
+
+			// checkEventNote();
+
+			++distributedChartCount;
+			break;
+		}
+	}
+
+	/**
+ * Trying to create a note with vanilla methods causes a lot of problems with improper data storage and weird behavior.
+ * 
+ * Therefore, a note needs to be generated fresh in a lot of cases.
+ * @param noteData The data array that holds the note's information before its created.
+ * @param storageList A note array to automatically add the note to. Due to handling sustain note generation being cumbersome, this is left in the newNote creation process.
+ */
+	function generateNote(noteData:Dynamic, storageList:Array<Note>, section:SwagSection):Void
+	{
+		// Copied from Psych Engine note generation
+		// Combat change notes left intentionally for documenation
+
+		var daStrumTime:Float = noteData[0];
+		var daNoteData:Int = Std.int(noteData[1] % 4);
+		// Combat changes
+		var daUnblockable:Bool = noteData[4];
+		var daDeathNote:Bool = noteData[5];
+
+		var gottaHitNote:Bool = section.mustHitSection;
+
+		if (noteData[1] > 3)
+		{
+			gottaHitNote = !section.mustHitSection;
+		}
+		var oldNote:Note;
+
+		if (storageList.length > 0)
+			oldNote = storageList[Std.int(storageList.length - 1)];
+		else
+			oldNote = null;
+		// Combat change
+		// add: false, false, daUnblockable, daDeathNote
+		var swagNote:Note = new Note(daStrumTime, daNoteData, oldNote, false, false, daUnblockable, daDeathNote);
+
+		swagNote.mustPress = gottaHitNote;
+		swagNote.sustainLength = noteData[2];
+		swagNote.gfNote = (section.gfSection && (noteData[1] < 4));
+		swagNote.noteType = noteData[3];
+		if (!Std.isOfType(noteData[3], String))
+			swagNote.noteType = editors.ChartingState.noteTypeList[noteData[3]]; // Backward compatibility + compatibility with Week 7 charts
+		swagNote.scrollFactor.set();
+		var susLength:Float = swagNote.sustainLength;
+
+		susLength = susLength / Conductor.stepCrochet;
+		storageList.push(swagNote);
+		var floorSus:Int = Math.floor(susLength);
+
+		if (floorSus > 0)
+		{
+			for (susNote in 0...floorSus + 1)
+			{
+				oldNote = storageList[Std.int(storageList.length - 1)];
+				// Combat change
+				// Add: false, daUnblockable, daDeathNote
+				var sustainNote:Note = new Note(daStrumTime + (Conductor.stepCrochet * susNote) + (Conductor.stepCrochet / FlxMath.roundDecimal(songSpeed, 2)),
+					daNoteData, oldNote, true, false, daUnblockable, daDeathNote);
+
+				sustainNote.mustPress = gottaHitNote;
+				sustainNote.gfNote = (section.gfSection && (noteData[1] < 4));
+				sustainNote.noteType = swagNote.noteType;
+				sustainNote.scrollFactor.set();
+				swagNote.tail.push(sustainNote);
+				sustainNote.parent = swagNote;
+				storageList.push(sustainNote);
+				if (sustainNote.mustPress)
+				{
+					sustainNote.x += FlxG.width / 2; // general offset
+				}
+				else if (ClientPrefs.middleScroll)
+				{
+					sustainNote.x += 310;
+					if (daNoteData > 1) // Up and Right
+					{
+						sustainNote.x += FlxG.width / 2 + 25;
+					}
+				}
+			}
+		}
+		if (swagNote.mustPress)
+		{
+			swagNote.x += FlxG.width / 2; // general offset
+		}
+		else if (ClientPrefs.middleScroll)
+		{
+			swagNote.x += 310;
+			if (daNoteData > 1) // Up and Right
+			{
+				swagNote.x += FlxG.width / 2 + 25;
+			}
+		}
+
+		if (noteTypeMap != null && !noteTypeMap.exists(swagNote.noteType))
+		{
+			noteTypeMap.set(swagNote.noteType, true);
+		}
+
+		storageList.sort(sortByShit);
+	}
+
+	function regenerateSong():Void
+	{
+		KillNotes();
+
+		for (chart in cachedChartArray)
+		{
+			if (chart.name == SONG.activeChart)
+			{
+				unspawnNotes = [];
+				unspawnNotes = chart.unspawnNotes.copy();
+				chart.unspawnNotes = [];
+
+				// eventNotes = chart.eventNotes.copy();
+				// chart.eventNotes = [];
+
+				break;
+			}
+		}
+
+		distributingChart = true;
+		distributedChartCount = 0;
+		generateDistributedChart();
+
+		Conductor.songPosition = 0;
+		notes.cameras = [camHUD];
+
+		lastBeatHit = -1;
+	}
+
+	function loopSong(?justCompleted:Bool = true):Void
+	{
+		if (cachedChartArray == null)
+			finishSong();
+		else
+			regenerateSong();
+	}
+
+	function onIntroComplete():Void
+	{
+		SONG.activeChart = 'Inst';
+		// FlxG.sound.playMusic(getMusicFile(), 1, false);
+
+		/*for (i in 0...cachedSongArray.length)
+		{
+			if (cachedSongArray[i].name == SONG.activeChart)
+			{
+				FlxG.sound.music = cachedSongArray[i];
+				break;
+			}
+	}*/
+
+		FlxG.sound.music.loadEmbedded(getMusicFile(), true, false, loopSong.bind());
+
+		// getVocalSoundFile();
+		if (cachedChartArray == null)
+			finishSong();
+		else
+			regenerateSong();
+	}
+
+	function getMusicFile(getVocals:Bool = false):flixel.system.FlxAssets.FlxSoundAsset
+	{
+		var musicFile:flixel.system.FlxAssets.FlxSoundAsset = null;
+		var vocalSuffix:String = '';
+
+		if (getVocals)
+			vocalSuffix = "Voices";
+
+		if (Song.getChartByName(SONG.activeChart, SONG) != null)
+			musicFile = Paths.songFile(PlayState.SONG.song, Song.getChartByName(SONG.activeChart, SONG).songFileName + vocalSuffix);
+
+		if (musicFile == null && !getVocals)
+			musicFile = Paths.inst(PlayState.SONG.song);
+
+		return musicFile;
+	}
+
+	function getVocalSoundFile():Void
+	{
+		if (getMusicFile(true) != null && SONG.needsVoices)
+			vocals = new FlxSound().loadEmbedded(getMusicFile(true));
+		else
+			vocals = new FlxSound();
+	}
+
+	// End of changes
 
 	var curLight:Int = -1;
 	var curLightEvent:Int = -1;

@@ -1,0 +1,25 @@
+{
+	"songs": [
+		["training-test", "bf", [40, 73, 31]]
+	],
+
+	"weekCharacters": [
+		"",
+		"bf",
+		"gf"
+	],
+	"weekBackground": "stage",
+
+	"storyName": "The Art of Battle",
+	"weekBefore": "tutorial",
+	"weekName": "Tutorial",
+	"startUnlocked": true,
+
+	"hideStoryMode": false,
+	"hideFreeplay": false,
+
+	"characterSpecific": "bf",
+	"disable_sing_victory": ["dominion"],
+	"disable_combat_victory": [],
+	"require_combat_victory": ["trial"]
+}

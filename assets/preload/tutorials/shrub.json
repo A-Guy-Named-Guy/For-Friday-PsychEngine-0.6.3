@@ -3,7 +3,7 @@
 
 	"tutorial_text": [
 		{
-			"text": "Though lacking a consistent offense in the form of unblockables,\n\nthe Shrub can apply damage via posture infliction.\n\n\n\nThe Shrub can bash with the \"$specialBind\" keyboard input.\n\n\n\nAttacking to a down singing note instead bashes,\n\nwhich interrupts opponent actions/special attacks, and ability\n\nto block for a short time.\n\n\n\nIf the opponent has full posture, an attack after a bash will\n\ndeal lethal damage.\n\n\n\nThe Shrub is not defeated upon depleting stamina, but he cannot\n\nperform any maneuvers he does not have enough stamina for.\n\n\n\nPassively chip enemy posture by blocking attack flurries,\n\nthrow attacks during moments of downtime to stop recovery,\n\nthen end with a lethal bash-to-attack once posture reaches full.",
+			"text": "THE MENTOR\n\nThe last of ancient kin, and your guide.\n\n\n\nPOSTURE\n\nThe Shrub uses the \"Posture\" mechanic.\n\nBlocking and attacking fills enemy posture and stops posture recovery.\n\n\n\nSPECIAL: BASH\n\nThe Shrub can bash with the \"$specialBind\" keyboard input,\n\npreventing enemy attacks and blocks for a short time.\n\nAttacks after a bash deal lethal damage if posture is full.\n\n\n\nUNCHECKED BY PERFORMANCE\n\nThe Shrub is not defeated upon depleting stamina,\n\nbut cannot perform maneuvers without sufficient stamina.",
 			"position": [580, 0],
 			"size": 16,
 			"screenCenterX": false,

@@ -12,8 +12,10 @@ import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.group.FlxSpriteGroup;
 import flixel.tweens.FlxTween;
 import flixel.util.FlxSort;
+import flixel.util.FlxTimer;
 import forfriday.CharacterExtra;
 import forfriday.Combat;
+import forfriday.EnemyAI;
 import haxe.Json;
 import haxe.format.JsonParser;
 import openfl.utils.AssetType;
@@ -61,6 +63,9 @@ typedef CharacterFile =
 	var combatSoundEffects:Array<Array<String>>;
 	var soundsToPickFromRandom:Array<Array<Dynamic>>;
 	var soundsToVaryVolume:Array<Array<Dynamic>>;
+	var attacks:Array<AttackData>;
+	var chains:Array<ChainData>;
+	// End of changes
 }
 
 typedef AnimArray =
@@ -73,11 +78,38 @@ typedef AnimArray =
 	var offsets:Array<Int>;
 }
 
-// Combat changes
-// The changes to this file are the sole exception to the "minimal codebase changes" philosophy,
-// As there's far too much potential for streamlining things
-// Thankfully this should mostly be additions rather than having to adapt systems
-// (with exception to a new animation-check inside playAnim(), and some other things along those lines)
+// Combat change
+typedef AttackData =
+{
+	var name:Null<String>;
+	var attack_animation_name:Null<String>;
+	var startup_animation_name:Null<String>;
+	var soundOnHit:Null<String>;
+	var soundOnMiss:Null<String>;
+	var not_an_attack:Null<Bool>;
+	var direction:Null<String>;
+	var damage:Null<Float>;
+	var posture_damage:Null<Float>;
+	var stamina_damage:Null<Float>;
+	var stamina_cost:Null<Float>;
+	var health_recover:Null<Float>;
+	var posture_recover:Null<Float>;
+	var step_based_timing:Null<Bool>;
+	var duration:Null<Float>;
+	var recovery:Null<Float>;
+	var is_unblockable:Null<Bool>;
+	var is_bash:Null<Bool>;
+}
+
+typedef ChainData =
+{
+	var name:String;
+	var direction_overrides:Array<String>;
+	var chain:Array<String>;
+}
+
+// End of changes
+
 class Character extends FlxSprite
 {
 	public var animOffsets:Map<String, Array<Dynamic>>;
@@ -133,6 +165,18 @@ class Character extends FlxSprite
 	public var soundEffects:Map<String, String> = new Map();
 	public var soundRandomPicks:Map<String, Array<Int>> = new Map();
 	public var soundVolumeVariance:Map<String, Array<Float>> = new Map();
+
+	public var attackArray:Array<AttackData> = [];
+	public var chainArray:Array<ChainData> = [];
+
+	public var currentChainName:String = 'neutral';
+	public var currentChain:ChainData = {name: 'neutral', direction_overrides: [], chain: []}
+	public var placeInChain:Int = 0;
+	public var currentAttack:AttackData;
+
+	public var actionTimer:FlxTimer = new FlxTimer();
+	public var actionStepTimer:Int = 0;
+	public var currentAction:String = 'neutral';
 
 	// End changes
 	public function new(x:Float, y:Float, ?character:String = 'bf', ?isPlayer:Bool = false)
@@ -278,6 +322,8 @@ class Character extends FlxSprite
 					}
 				}
 
+				if (json.attacks != null && json.chains != null)
+					generateAttackAndChainArray(json.attacks, json.chains);
 				// End of changes
 
 				positionArray = json.position;
@@ -345,6 +391,8 @@ class Character extends FlxSprite
 
 		// dance() uses the combatIdle() function, which needs an animation to be played to prevent crashes
 		playAnim('idle');
+
+		currentAttack = generateAttack(null);
 		// End of changes
 
 		originalFlipX = flipX;
@@ -743,7 +791,7 @@ class Character extends FlxSprite
 	// All of the base game's sound files are both MP3 and OGG files
 	// However, these sound effects are WAV files, and there is a reason for it
 	//
-	// Though WAV files are significantly bigger file sizes, they load significantly faster since they aren't compressed
+	// Though WAV files are significantly bigger file sizes, they load  faster since they aren't compressed
 	// Therefore, sound effects benefit best from using WAV files, while things like the song file should stay the MP3/OGG
 	//
 	// I've read other reasons for using WAV that implies advantages to MP3 that I'm unsure of, so take this advice with a grain of salt
@@ -806,6 +854,134 @@ class Character extends FlxSprite
 				if (animation.curAnim.name.startsWith("combatReady") && animation.finished)
 					playAnim('idle', true, false, idleDefaultFrame);
 			}
+		}
+	}
+
+	function generateAttack(attackData:Null<AttackData>):AttackData
+	{
+		if (attackData == null)
+			attackData = {
+				name: null,
+				attack_animation_name: null,
+				startup_animation_name: null,
+				soundOnHit: null,
+				soundOnMiss: null,
+				not_an_attack: null,
+				direction: null,
+				damage: null,
+				posture_damage: null,
+				stamina_damage: null,
+				stamina_cost: null,
+				health_recover: null,
+				posture_recover: null,
+				step_based_timing: null,
+				duration: null,
+				recovery: null,
+				is_unblockable: null,
+				is_bash: null
+			}
+
+		var newAttack:AttackData = {
+			name: attackData.name,
+			attack_animation_name: attackData.attack_animation_name,
+			startup_animation_name: attackData.startup_animation_name,
+			soundOnHit: attackData.soundOnHit,
+			soundOnMiss: attackData.soundOnMiss,
+			not_an_attack: attackData.not_an_attack,
+			direction: attackData.direction,
+			damage: attackData.damage,
+			posture_damage: attackData.posture_damage,
+			stamina_damage: attackData.stamina_damage,
+			stamina_cost: attackData.stamina_cost,
+			health_recover: attackData.health_recover,
+			posture_recover: attackData.posture_recover,
+			step_based_timing: attackData.step_based_timing,
+			duration: attackData.duration,
+			recovery: attackData.recovery,
+			is_unblockable: attackData.is_unblockable,
+			is_bash: attackData.is_bash
+		};
+
+		// These != null checks are to allow for attacks to be truncated a bit
+
+		if (newAttack.name == null)
+			newAttack.name = 'player_sing_attack';
+		if (newAttack.direction == null)
+			newAttack.direction = 'ANY';
+
+		if (newAttack.attack_animation_name == null)
+			newAttack.attack_animation_name = 'combatAttack';
+		if (newAttack.startup_animation_name == null)
+			newAttack.startup_animation_name = 'combatWind';
+
+		if (newAttack.soundOnHit == null)
+			newAttack.soundOnHit = 'strike';
+		if (newAttack.soundOnMiss == null)
+			newAttack.soundOnMiss = 'whiff';
+
+		if (newAttack.not_an_attack == null)
+			newAttack.not_an_attack = false;
+
+		if (newAttack.direction == null)
+			newAttack.direction = 'ANY';
+
+		// To allow sing attacks to prune this variable
+		if (newAttack.is_unblockable == null)
+			newAttack.is_unblockable = false;
+
+		// Above stat plus not_an_attack makes these unused
+		if (newAttack.damage == null)
+			newAttack.damage = 15;
+		if (newAttack.stamina_damage == null)
+			newAttack.stamina_damage = 0.5;
+		if (newAttack.is_bash == null)
+			newAttack.is_bash = false;
+
+		// Enemy attacks don't need this, and players without posture mechanics
+		if (newAttack.posture_damage == null)
+			newAttack.posture_damage = 3;
+
+		// For enemy attacks, since enemies don't use stamina
+		if (newAttack.stamina_cost == null)
+			newAttack.stamina_cost = 0.2;
+
+		// Healing attacks are likely not the broad norm
+		if (newAttack.health_recover == null)
+			newAttack.health_recover = 0;
+		if (newAttack.stamina_cost == null)
+			newAttack.posture_recover = 0;
+
+		// For attacks that occur instantly
+		if (newAttack.step_based_timing == null)
+			newAttack.step_based_timing = true;
+		if (newAttack.duration == null)
+			newAttack.duration = 0;
+		if (newAttack.recovery == null)
+			newAttack.recovery = 0;
+
+		return newAttack;
+	}
+
+	function generateAttackAndChainArray(attackDataArray:Array<AttackData>, chainDataArray:Array<ChainData>)
+	{
+		for (i in 0...attackDataArray.length)
+		{
+			var attackData:AttackData = attackDataArray[i];
+
+			attackArray.push(generateAttack(attackData));
+		}
+
+		for (i in 0...chainDataArray.length)
+		{
+			var chainData = chainDataArray[i];
+
+			var newChain:ChainData = {
+				name: chainData.name,
+				direction_overrides: chainData.direction_overrides,
+				chain: chainData.chain
+			};
+
+			chainArray.push(newChain);
 		}
 	}
 }

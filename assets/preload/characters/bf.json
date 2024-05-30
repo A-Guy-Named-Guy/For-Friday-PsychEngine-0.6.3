@@ -502,6 +502,83 @@
 	"soundsToPickFromRandom": [["whiff", [1, 3]], ["strike", [1, 4]]],
 	"soundsToVaryVolume": [["whiff", [0.9, 1]], ["strike", [0.7, 0.9]], ["heal" , [0.7, 0.9]], ["oos", [0.7, 0.9]]],
 
+	"attacks":
+	[
+		{
+			"name": "player_sing_attack",
+			"attack_animation_name": "combatAttack",
+			"startup_animation_name": "combatWind",
+			"direction": "ANY",
+			"damage": 2,
+			"stamina_cost": 0.2,
+			"is_unblockable": true
+		},
+		{
+			"name": "enemy_sing_attack",
+			"attack_animation_name": "combatAttack",
+			"startup_animation_name": "combatWind",
+			"direction": "ANY",
+			"damage": 12
+		},
+		{
+			"name": "player_sing_special",
+			"attack_animation_name": "combatAttack",
+			"startup_animation_name": "combatWind",
+			"not_an_attack": true,
+			"direction": "SPECIAL",
+			"damage": 0,
+			"stamina_cost": -0.6,
+			"health_recover": -40
+		},
+		{
+			"name": "enemy_sing_special",
+			"attack_animation_name": "combatAttack",
+			"startup_animation_name": "combatWind",
+			"not_an_attack": true,
+			"direction": "SPECIAL",
+			"damage": 0,
+			"health_recover": 20,
+			"posture_recover": 25
+		},
+		{
+			"name": "basic_attack",
+			"attack_animation_name": "combatAttack",
+			"startup_animation_name": "combatWind",
+			"direction": "ANY",
+			"damage": 12,
+			"step_based_timing": true,
+			"duration": 2,
+			"recovery": 2
+		},
+		{
+			"name": "heavy_attack",
+			"attack_animation_name": "combatAttack",
+			"startup_animation_name": "combatWind",
+			"direction": "ANY",
+			"damage": 25,
+			"step_based_timing": true,
+			"duration": 4,
+			"recovery": 4,
+			"is_unblockable": true
+		}
+	],
+
+	"chains":
+	[
+		{
+			"name": "heavy_finisher",
+			"direction_overrides":
+			[
+			],
+			"chain":
+			[
+				"basic_attack",
+				"basic_attack",
+				"heavy_attack"
+			]
+		}
+	],
+
 	"characterExtras": [
 		"bfFace",
 		"bfMicTop",

@@ -215,6 +215,12 @@ class EditorPlayState extends MusicBeatState
 
 		var noteData:Array<SwagSection>;
 
+		// Combat change
+		// SwagSong notes code
+		//
+		// This creates all the notes
+		// Check into all this more in-depth later, ties in with handling of ChartingState
+
 		// NEW SHIT
 		noteData = songData.notes;
 
