@@ -71,15 +71,12 @@ class Combat extends PlayState
 	var playerGuardActive:Bool = false;
 	var singGuard:Bool = false;
 	var attackRecovery:Bool = false;
-	var inChain:Bool = false;
 	var enemyWasBashed:Bool = false;
 	var hasSustainAttacked:Bool = false;
 	var combatNoteData:Int = 0;
-	var enemyPassiveGuard:Bool = true;
 	var enemyGuardDown:Bool = false;
 	var bufferNoteAttack:Bool = false;
 	var attackDelay:Bool = false;
-	var hasStartedAttack:Bool = false;
 	var enemyAttackIndicated:Bool = false;
 	var instantSingAttack:Bool = false;
 
@@ -92,6 +89,8 @@ class Combat extends PlayState
 	var playerAttackPosition:Int = 0;
 	var downAttackPositionShift:Bool = false;
 
+	var enemyMatchedPlayerGuard:Bool = false;
+
 	var guardArrow:FlxSprite;
 	var attackTypeIndicator:FlxSprite = new FlxSprite(100, 450);
 
@@ -100,19 +99,21 @@ class Combat extends PlayState
 
 	var hitOverlay:FlxSprite;
 
+	public var timerArray:Array<FlxTimer> = [];
+
+	var playerInputChainArray:Array<String> = [];
+
 	public var reflexGuardTimer:FlxTimer = new FlxTimer();
 	public var singGuardTimer:FlxTimer = new FlxTimer();
-
-	var attackRecoveryTimer:FlxTimer = new FlxTimer();
-	var enemyPassiveGuardTimer:FlxTimer = new FlxTimer();
-	var hasHitNoteTimer:FlxTimer = new FlxTimer();
-	var playerWasBashedTimer:FlxTimer = new FlxTimer();
-	var enemyWasBashedTimer:FlxTimer = new FlxTimer();
-	var attackDelayTimer:FlxTimer = new FlxTimer();
-	var isDodgeTimer:FlxTimer = new FlxTimer();
-	var posturePauseTimer:FlxTimer = new FlxTimer();
-	var chainTimer:FlxTimer = new FlxTimer();
-	var instantSingAttackTimer:FlxTimer = new FlxTimer();
+	public var attackRecoveryTimer:FlxTimer = new FlxTimer();
+	public var hasHitNoteTimer:FlxTimer = new FlxTimer();
+	public var playerWasBashedTimer:FlxTimer = new FlxTimer();
+	public var enemyWasBashedTimer:FlxTimer = new FlxTimer();
+	public var attackDelayTimer:FlxTimer = new FlxTimer();
+	public var isDodgeTimer:FlxTimer = new FlxTimer();
+	public var posturePauseTimer:FlxTimer = new FlxTimer();
+	public var chainTimer:FlxTimer = new FlxTimer();
+	public var instantSingAttackTimer:FlxTimer = new FlxTimer();
 
 	public var stepTimerCrochet:Float = (Conductor.stepCrochet / 1000); // steps in milliseconds compatible with FlxTimer
 
@@ -127,14 +128,17 @@ class Combat extends PlayState
 	var manuallySwitchedGuard:Bool = false;
 
 	// This is the core file for handling combat
-	// Regarding the entirety of this mod: The setup for this code aims to condense as much of it into it own files as possible
-	// Basically the goal is to make as few edits to the engine's code outside of drag-and-dropping the files for this mod
-	// Unfortunately it's not possible to prune out every engine-edit, but steps were taken at every chance to reduce this
-	// Any change made will have a "Combat change" comment next to it
+	// Any change made to existing vanilla files will have a "Combat change" comment next to it
 
 	public function new()
 	{
 		super();
+
+		// Thanks to the fact that I keep butting into making a variable equal to an object just references the original object,
+		// I can at least use this for some good
+		// PlayState.instance.boyfriend used to be here like 150 times before
+		boyfriend = PlayState.instance.boyfriend;
+		dad = PlayState.instance.dad;
 
 		// Combat change
 		// Null static values default to false (since static values can't be null)
@@ -153,17 +157,13 @@ class Combat extends PlayState
 
 		if (combatMechanics)
 		{
-			// Thanks to the fact that I keep butting into making a variable equal to an object just references the original object,
-			// I can at least use this for some good
-			// PlayState.instance.boyfriend used to be here like 150 times before
-			boyfriend = PlayState.instance.boyfriend;
-			dad = PlayState.instance.dad;
-
 			trace('start combat new');
 			trace(stepTimerCrochet);
 			FlxG.watch.addQuick("hasHitNote", hasHitNote);
 			FlxG.watch.addQuick("hasParried", hasParried);
 			FlxG.watch.addQuick("bufferNoteAttack", bufferNoteAttack);
+			FlxG.watch.addQuick("BF Action", boyfriend.currentAction);
+			FlxG.watch.addQuick("Dad Action", dad.currentAction);
 
 			playerGuard = new FlxTypedGroup<FlxSprite>();
 			enemyGuard = new FlxTypedGroup<FlxSprite>();
@@ -210,6 +210,24 @@ class Combat extends PlayState
 			if (enableTimingIndicator)
 				setupTimingIndicator();
 
+			timerArray.push(reflexGuardTimer);
+			timerArray.push(singGuardTimer);
+			timerArray.push(attackRecoveryTimer);
+			timerArray.push(hasHitNoteTimer);
+			timerArray.push(playerWasBashedTimer);
+			timerArray.push(attackDelayTimer);
+			timerArray.push(isDodgeTimer);
+			timerArray.push(posturePauseTimer);
+			timerArray.push(chainTimer);
+			timerArray.push(instantSingAttackTimer);
+			timerArray.push(dad.actionTimer);
+			timerArray.push(boyfriend.actionTimer);
+
+			for (flxTimer in timerArray)
+			{
+				flxTimer = new FlxTimer();
+			}
+
 			trace('finished create()');
 		}
 	}
@@ -244,25 +262,30 @@ class Combat extends PlayState
 			if (PlayState.instance.generatedMusic)
 			{
 				// if (PlayState.SONG.notes[PlayState.instance.curSection].sectionNotes == [])
-				// {
+				if (!PlayState.instance.startingSong && !boyfriend.stunned && !PlayState.instance.paused)
+				{
+					if (dad.currentAction == 'recovery')
+						hasParried = false;
 
-				// determineEnemyChain();
-				// if (dad.currentAction == 'neutral' && !dad.currentAttack.step_based_timing)
-				//	performEnemyChartlessAttack();
+					determineEnemyChain();
+					if (dad.currentAction == 'neutral' && !dad.currentAttack.step_based_timing)
+						performEnemyAttack();
+				}
 
-				// }
 				// else
-				evaluateCombatNotes();
+				// evaluateCombatNotes();
 				// All behavior for the enemy's notes are chunked into evaluateCombatNotes()
 			}
 
 			if (updateTrace)
 				trace('pre controls');
 
-			if (!disableControls && !boyfriend.isBashed && !hasStartedAttack)
+			if (!disableControls && !boyfriend.isBashed)
 			{
 				if (controls.ATTACK_P && !bufferNoteAttack && !attackDelay)
 				{
+					PlayState.instance.callOnLuas('onStartingAttack', ['boyfriend']);
+
 					// attackDelay is here to make a small delay before an attack is thrown if it's not unblockable
 					// Unblockables account for buffering the attack in time to let a guard switch happen
 					// This is here to provide a buffer before the attack is thrown to give some time to actually press the guard button before the attack is thrown
@@ -301,8 +324,6 @@ class Combat extends PlayState
 
 				if (controls.DDOWN_P)
 				{
-					hasStartedAttack = false;
-
 					if (isDodgeTimer.active)
 						isDodgeTimer.reset();
 					else
@@ -312,14 +333,14 @@ class Combat extends PlayState
 						isDodge = false;
 					});
 
-					initiateChain();
+					// initiateChain();
 
 					boyfriend.playAnim('combatReadyDOWN', true);
 				}
 
 				if (controls.SPECIAL_P)
 				{
-					evaluateAttack('specialKey');
+					evaluateAttack('special');
 				}
 
 				if (controls.GLEFT_P || controls.GUP_P || controls.GRIGHT_P)
@@ -327,63 +348,67 @@ class Combat extends PlayState
 					cancelStates();
 					playerPreviousGuardPosition = boyfriend.guardPosition;
 
+					var newGuardPosition:Int = 0;
+
 					if (controls.GLEFT_P)
-						boyfriend.guardPosition = 0;
+						newGuardPosition = 0;
 					if (controls.GUP_P)
-						boyfriend.guardPosition = 2;
+						newGuardPosition = 2;
 					if (controls.GRIGHT_P)
-						boyfriend.guardPosition = 3;
+						newGuardPosition = 3;
 
-					if (boyfriend.hasReflexGuard)
-					{
-						switch (boyfriend.guardPosition)
+					switchGuard(playerGuard, 'normal', newGuardPosition);
+
+					/*if (boyfriend.hasReflexGuard)
 						{
-							case 0:
-								boyfriend.playAnim('combatReadyLEFT', true);
-							case 1:
-							// Nope
-							case 2:
-								boyfriend.playAnim('combatReadyUP', true);
-							case 3:
-								boyfriend.playAnim('combatReadyRIGHT', true);
-						}
-					}
-					else
-					{
-						if (controls.GLEFT_P)
-						{
-							switch (playerPreviousGuardPosition)
-							{
-								case 2:
-									boyfriend.playAnim('combatSwapUpLEFT', true);
-								case 3:
-									boyfriend.playAnim('combatSwapRightLEFT', true);
-							}
-						}
-						if (controls.GUP_P)
-						{
-							switch (playerPreviousGuardPosition)
+							switch (boyfriend.guardPosition)
 							{
 								case 0:
-									boyfriend.playAnim('combatSwapLeftUP', true);
-								case 3:
-									boyfriend.playAnim('combatSwapRightUP', true);
-							}
-						}
-						if (controls.GRIGHT_P)
-						{
-							switch (playerPreviousGuardPosition)
-							{
-								case 0:
-									boyfriend.playAnim('combatSwapLeftRIGHT', true);
+									boyfriend.playAnim('combatReadyLEFT', true);
+								case 1:
+								// Nope
 								case 2:
-									boyfriend.playAnim('combatSwapUpRIGHT', true);
+									boyfriend.playAnim('combatReadyUP', true);
+								case 3:
+									boyfriend.playAnim('combatReadyRIGHT', true);
 							}
 						}
-					}
+						else
+						{
+							if (controls.GLEFT_P)
+							{
+								switch (playerPreviousGuardPosition)
+								{
+									case 2:
+										boyfriend.playAnim('combatSwapUpLEFT', true);
+									case 3:
+										boyfriend.playAnim('combatSwapRightLEFT', true);
+								}
+							}
+							if (controls.GUP_P)
+							{
+								switch (playerPreviousGuardPosition)
+								{
+									case 0:
+										boyfriend.playAnim('combatSwapLeftUP', true);
+									case 3:
+										boyfriend.playAnim('combatSwapRightUP', true);
+								}
+							}
+							if (controls.GRIGHT_P)
+							{
+								switch (playerPreviousGuardPosition)
+								{
+									case 0:
+										boyfriend.playAnim('combatSwapLeftRIGHT', true);
+									case 2:
+										boyfriend.playAnim('combatSwapUpRIGHT', true);
+								}
+							}
+						}
 
-					if (!singGuard)
-						updateGuardUI(playerGuard, 'normal');
+						if (!singGuard)
+							updateGuardUI(playerGuard, 'normal'); */
 
 					playerGuardActive = true;
 
@@ -405,7 +430,7 @@ class Combat extends PlayState
 			else if (boyfriend.isBashed && boyfriend.special == 'recover')
 			{
 				if (controls.SPECIAL_P)
-					evaluateAttack('specialKey');
+					evaluateAttack('special');
 			}
 			if (updateTrace)
 				trace('pre timer');
@@ -786,17 +811,11 @@ class Combat extends PlayState
 					}
 				}
 
+				if (!daNote.isCombatNote)
+					hasParried = false;
+
 				if (daNote.wasGoodHit)
 				{
-					enemyPassiveGuard = false;
-					if (enemyPassiveGuardTimer.active)
-						enemyPassiveGuardTimer.reset();
-					else
-						enemyPassiveGuardTimer.start(stepTimerCrochet * 4, function(tmr:FlxTimer)
-						{
-							enemyPassiveGuard = true;
-						});
-
 					switch (daNote.noteType)
 					{
 						case "attack":
@@ -823,14 +842,7 @@ class Combat extends PlayState
 							if (daNote.noteData == 1)
 								attackName == 'enemy_sing_special';
 
-							for (i in 0...dad.attackArray.length)
-							{
-								if (dad.attackArray[i].name != attackName)
-									continue;
-
-								attackData = dad.attackArray[i];
-								break;
-							}
+							attackData = dad.attackMap.get(attackName);
 
 							if (!daNote.isSustainNote && attackData != null)
 								evaluateEnemyAttack(attackData, ignoreIsBashed, daNote.noteData, forceUnblockable, deathNoteAttack);
@@ -899,11 +911,28 @@ class Combat extends PlayState
 			return;
 		}
 
+		switch (boyfriend.currentAction)
+		{
+			case 'recovery' | 'hitstun':
+				if (boyfriend.actionTimer.timeLeft <= 1)
+				{
+					boyfriend.actionTimer.onComplete = function(tmr:FlxTimer)
+					{
+						evaluateAttack();
+					};
+
+					executeAttack = false;
+				}
+			case 'startup':
+				playerAttackPosition = boyfriend.guardPosition;
+				executeAttack = false;
+		}
+
 		if (!dad.isBashed)
 		{
-			if (dad.currentAction == 'startup')
+			if (dad.currentAction == 'startup' && dad.guardPosition == boyfriend.guardPosition)
 			{
-				if (dad.actionTimer.time <= 1)
+				if (dad.actionTimer.timeLeft <= 0.5)
 				{
 					hasParried = true;
 					FlxG.watch.addQuick("hasParried", hasParried);
@@ -911,11 +940,11 @@ class Combat extends PlayState
 					executeAttack = false;
 				}
 			}
-			else if (dad.currentAction == 'stepStartup')
+			else if (dad.currentAction == 'stepStartup' && dad.guardPosition == boyfriend.guardPosition)
 			{
 				var timeCounter:Float = 0;
 				var parryWindow:Int = 0;
-				while (timeCounter < 1)
+				while (timeCounter < 0.7)
 				{
 					timeCounter += stepTimerCrochet;
 					++parryWindow;
@@ -960,74 +989,76 @@ class Combat extends PlayState
 		}
 	}
 
-	function evaluateAttack(specialInitiation:String = 'none'):Void
+	function evaluateAttack(input:String = 'attack'):Void
 	{
 		attackDelayTimer.cancel();
 		attackDelay = false;
 
-		var isSpecialAttackNote:Bool = false;
+		// var isSpecialAttackNote:Bool = false;
 		var localStaminaModifier:Float = 1;
 
 		bufferNoteAttack = false;
 
 		FlxG.watch.addQuick("bufferNoteAttack", bufferNoteAttack);
 
-		if (specialInitiation == 'attackNote')
-			isSpecialAttackNote = true;
-
-		if (isSpecialAttackNote)
+		if (input == 'singAttack')
 			localStaminaModifier = 0;
 
-		switch (boyfriend.special)
-		{
-			case 'bash':
-				if ((inChain || isSpecialAttackNote || specialInitiation == 'specialKey') && !dad.isBashed)
-				{
-					if (PlayState.instance.health >= boyfriend.staminaCost * 3 * localStaminaModifier)
-						specialBash(localStaminaModifier);
+		// if (isSpecialAttackNote)
+		//	localStaminaModifier = 0;
+
+		startPlayerAttack(localStaminaModifier, input);
+
+		/*switch (boyfriend.special)
+			{
+				case 'bash':
+					if ((isSpecialAttackNote || specialInitiation == 'specialKey') && !dad.isBashed)
+					{
+						if (PlayState.instance.health >= boyfriend.staminaCost * 3 * localStaminaModifier)
+							specialBash(localStaminaModifier);
+						else
+							boyfriend.playSoundEffect('oos');
+					}
+					else if (PlayState.instance.health >= boyfriend.staminaCost * localStaminaModifier || characterDeathByStamina)
+					{
+						startPlayerAttack(localStaminaModifier, 'special');
+					}
 					else
 						boyfriend.playSoundEffect('oos');
-				}
-				else if (PlayState.instance.health >= boyfriend.staminaCost * localStaminaModifier || characterDeathByStamina)
-				{
-					playerAttack(localStaminaModifier);
-				}
-				else
-					boyfriend.playSoundEffect('oos');
-			case 'recover':
-				if (!isSpecialAttackNote && specialInitiation == 'specialKey')
-				{
-					boyfriend.playAnim('combatAttackSPECIAL');
-					if (boyfriend.combatHealth > boyfriend.combatHealthMax / 2 && !boyfriend.isBashed)
+				case 'recover':
+					if (!isSpecialAttackNote && specialInitiation == 'specialKey')
 					{
-						boyfriend.combatHealth -= boyfriend.combatHealthMax / 2;
-						PlayState.instance.health += 0.6;
-						boyfriend.playSoundEffect('heal');
-					}
-					else if (boyfriend.isBashed)
-					{
-						boyfriend.isBashed = false;
-						playerWasBashedTimer.cancel();
-						PlayState.instance.health += 0.3;
-						boyfriend.playSoundEffect('heal');
-
-						#if ACHIEVEMENTS_ALLOWED
-						var achieve:String = PlayState.instance.checkForAchievement(['recover_tech']);
-						if (achieve != null)
+						boyfriend.playAnim('combatAttackSPECIAL');
+						if (boyfriend.combatHealth > boyfriend.combatHealthMax / 2 && !boyfriend.isBashed)
 						{
-							PlayState.instance.startAchievement(achieve);
-							Achievements.unlockAchievement(achieve);
+							boyfriend.combatHealth -= boyfriend.combatHealthMax / 2;
+							PlayState.instance.health += 0.6;
+							boyfriend.playSoundEffect('heal');
 						}
-						#end
-					}
+						else if (boyfriend.isBashed)
+						{
+							boyfriend.isBashed = false;
+							playerWasBashedTimer.cancel();
+							PlayState.instance.health += 0.3;
+							boyfriend.playSoundEffect('heal');
 
-					cancelStates();
-				}
-				else
-					playerAttack(localStaminaModifier);
-			default:
-				playerAttack();
-		}
+							#if ACHIEVEMENTS_ALLOWED
+							var achieve:String = PlayState.instance.checkForAchievement(['recover_tech']);
+							if (achieve != null)
+							{
+								PlayState.instance.startAchievement(achieve);
+								Achievements.unlockAchievement(achieve);
+							}
+							#end
+						}
+
+						cancelStates();
+					}
+					else
+						startPlayerAttack(localStaminaModifier);
+				default:
+					startPlayerAttack();
+		}*/
 	}
 
 	function specialBash(?localStaminaModifier:Float = 1):Void
@@ -1038,7 +1069,7 @@ class Combat extends PlayState
 		boyfriend.playSoundEffect('bash');
 		updateGuardUI(enemyGuard, 'inactive');
 
-		damagePosture(1.5);
+		damagePosture();
 		PlayState.instance.health -= boyfriend.staminaCost * 3 * localStaminaModifier;
 
 		dad.isBashed = true;
@@ -1054,7 +1085,178 @@ class Combat extends PlayState
 		cancelStates();
 	}
 
-	function playerAttack(?localStaminaModifier:Float = 1):Void
+	function determinePlayerChain(input:String):String
+	{
+		var nextAttack:String = 'basic_attack';
+		var inputAttack:String = 'basic_attack';
+
+		switch (input)
+		{
+			case 'attack':
+				inputAttack = 'basic_attack';
+			case 'special':
+				inputAttack = 'special_attack';
+			case 'singAttack':
+				inputAttack = 'player_sing_attack';
+		}
+
+		nextAttack = inputAttack;
+
+		playerInputChainArray.push(input);
+
+		if (playerInputChainArray.length > 0)
+			nextAttack = checkPlayerChain(input);
+
+		if (nextAttack == null || playerInputChainArray.length == 0)
+		{
+			resetPlayerChain();
+			playerInputChainArray.push(input);
+			nextAttack = inputAttack;
+		}
+
+		++boyfriend.placeInChain;
+
+		if (chainTimer.active)
+			chainTimer.reset();
+		else
+			chainTimer = new FlxTimer().start(boyfriend.currentAttack.chain_duration, function(tmr:FlxTimer)
+			{
+				resetPlayerChain();
+			});
+
+		return nextAttack;
+	}
+
+	/**
+	 * Iterates through the player's chains to find if the current input sequence has a match
+	 * 
+	 * This is its own function largely so nextAttack in determinePlayerChain() becomes null if no matches are found
+	 */
+	function checkPlayerChain(input:String):String
+	{
+		var nextAttack:String = null;
+
+		for (chain in boyfriend.chainMap.iterator())
+		{
+			for (i in 0...chain.input_chain.length)
+			{
+				if (chain.input_chain[i] != playerInputChainArray[i])
+					break;
+
+				if (i != boyfriend.placeInChain)
+					continue;
+
+				// Reaching this point proves the chain is a match
+				if (i >= chain.input_chain.length)
+					resetPlayerChain();
+				else
+				{
+					nextAttack = chain.attack_chain[boyfriend.placeInChain];
+					break;
+				}
+			}
+		}
+
+		return nextAttack;
+	}
+
+	function resetPlayerChain():Void
+	{
+		boyfriend.placeInChain = 0;
+		playerInputChainArray = [];
+		chainTimer.cancel();
+	}
+
+	public function determinePlayerAttack(?attackName:String):AttackData
+	{
+		var currentAttack:AttackData = null;
+
+		currentAttack = boyfriend.attackMap.get(attackName);
+
+		if (currentAttack == null)
+			currentAttack = boyfriend.attackMap.get('basic_attack');
+		if (currentAttack == null)
+			currentAttack = boyfriend.attackMap.get('player_sing_attack');
+		if (currentAttack == null)
+			currentAttack = boyfriend.generateAttack(null);
+
+		return currentAttack;
+	}
+
+	/**
+	 * Gets an effect from a character's effect array
+	 * @param character The character performing the attack
+	 * @param effect Valid effects: 'onComplete', 'onHit', 'onBlock', 'onParry'
+	 * @param attack Optionally check a specific attack. Can be left null to check the character's currentAttack
+	 * @return AttackEffectData
+	 */
+	function getAttackEffect(character:Character, effect:String, ?attack:Null<AttackData>):AttackEffectData
+	{
+		var effectName:String = null;
+
+		if (attack == null)
+			attack = character.currentAttack;
+		if (attack == null)
+			return null;
+
+		switch (effect)
+		{
+			case 'onComplete':
+				effectName = attack.on_complete;
+			case 'onHit':
+				effectName = attack.on_hit;
+			case 'onBlock':
+				effectName = attack.on_block;
+			case 'onParry':
+				effectName = attack.on_parry;
+		}
+
+		var currentEffect:AttackEffectData = null;
+
+		currentEffect = character.attackEffectMap.get(effectName);
+
+		return currentEffect;
+	}
+
+	/**
+	 * Applies all stats of an attack effect at once.
+	 * @param blockStunAttack If true, reapplies blockStun action on enemy with effect's hitstun instead
+	 */
+	function applyAttackEffect(attackEffect:AttackEffectData, attacker:Character, blockStunAttack:Bool = false):Void
+	{
+		if (attackEffect == null)
+			return;
+
+		var defender:Character = dad;
+
+		if (attacker == dad)
+			defender = boyfriend;
+
+		if (attacker == boyfriend && attackEffect.posture_damage != null)
+			damagePosture(attackEffect.posture_damage);
+
+		attackEffect = Character.fillNullAttackEffectData(attackEffect);
+
+		reduceHealth(defender, attackEffect.damage);
+
+		if (defender == boyfriend)
+			PlayState.instance.health -= attackEffect.stamina_damage;
+		if (attacker == boyfriend)
+			PlayState.instance.health -= attackEffect.stamina_cost;
+
+		attacker.combatHealth += attackEffect.health_recover;
+		attacker.posture += attackEffect.posture_recover;
+
+		if (!attacker.currentAttack.not_an_attack && !blockStunAttack)
+			inflictHitstun(defender, attackEffect.hitstun);
+
+		if (blockStunAttack)
+			enemyBlockStun(attackEffect.hitstun);
+
+		attacker.playSoundEffect(attackEffect.sound);
+	}
+
+	function startPlayerAttack(localStaminaModifier:Float = 1, input:String = 'attack'):Void
 	{
 		if (attackDelay)
 		{
@@ -1072,12 +1274,15 @@ class Combat extends PlayState
 			hasHitNoteTimer.cancel();
 		}
 
+		input = determinePlayerChain(input);
+		boyfriend.currentAttack = determinePlayerAttack(input);
+
+		PlayState.instance.health -= boyfriend.currentAttack.stamina_cost * localStaminaModifier;
+
 		// attackRecovery creates a delay after throwing an attack so you can't spam attacks abnormally quickly
 		// Intentionally bypassed by unblockable shenanigans, you want note unblockables to be as fast as the charting allows
 		if (!attackRecovery && !hasHitNote)
 		{
-			PlayState.instance.health -= (boyfriend.staminaCost * 1.5 * localStaminaModifier);
-
 			hasParried = false;
 			FlxG.watch.addQuick("hasParried", hasParried);
 
@@ -1100,8 +1305,6 @@ class Combat extends PlayState
 		}
 		else if (hasHitNote)
 		{
-			PlayState.instance.health -= boyfriend.staminaCost * localStaminaModifier;
-
 			// Intentionally set with or without sustain note, just needed for the logic to work
 			hasSustainAttacked = true;
 		}
@@ -1113,61 +1316,136 @@ class Combat extends PlayState
 
 		moveCharacterToFront();
 
-		boyfriend.playAnim(appendDirection('combatAttack', playerAttackPosition) + (hasHitNote
-			&& boyfriend.hasUnblockableNoteAttacks ? 'unblockable' : ''),
-			true);
+		cancelStates();
 
-		if (!boyfriend.hasUnblockableNoteAttacks)
-			hasHitNote = false;
-
-		if (enemyPostureMechanic)
+		if (boyfriend.currentAttack.duration <= 0)
 		{
-			// Greatly increase posture damage while enemy is singing as an alternative strategy to damage
-			if (boyfriend.guardPosition == dad.guardPosition && enemyPassiveGuard)
-				damagePosture(3);
-			else
-				damagePosture();
-		}
-
-		if ((boyfriend.guardPosition == dad.guardPosition || enemyPassiveGuard) && !hasHitNote && !enemyGuardDown && !dad.isBashed)
-		{
-			switch (playerAttackPosition)
+			if (!boyfriend.currentAttack.not_an_attack)
 			{
-				case 0:
-					dad.playAnim('combatBlockLEFT', true);
-				case 2:
-					dad.playAnim('combatBlockUP', true);
-				case 3:
-					dad.playAnim('combatBlockRIGHT', true);
+				if (dad.guardPosition == playerAttackPosition)
+					enemyBlockStun();
+				else if (dad.currentAction != 'blockStun')
+					dad.guardPosition = playerAttackPosition;
 			}
 
-			if (dad.guardPosition == playerAttackPosition)
-			{
-				var newPosition:Int = FlxG.random.int(0, 2);
-				if (newPosition > 0)
-					++newPosition;
-
-				// Re-randomizing once to decrease chance that guard sticks to one side
-				if (newPosition == playerAttackPosition)
-				{
-					newPosition = FlxG.random.int(0, 2);
-					if (newPosition > 0)
-						++newPosition;
-				}
-
-				dad.guardPosition = newPosition;
-			}
-			else
-				dad.guardPosition = playerAttackPosition;
-
-			dad.playSoundEffect('block');
+			executePlayerAttack();
 		}
 		else
+		{
+			if (boyfriend.currentAttack.direction == 'ANY')
+				boyfriend.playAnim(appendDirection(boyfriend.currentAttack.startup_animation_name, playerAttackPosition, true)
+					+ (boyfriend.currentAttack.is_unblockable ? 'unblockable' : ''),
+					true);
+			else
+				boyfriend.playAnim(boyfriend.currentAttack.startup_animation_name
+					+ boyfriend.currentAttack.direction
+					+ (boyfriend.currentAttack.is_unblockable ? 'unblockable' : ''),
+					true);
+
+			boyfriend.currentAction = 'startup';
+			var currentDuration:Float = boyfriend.currentAttack.duration;
+			if (boyfriend.currentAttack.step_based_timing)
+				currentDuration *= stepTimerCrochet;
+
+			if (boyfriend.actionTimer.active)
+				boyfriend.actionTimer.reset(currentDuration);
+			else
+				boyfriend.actionTimer.start(currentDuration);
+
+			boyfriend.actionTimer.onComplete = function(tmr:FlxTimer)
+			{
+				executePlayerAttack();
+			};
+
+			if (!boyfriend.currentAttack.not_an_attack)
+			{
+				switch (dad.currentAction)
+				{
+					case 'blockStun' | 'recovery' | 'stepRecovery':
+						dad.actionTimer.onComplete = function(tmr:FlxTimer)
+						{
+							enemyStartDefense();
+						}
+					case 'neutral' | 'hitstun':
+						enemyStartDefense();
+				}
+			}
+		}
+
+		updateGuardUI(enemyGuard, 'normal');
+	}
+
+	function executePlayerAttack():Void
+	{
+		if (boyfriend.currentAttack.direction == 'ANY')
+			boyfriend.playAnim(appendDirection(boyfriend.currentAttack.attack_animation_name, playerAttackPosition, true)
+				+ (boyfriend.currentAttack.is_unblockable ? 'unblockable' : ''),
+				true);
+		else
+			boyfriend.playAnim(boyfriend.currentAttack.attack_animation_name
+				+ boyfriend.currentAttack.direction
+				+ (boyfriend.currentAttack.is_unblockable ? 'unblockable' : ''),
+				true);
+
+		applyAttackEffect(getAttackEffect(boyfriend, 'onComplete'), boyfriend);
+
+		if (boyfriend.currentAttack.recovery > 0)
+		{
+			boyfriend.currentAction = 'recovery';
+			var currentRecovery:Float = boyfriend.currentAttack.recovery;
+			if (boyfriend.currentAttack.step_based_timing)
+				currentRecovery *= stepTimerCrochet;
+
+			if (boyfriend.actionTimer.active)
+				boyfriend.actionTimer.reset(currentRecovery);
+			else
+				boyfriend.actionTimer.start(currentRecovery);
+
+			boyfriend.actionTimer.onComplete = function(tmr:FlxTimer)
+			{
+				boyfriend.currentAction = 'neutral';
+			};
+		}
+		else
+			boyfriend.currentAction = 'neutral';
+
+		if (boyfriend.currentAttack.not_an_attack)
+			return;
+
+		PlayState.instance.callOnLuas('onAttacked', ['dad']);
+		PlayState.instance.callOnLuas('onExecutingAttack', ['boyfriend']);
+
+		if ((boyfriend.guardPosition == dad.guardPosition
+			&& !boyfriend.currentAttack.is_unblockable
+			&& !enemyGuardDown
+			&& !dad.isBashed)
+			|| dad.currentAction == 'startup'
+			|| dad.currentAction == 'stepStartup'
+			|| dad.currentAction == 'recovery'
+			|| dad.currentAction == 'stepRecovery')
+		{
+			PlayState.instance.callOnLuas('onDefend', ['dad']);
+
+			if (dad.blockCount >= 3)
+			{
+				playerAttackParried();
+				dad.blockCount = 0;
+			}
+			else
+			{
+				playerAttackBlocked();
+				++dad.blockCount;
+			}
+		}
+		else
+		{
 			playerAttackLand();
+			dad.blockCount += 2;
+		}
 
 		updateGuardUI(enemyGuard, 'normal');
 
-		cancelStates();
+		determineEnemyChain(true);
 	}
 
 	function evaluateEnemyAttack(attackData:AttackData, ignoreIsBashed:Bool = false, ?attackDirectionInt:Int, forceUnblockable:Bool = false,
@@ -1201,7 +1479,17 @@ class Combat extends PlayState
 			}
 		}
 
-		dad.playAnim(appendDirection(attackData.attack_animation_name, attackDirectionInt, true) + (forceUnblockable ? 'unblockable' : ''), true);
+		var attackAnimationName:String = '';
+
+		if (attackData.append_direction_to_anim_name || attackData.direction == 'ANY')
+			attackAnimationName = appendDirection(attackData.attack_animation_name, attackDirectionInt, true);
+		else
+			attackAnimationName = attackData.attack_animation_name;
+
+		if (forceUnblockable)
+			attackAnimationName += 'unblockable';
+
+		dad.playAnim(attackAnimationName, true);
 
 		// The intention is to force-kill if this note passes without the opponent defeated
 		// This is intended as a cinematic-end to a song if the opponent wasn't defeated
@@ -1221,18 +1509,24 @@ class Combat extends PlayState
 		if (enemyPostureMechanic)
 			dad.posture -= attackData.posture_recover;
 
+		if (!attackData.not_an_attack)
+			PlayState.instance.callOnLuas('onAttacked', ['boyfriend']);
+
 		if (attackData.not_an_attack)
 		{
-			dad.playSoundEffect(attackData.soundOnHit);
+			dad.playSoundEffect(attackData.sound_on_hit);
 		}
 		else if (attackData.is_bash)
 		{
 			if (isDodge || singGuard)
 			{
+				PlayState.instance.callOnLuas('onDefend', ['boyfriend']);
+				PlayState.instance.callOnLuas('onDodge', ['boyfriend']);
+
 				// The weapon the enemy is using likely has a greater influence on the kind of sound,
 				// Compared to the player character's dodging method
 				// Thus the sound is checking dad instead of boyfriend
-				dad.playSoundEffect(attackData.soundOnMiss);
+				dad.playSoundEffect(attackData.sound_on_miss);
 
 				if (!boyfriend.animation.curAnim.name.startsWith('sing'))
 					boyfriend.playAnim('combatDodge', true);
@@ -1240,7 +1534,8 @@ class Combat extends PlayState
 			else
 			{
 				PlayState.instance.health -= 0.5;
-				dad.playSoundEffect(attackData.soundOnHit);
+				dad.playSoundEffect(attackData.sound_on_hit);
+				boyfriend.playSoundEffect(boyfriend.characterSounds.struck);
 				boyfriend.playAnim('combatHit', true);
 
 				cameraBounce(1);
@@ -1269,8 +1564,11 @@ class Combat extends PlayState
 		}
 		else if (hasParried && (boyfriend.guardPosition == dad.guardPosition))
 		{
-			boyfriend.playSoundEffect('parry');
-			damagePosture(1.5);
+			PlayState.instance.callOnLuas('onDefend', ['boyfriend']);
+			PlayState.instance.callOnLuas('onParry', ['boyfriend']);
+
+			boyfriend.playSoundEffect(boyfriend.characterSounds.parry);
+			damagePosture();
 
 			if (PlayState.instance.health < 2)
 				PlayState.instance.health += 0.33;
@@ -1307,10 +1605,13 @@ class Combat extends PlayState
 		}
 		else if (((dad.guardPosition == boyfriend.guardPosition) && playerGuardActive) || singGuard)
 		{
+			PlayState.instance.callOnLuas('onDefend', ['boyfriend']);
+			PlayState.instance.callOnLuas('onBlock', ['boyfriend']);
+
 			if (manuallySwitchedGuard && boyfriend.guardPosition > 0)
 				achievementBlockedNonLeftAttack = true;
 
-			boyfriend.playSoundEffect('block');
+			boyfriend.playSoundEffect(boyfriend.characterSounds.block);
 
 			if ((boyfriend.hasReflexGuard && !boyfriend.animation.curAnim.name.startsWith('sing')) || (!boyfriend.hasReflexGuard))
 			{
@@ -1345,6 +1646,8 @@ class Combat extends PlayState
 		FlxG.watch.addQuick("hasParried", hasParried);
 
 		cancelStates();
+		inflictHitstun(boyfriend);
+		resetPlayerChain();
 
 		if (attackDelay)
 		{
@@ -1355,148 +1658,250 @@ class Combat extends PlayState
 		updateGuardUI(enemyGuard, 'normal');
 	}
 
-	function determineEnemyChain():Void
+	function determineEnemyChain(forceChainChange:Bool = false):Void
 	{
-		if (dad.placeInChain > dad.currentChain.chain.length - 1 || dad.currentChainName == 'neutral')
+		if (dad.placeInChain > dad.currentChain.attack_chain.length - 1 || dad.currentChainName == 'neutral' || forceChainChange)
 		{
-			dad.currentChainName = dad.chainArray[Std.random(dad.chainArray.length)].name;
+			var mapLength:Int = 0;
+			for (value in dad.chainMap.iterator())
+				++mapLength;
 
-			for (i in 0...dad.chainArray.length)
+			var randValue:Int = Std.random(mapLength);
+			mapLength = 0;
+			for (value in dad.chainMap.iterator())
 			{
-				if (dad.chainArray[i].name != dad.currentChainName)
-					continue;
-
-				dad.currentChain = dad.chainArray[i];
-				dad.placeInChain = 0;
-				dad.currentChainName = dad.currentChain.name;
-
-				chooseEnemyChartlessAttack();
-				break;
+				if (randValue == mapLength)
+				{
+					dad.currentChainName = value.name;
+					break;
+				}
+				++mapLength;
 			}
+
+			if (dad.currentChain == null)
+				dad.currentChain = {
+					name: 'nullChain',
+					directions: null,
+					input_chain: null,
+					attack_chain: ['basic_attack']
+				}
+
+			dad.currentChain = dad.chainMap.get(dad.currentChainName);
+
+			dad.placeInChain = 0;
+			chooseEnemyAttack();
 		}
 	}
 
-	function chooseEnemyChartlessAttack():Void
+	function chooseEnemyAttack():Void
 	{
-		if (dad.placeInChain > dad.currentChain.chain.length - 1)
+		if (dad.placeInChain > dad.currentChain.attack_chain.length - 1)
 		{
 			determineEnemyChain();
 			return;
 		}
 
-		for (i in 0...dad.attackArray.length)
+		dad.currentAttack = dad.attackMap.get(dad.currentChain.attack_chain[dad.placeInChain]);
+		if (dad.currentChain.directions[dad.placeInChain] != '')
 		{
-			if (dad.attackArray[i].name != dad.currentChain.chain[dad.placeInChain])
-				continue;
-
-			dad.currentAttack = dad.attackArray[i];
-			if (dad.currentChain.direction_overrides[dad.placeInChain] != '')
-			{
-				if (dad.currentChain.direction_overrides[dad.placeInChain] == 'LEFT'
-					|| dad.currentChain.direction_overrides[dad.placeInChain] == 'UP'
-					|| dad.currentChain.direction_overrides[dad.placeInChain] == 'RIGHT')
-					dad.currentAttack.direction = dad.currentChain.direction_overrides[dad.placeInChain];
-			}
-			break;
+			if (dad.currentChain.directions[dad.placeInChain] == 'LEFT'
+				|| dad.currentChain.directions[dad.placeInChain] == 'UP'
+				|| dad.currentChain.directions[dad.placeInChain] == 'RIGHT')
+				dad.currentAttack.direction = dad.currentChain.directions[dad.placeInChain];
 		}
 	}
 
-	function performEnemyChartlessAttack():Void
+	// This exists mainly for setting an attack directly through lua
+	public function luaChangeEnemyAttack(attackName:String)
+	{
+		if (attackName == null)
+			return;
+
+		dad.currentAttack = dad.attackMap.get(attackName);
+	}
+
+	function performEnemyAttack():Void
 	{
 		var currentDirection:Int = 0;
 
-		switch (dad.currentAttack.direction)
+		switch (dad.currentAction)
 		{
-			case 'ANY':
-				currentDirection = FlxG.random.int(0, 2);
-				if (currentDirection > 0)
-					++currentDirection;
-			// case 'LEFT' is default, so no case needed
-			case 'SPECIAL':
-				currentDirection = 1;
-			case 'UP':
-				currentDirection = 2;
-			case 'RIGHT':
-				currentDirection = 3;
-		}
+			case 'neutral':
+				if (dad.currentAttack.duration > 0)
+				{
+					dad.currentAction = 'startup';
 
-		if (dad.currentAttack.duration > 0 && dad.currentAction == 'neutral')
-		{
-			dad.currentAction = 'startup';
+					PlayState.instance.callOnLuas('onStartingAttack', ['dad']);
+					switch (dad.currentAttack.direction)
+					{
+						case 'ANY':
+							currentDirection = FlxG.random.int(0, 2);
+							if (currentDirection > 0) ++currentDirection;
+						// case 'LEFT' is default, so no case needed
+						case 'SPECIAL':
+							currentDirection = 1;
+						case 'UP':
+							currentDirection = 2;
+						case 'RIGHT':
+							currentDirection = 3;
+					}
 
-			if (currentDirection != 1)
-			{
-				dad.guardPosition = currentDirection;
-				updateGuardUI(enemyGuard, 'attack');
-			}
+					if (currentDirection != 1)
+					{
+						dad.guardPosition = currentDirection;
+						updateGuardUI(enemyGuard, 'attack');
+					}
 
-			if (dad.currentAttack.startup_animation_name == 'combatWind')
-			{
-				dad.playAnim(appendDirection(dad.currentAttack.startup_animation_name, currentDirection, true)
-					+ (dad.currentAttack.is_unblockable ? 'unblockable' : ''),
-					true);
-			}
-			else
-				dad.playAnim(dad.currentAttack.startup_animation_name, true);
+					if (dad.currentAttack.startup_animation_name == 'combatWind')
+					{
+						dad.playAnim(appendDirection(dad.currentAttack.startup_animation_name, currentDirection, true)
+							+ (dad.currentAttack.is_unblockable ? 'unblockable' : ''),
+							true);
+					}
+					else
+						dad.playAnim(dad.currentAttack.startup_animation_name, true);
 
-			if (dad.currentAttack.step_based_timing)
-			{
-				dad.currentAction = 'stepStartup';
-				dad.actionStepTimer = 0;
-			}
-			else
-			{
-				if (dad.actionTimer.active)
-					dad.actionTimer.reset(dad.currentAttack.duration);
+					if (dad.currentAttack.step_based_timing)
+					{
+						dad.currentAction = 'stepStartup';
+						dad.actionStepTimer = 0;
+					}
+					else
+					{
+						if (dad.actionTimer.active)
+							dad.actionTimer.reset(dad.currentAttack.duration);
+						else
+							dad.actionTimer.start(dad.currentAttack.duration);
+						dad.actionTimer.onComplete = function(tmr:FlxTimer)
+						{
+							dad.currentAction = 'attack';
+							performEnemyAttack();
+						};
+					}
+				}
+			case 'attack':
+				PlayState.instance.callOnLuas('onExecutingAttack', ['dad']);
+				switch (dad.currentAttack.direction)
+				{
+					case 'ANY':
+						currentDirection = FlxG.random.int(0, 2);
+						if (currentDirection > 0) ++currentDirection;
+					// case 'LEFT' is default, so no case needed
+					case 'SPECIAL':
+						currentDirection = 1;
+					case 'UP':
+						currentDirection = 2;
+					case 'RIGHT':
+						currentDirection = 3;
+				}
+				if (currentDirection != 1)
+				{
+					dad.guardPosition = currentDirection;
+					updateGuardUI(enemyGuard, 'attack');
+				}
+
+				evaluateEnemyAttack(dad.currentAttack, false);
+				dad.currentAction = 'recovery';
+				dad.blockCount = 0;
+
+				if (dad.currentAttack.step_based_timing)
+				{
+					dad.currentAction = 'stepRecovery';
+					dad.actionStepTimer = 0;
+				}
 				else
-					dad.actionTimer.start(dad.currentAttack.duration);
-				dad.actionTimer.onComplete = onCompleteEnemyRecovery;
-			}
-		}
-		else if (dad.currentAction == 'attack')
-		{
-			evaluateEnemyAttack(dad.currentAttack, false);
-			dad.currentAction = 'recovery';
-
-			if (dad.currentAttack.step_based_timing)
-			{
-				dad.currentAction = 'stepRecovery';
-				dad.actionStepTimer = 0;
-			}
-			else
-			{
-				if (dad.actionTimer.active)
-					dad.actionTimer.reset(dad.currentAttack.recovery);
-				else
-					dad.actionTimer.start(dad.currentAttack.recovery);
-				dad.actionTimer.onComplete = onCompleteEnemyRecovery;
-			}
+				{
+					if (dad.actionTimer.active)
+						dad.actionTimer.reset(dad.currentAttack.recovery);
+					else
+						dad.actionTimer.start(dad.currentAttack.recovery);
+					dad.actionTimer.onComplete = function(tmr:FlxTimer)
+					{
+						enemyContinueChain();
+					}
+				}
 		}
 	}
 
-	function onCompleteEnemyRecovery(tmr:FlxTimer)
+	function enemyBlockStun(?hitstunDuration:Null<Float>, stepBasedTiming:Bool = false):Void
+	{
+		var blockStunDuration:Float = 0.7;
+
+		changeAction(dad, 'blockStun', blockStunDuration);
+
+		if (hitstunDuration == null)
+		{
+			hitstunDuration = boyfriend.currentAttack.hitstun;
+			if (boyfriend.currentAttack.step_based_timing)
+				hitstunDuration *= stepTimerCrochet;
+		}
+		else if (stepBasedTiming)
+			hitstunDuration *= stepTimerCrochet;
+
+		if (hitstunDuration > blockStunDuration)
+		{
+			hitstunDuration -= blockStunDuration;
+
+			dad.actionTimer.onComplete = function(tmr:FlxTimer)
+			{
+				inflictHitstun(dad, hitstunDuration);
+			}
+		}
+		else
+			dad.actionTimer.onComplete = function(tmr:FlxTimer)
+			{
+				dad.currentAction = 'neutral';
+			}
+	}
+
+	function enemyStartDefense():Void
+	{
+		if (dad.guardPosition != playerAttackPosition)
+		{
+			changeAction(dad, 'swappingGuard', 0.7);
+			switchGuard(enemyGuard, 'normal', playerAttackPosition);
+		}
+		else
+			changeAction(dad, 'defending', boyfriend.currentAttack.duration);
+
+		dad.actionTimer.onComplete = function(tmr:FlxTimer)
+		{
+			if (dad.currentAction == 'swappingGuard')
+			{
+				changeAction(dad, 'defending', boyfriend.actionTimer.timeLeft + 0.5);
+				tmr.onComplete = function(tmr:FlxTimer)
+				{
+					dad.currentAction = 'neutral';
+				}
+			}
+			else
+				dad.currentAction = 'neutral';
+		}
+	}
+
+	function enemyContinueChain():Void
 	{
 		dad.currentAction = 'neutral';
 		++dad.placeInChain;
-		chooseEnemyChartlessAttack();
-		performEnemyChartlessAttack();
+		chooseEnemyAttack();
+		performEnemyAttack();
 	}
 
 	function enemyAttackLand(attackData:AttackData):Void
 	{
-		boyfriend.combatHealth -= attackData.damage;
+		PlayState.instance.callOnLuas('onHit', ['boyfriend']);
+
+		reduceHealth(boyfriend, attackData.damage);
 		PlayState.instance.health -= attackData.stamina_damage;
 
 		if (boyfriend.hasReflexGuard)
 			playerGuardActive = false;
 
-		hasStartedAttack = false;
-
 		boyfriend.isBashed = false;
 		playerWasBashedTimer.cancel();
 
-		// dad.playSoundEffect('strike');
-		dad.playSoundEffect(attackData.soundOnHit);
+		dad.playSoundEffect(attackData.sound_on_hit);
+		boyfriend.playSoundEffect(boyfriend.characterSounds.struck);
 
 		switch (dad.guardPosition)
 		{
@@ -1516,50 +1921,120 @@ class Combat extends PlayState
 		cameraBounce(dad.guardPosition);
 	}
 
-	function playerAttackLand():Void
+	function playerAttackBlocked():Void
 	{
-		if (enemyPostureMechanic)
+		switch (playerAttackPosition)
 		{
-			if (dad.posture >= dad.postureMax)
-			{
-				if (dad.isBashed)
-				{
-					reduceHealth(dad, boyfriend.baseDamage * 5);
-					dad.posture -= (dad.postureMax / 2);
+			case 0:
+				dad.playAnim('combatBlockLEFT', true);
+			case 2:
+				dad.playAnim('combatBlockUP', true);
+			case 3:
+				dad.playAnim('combatBlockRIGHT', true);
+		}
 
-					boyfriend.playSoundEffect('postureBreak');
-					cameraBounce(playerAttackPosition);
-				}
-				else
-				{
-					reduceHealth(dad, boyfriend.baseDamage);
-					boyfriend.playSoundEffect('strike');
-				}
-			}
-			else
+		if (dad.guardPosition == playerAttackPosition && dad.currentAction != 'swappingGuard')
+		{
+			enemyBlockStun();
+
+			var newPosition:Int = FlxG.random.int(0, 2);
+			if (newPosition > 0)
+				++newPosition;
+
+			// If the player hit off-guard to force a match, imposes 50/50 to stay the same side
+			// In other words this is to prevent spamming a single side from being too effective
+			if (enemyMatchedPlayerGuard && FlxG.random.int(0, 1) == 1)
+				newPosition = playerAttackPosition;
+			// Re-randomizing once to decrease chance that guard sticks to one side
+			else if (newPosition == playerAttackPosition)
 			{
-				reduceHealth(dad, boyfriend.baseDamage / 2);
-				boyfriend.playSoundEffect('strike');
+				newPosition = FlxG.random.int(0, 2);
+				if (newPosition > 0)
+					++newPosition;
 			}
+
+			enemyMatchedPlayerGuard = false;
+
+			dad.guardPosition = newPosition;
 		}
 		else
 		{
-			boyfriend.playSoundEffect('strike');
-
-			if (hasHitNote)
-				reduceHealth(dad, boyfriend.baseDamage * 1.5);
-			else
-				reduceHealth(dad, boyfriend.baseDamage);
+			dad.guardPosition = playerAttackPosition;
+			enemyMatchedPlayerGuard = true;
 		}
 
-		dad.guardPosition = boyfriend.guardPosition;
+		PlayState.instance.callOnLuas('onBlock', ['dad']);
 
-		switch (boyfriend.guardPosition)
+		dad.playSoundEffect(dad.characterSounds.block);
+
+		var effect:AttackEffectData = getAttackEffect(boyfriend, 'onBlock');
+
+		if (effect != null)
+		{
+			if (effect.posture_damage == null)
+				damagePosture();
+
+			var blockStunAttack:Bool = false;
+			if (dad.currentAction == 'blockStun')
+				blockStunAttack = true;
+
+			applyAttackEffect(effect, boyfriend, blockStunAttack);
+		}
+		else
+		{
+			if (dad.currentAction != 'blockStun')
+				inflictHitstun(dad);
+			damagePosture();
+		}
+	}
+
+	function playerAttackParried():Void
+	{
+		switch (playerAttackPosition)
+		{
+			case 0:
+				dad.playAnim('combatBlockLEFT', true);
+			case 2:
+				dad.playAnim('combatBlockUP', true);
+			case 3:
+				dad.playAnim('combatBlockRIGHT', true);
+		}
+
+		dad.guardPosition = playerAttackPosition;
+
+		PlayState.instance.callOnLuas('onParry', ['dad']);
+
+		dad.playSoundEffect(dad.characterSounds.parry);
+
+		boyfriend.playAnim('combatHit', true);
+		inflictHitstun(boyfriend);
+
+		determineEnemyChain(true);
+		enemyContinueChain();
+
+		var effect:AttackEffectData = getAttackEffect(boyfriend, 'onParry');
+
+		if (effect != null)
+		{
+			if (effect.posture_damage == null)
+				damagePosture();
+
+			applyAttackEffect(effect, boyfriend);
+		}
+		else
+			damagePosture();
+	}
+
+	function playerAttackLand():Void
+	{
+		dad.guardPosition = playerAttackPosition;
+
+		switch (playerAttackPosition)
 		{
 			case 0:
 				dad.playAnim('combatHitLEFT', true);
 			case 1:
-			// Nope
+				// Nope
 			case 2:
 				dad.playAnim('combatHitUP', true);
 			case 3:
@@ -1571,6 +2046,46 @@ class Combat extends PlayState
 
 		hasHitNoteTimer.cancel();
 		hasHitNote = false;
+
+		dad.actionTimer.cancel();
+
+		PlayState.instance.callOnLuas('onHit', ['dad']);
+
+		var effect:AttackEffectData = getAttackEffect(boyfriend, 'onComplete');
+
+		// Intentionally done before potentially applying posture damage
+		if (dad.posture >= dad.postureMax && dad.isBashed)
+		{
+			dad.posture -= (dad.postureMax / 2);
+
+			boyfriend.playSoundEffect('postureBreak');
+			cameraBounce(playerAttackPosition);
+
+			if (effect != null)
+			{
+				if (effect.damage != null)
+					effect.damage *= 5;
+				effect.posture_damage = 0;
+				applyAttackEffect(effect, boyfriend);
+			}
+			else
+			{
+				reduceHealth(dad, boyfriend.currentAttack.damage * 5);
+				inflictHitstun(dad);
+			}
+		}
+		else
+		{
+			if (effect != null)
+				applyAttackEffect(effect, boyfriend);
+			else
+			{
+				boyfriend.playSoundEffect(boyfriend.currentAttack.sound_on_hit);
+				dad.playSoundEffect(dad.characterSounds.struck);
+				reduceHealth(dad, boyfriend.currentAttack.damage);
+				inflictHitstun(dad);
+			}
+		}
 	}
 
 	/**
@@ -1656,6 +2171,96 @@ class Combat extends PlayState
 		});
 	}
 
+	/**
+	 * Includes logic for the guard-switch animation in addition to calling updateGuardUI()
+	 *
+	 * @param characterGuard 	A guard widget sprite group, mainly playerGuard or enemyGuard
+	 * @param updateType 		A string to determine which animation for the guard to use. 'normal' animates normal,
+	 *							'neutral' is like normal but without the initial flash animation, 'attack' does an orange arrow,
+	 *							'inactive' disables all arrows (with the current guard position arrow keeping a black outline),
+	 *							and 'singGuard' is a temporary all-guard
+	 * @param newGuardPosition
+	 * 
+	**/
+	function switchGuard(characterGuard:FlxTypedGroup<FlxSprite>, updateType:String, newGuardPosition:Int):Void
+	{
+		var character:Character = null;
+
+		if (characterGuard == playerGuard)
+			character = boyfriend;
+		else if (characterGuard == enemyGuard)
+			character = dad;
+		else
+			return;
+
+		if (character.hasReflexGuard)
+		{
+			switch (newGuardPosition)
+			{
+				case 0:
+					boyfriend.playAnim('combatReadyLEFT', true);
+				case 1:
+					// Nope
+				case 2:
+					boyfriend.playAnim('combatReadyUP', true);
+				case 3:
+					boyfriend.playAnim('combatReadyRIGHT', true);
+			}
+		}
+		else
+		{
+			switch (newGuardPosition)
+			{
+				case 0:
+					switch (character.guardPosition)
+					{
+						case 2:
+							character.playAnim('combatSwapUpLEFT', true);
+						case 3:
+							character.playAnim('combatSwapRightLEFT', true);
+					}
+				case 2:
+					switch (character.guardPosition)
+					{
+						case 0:
+							character.playAnim('combatSwapLeftUP', true);
+						case 3:
+							character.playAnim('combatSwapRightUP', true);
+					}
+				case 3:
+					switch (character.guardPosition)
+					{
+						case 0:
+							character.playAnim('combatSwapLeftRIGHT', true);
+						case 2:
+							character.playAnim('combatSwapUpRIGHT', true);
+					}
+			}
+		}
+
+		character.guardPosition = newGuardPosition;
+
+		if (character == boyfriend && !singGuard || character != boyfriend)
+			updateGuardUI(characterGuard, updateType);
+	}
+
+	/**
+	 * Changes the action of an input character and sets up a timer.
+	 * 
+	 * Actions are tracked with the currentAction string and actionTimer, both of which are intended to change accordingly to each action.
+	 * This means actions are mutually exclusive with each other.
+	 * 
+	 * Remember to update the onComplete of a character's respective actionTimer to either reset to neutral or transition to something else
+	**/
+	function changeAction(character:Character, actionName:String, actionTimerDuration:Float):Void
+	{
+		character.currentAction = actionName;
+		if (character.actionTimer.active)
+			character.actionTimer.reset(actionTimerDuration);
+		else
+			character.actionTimer.start(actionTimerDuration);
+	}
+
 	// Provides the automatic guarding/dodging when you are singing
 	// Also acts as one of the main parry benefits of certain characters (Namely BF)
 	function startSingGuard():Void
@@ -1685,7 +2290,6 @@ class Combat extends PlayState
 		cancelSingGuard();
 
 		bufferNoteAttack = false;
-		hasStartedAttack = false;
 
 		FlxG.watch.addQuick("bufferNoteAttack", bufferNoteAttack);
 	}
@@ -1730,21 +2334,16 @@ class Combat extends PlayState
 				instantSingAttack = false;
 			});
 
-		hasStartedAttack = false;
-
 		// Little animation tidbit to keep down-note attacks from getting monotonous
 		if (note.noteData == 1)
 		{
 			downAttackPositionShift = true;
 
-			initiateChain();
+			// initiateChain();
 		}
 		else
 		{
 			downAttackPositionShift = false;
-
-			chainTimer.cancel();
-			inChain = false;
 		}
 
 		boyfriend.isBashed = false;
@@ -1764,8 +2363,8 @@ class Combat extends PlayState
 				note.noteData = windNote.noteData;
 		}
 
-		if (note.noteData == 1)
-			initiateChain();
+		// if (note.noteData == 1)
+		//	initiateChain();
 
 		switch (note.noteType)
 		{
@@ -1781,9 +2380,9 @@ class Combat extends PlayState
 				if (note.rating == 'good' || note.rating == 'sick')
 				{
 					if (note.noteData == 1)
-						evaluateAttack('attackNote');
+						evaluateAttack('special');
 					else
-						playerAttack(0);
+						evaluateAttack();
 				}
 			case 'wind':
 				// Keep in mind for these wind cases that noteData gets changed to the soonest attack note
@@ -1834,8 +2433,19 @@ class Combat extends PlayState
 		enemyPostureMechanic = true;
 	}
 
-	function damagePosture(postureDamageModifer:Float = 1):Void
+	/**
+	 * Posture is only tracked on the enemy
+	 */
+	function damagePosture(?damage:Float):Void
 	{
+		if (!enemyPostureMechanic)
+			return;
+
+		if (damage == null)
+			damage = boyfriend.currentAttack.posture_damage;
+		if (damage == null)
+			return;
+
 		posturePause = true;
 
 		// Timer length is a constant instead of some kind of stepTimerCrochet to maintain consistency between song speeds
@@ -1848,7 +2458,40 @@ class Combat extends PlayState
 				posturePause = false;
 			});
 
-		dad.posture += boyfriend.postureDamage * postureDamageModifer;
+		dad.posture += damage;
+	}
+
+	public function inflictHitstun(defender:Character, ?duration:Float, ?forceTiming:String = ''):Void
+	{
+		var initiator:Character;
+
+		if (defender == boyfriend)
+			initiator = dad;
+		else
+			initiator = boyfriend;
+
+		if (duration == null)
+			duration = initiator.currentAttack.hitstun;
+		if (duration == null)
+			return;
+
+		switch (forceTiming)
+		{
+			case 'seconds':
+			case 'steps':
+				duration *= stepTimerCrochet;
+			default:
+				if (initiator.currentAttack.step_based_timing)
+					duration *= stepTimerCrochet;
+		}
+
+		changeAction(defender, 'hitstun', duration);
+		defender.actionTimer.onComplete = function(tmr:FlxTimer)
+		{
+			defender.currentAction = 'neutral';
+			if (defender == dad)
+				enemyMatchedPlayerGuard = false;
+		}
 	}
 
 	// This is a scrapped mechanic where the Shrub was originally going to only act according to the beat
@@ -1951,24 +2594,26 @@ class Combat extends PlayState
 			if (boyfriend.combatHealth <= boyfriend.combatHealthMax / 2)
 				achievementHealthStepCount += 1;
 
+		//
+		//
+		// dad step logic
 		if (!dad.currentAction.startsWith('step'))
 			dad.actionStepTimer = 0;
 
-		if (dad.currentAction == 'neutral' && dad.currentAttack.step_based_timing)
-			performEnemyChartlessAttack();
-
-		if (dad.currentAction == 'stepStartup')
+		switch (dad.currentAction)
 		{
-			if (dad.actionStepTimer >= dad.currentAttack.duration)
-			{
-				dad.currentAction = 'attack';
-				performEnemyChartlessAttack();
-			}
-		}
-		else if (dad.currentAction == 'stepRecovery')
-		{
-			if (dad.actionStepTimer >= dad.currentAttack.recovery)
-				onCompleteEnemyRecovery(null);
+			case 'neutral':
+				if (dad.currentAttack.step_based_timing)
+					performEnemyAttack();
+			case 'stepStartup':
+				if (dad.actionStepTimer >= dad.currentAttack.duration)
+				{
+					dad.currentAction = 'attack';
+					performEnemyAttack();
+				}
+			case 'stepRecovery':
+				if (dad.actionStepTimer >= dad.currentAttack.recovery)
+					enemyContinueChain();
 		}
 
 		if (dad.currentAction.startsWith('step'))
@@ -1982,20 +2627,6 @@ class Combat extends PlayState
 	{
 		isDodgeTimer.cancel();
 		isDodge = false;
-		chainTimer.cancel();
-		inChain = false;
-	}
-
-	function initiateChain():Void
-	{
-		inChain = true;
-		if (chainTimer.active)
-			chainTimer.reset();
-		else
-			chainTimer = new FlxTimer().start(stepTimerCrochet * 6, function(tmr:FlxTimer)
-			{
-				inChain = false;
-			});
 	}
 
 	/**
@@ -2255,7 +2886,7 @@ class Combat extends PlayState
 	{
 		character.combatHealth -= amount;
 
-		if (amount > 0)
+		if (character == dad && amount > 0)
 			achievementCumulativeDamage += amount;
 
 		#if ACHIEVEMENTS_ALLOWED

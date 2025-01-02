@@ -112,24 +112,29 @@ class CharacterExtra extends FlxSprite
 			// case 'your character name in case you want to hardcode them instead':
 			// Also I yoinked this whole thing from PsychEngine's json method
 			default:
-				var spritePath:String = 'characters/characterExtras/' + thisSprite + '.json';
+				/*
+					var spritePath:String = 'characters/characterExtras/' + thisSprite + '.json';
 
-				#if MODS_ALLOWED
-				var path:String = Paths.modFolders(spritePath);
-				if (!FileSystem.exists(path))
-				{
-					path = Paths.getPreloadPath(spritePath);
-				}
+					#if MODS_ALLOWED
+					var path:String = Paths.modFolders(spritePath);
+					if (!FileSystem.exists(path))
+					{
+						path = Paths.getPreloadPath(spritePath);
+					}
 
-				if (!FileSystem.exists(path))
-				#else
-				var path:String = Paths.getPreloadPath(spritePath);
-				if (!Assets.exists(path))
-				#end
-				{
-					path = Paths.getPreloadPath('characters/' + Character.DEFAULT_CHARACTER +
-						'.json'); // If a character couldn't be found, change him to BF just to prevent a crash
-				}
+					if (!FileSystem.exists(path))
+					#else
+					var path:String = Paths.getPreloadPath(spritePath);
+					if (!Assets.exists(path))
+					#end
+					{
+						path = Paths.getPreloadPath('characters/' + Character.DEFAULT_CHARACTER +
+							'.json'); // If a character couldn't be found, change him to BF just to prevent a crash
+					}
+				 */
+				var path:String = Character.getValidCharacterPath(thisSprite, true, character.curCharacter);
+				if (path == null)
+					path = Character.getValidCharacterPath(thisSprite, false, 'characterExtras');
 
 				#if MODS_ALLOWED
 				var rawJson = File.getContent(path);

@@ -6,6 +6,7 @@ import flash.media.Sound;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.addons.effects.FlxTrail;
+import flixel.animation.FlxAnimation;
 import flixel.animation.FlxBaseAnimation;
 import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.group.FlxGroup.FlxTypedGroup;
@@ -15,7 +16,6 @@ import flixel.util.FlxSort;
 import flixel.util.FlxTimer;
 import forfriday.CharacterExtra;
 import forfriday.Combat;
-import forfriday.EnemyAI;
 import haxe.Json;
 import haxe.format.JsonParser;
 import openfl.utils.AssetType;
@@ -44,27 +44,32 @@ typedef CharacterFile =
 	var healthbar_colors:Array<Int>;
 
 	// Combat changes
-	var death_soundName:String;
-	var death_characterName:String;
-	var idle_defaultFrame:Int;
-	var has_reflexGuard:Bool;
-	var has_unblockableNoteAttacks:Bool;
-	var stamina_cost:Float;
-	var default_guard_position:Int;
-	var posture_max:Float;
-	var posture_recoveryCoefficient:Float;
-	var combat_healthMax:Float;
-	var special_attack:String;
+	var death_soundName:Null<String>;
+	var death_characterName:Null<String>;
+	var idle_defaultFrame:Null<Int>;
+	var has_reflexGuard:Null<Bool>;
+	var has_unblockableNoteAttacks:Null<Bool>;
+	var stamina_cost:Null<Float>;
+	var default_guard_position:Null<Int>;
+	var posture_max:Null<Float>;
+	var posture_recoveryCoefficient:Null<Float>;
+	var combat_healthMax:Null<Float>;
+	var special_attack:Null<String>;
 	var ifPlayer_damage:Float;
 	var ifEnemy_damage:Float;
 	var posture_damage:Float;
-	var alternatingIdle:Bool;
-	var characterExtras:Array<String>;
+	var alternatingIdle:Null<Bool>;
+	var characterExtras:Null<Array<String>>;
 	var combatSoundEffects:Array<Array<String>>;
 	var soundsToPickFromRandom:Array<Array<Dynamic>>;
 	var soundsToVaryVolume:Array<Array<Dynamic>>;
+
 	var attacks:Array<AttackData>;
 	var chains:Array<ChainData>;
+	var attack_effects:Null<Array<AttackEffectData>>;
+	var startup_effects:Null<Array<StartupEffectData>>;
+	var sounds:Null<Array<SoundData>>;
+	var character_sounds:CharacterSounds;
 	// End of changes
 }
 
@@ -84,10 +89,50 @@ typedef AttackData =
 	var name:Null<String>;
 	var attack_animation_name:Null<String>;
 	var startup_animation_name:Null<String>;
-	var soundOnHit:Null<String>;
-	var soundOnMiss:Null<String>;
+	var sound_on_hit:Null<String>;
+	var sound_on_miss:Null<String>;
+
 	var not_an_attack:Null<Bool>;
 	var direction:Null<String>;
+
+	var damage:Null<Float>;
+	var posture_damage:Null<Float>;
+	var stamina_damage:Null<Float>;
+	var stamina_cost:Null<Float>;
+
+	var health_recover:Null<Float>;
+	var posture_recover:Null<Float>;
+
+	var step_based_timing:Null<Bool>;
+	var duration:Null<Float>;
+	var recovery:Null<Float>;
+	var chain_duration:Null<Float>;
+	var hitstun:Null<Float>;
+
+	var is_unblockable:Null<Bool>;
+	var is_bash:Null<Bool>;
+
+	var append_direction_to_anim_name:Null<Bool>;
+
+	var on_hit:Null<String>;
+	var on_block:Null<String>;
+	var on_parry:Null<String>;
+	var on_complete:Null<String>;
+}
+
+typedef ChainData =
+{
+	var name:String;
+
+	var directions:Null<Array<String>>;
+
+	var input_chain:Array<String>;
+	var attack_chain:Array<String>;
+}
+
+typedef AttackEffectData =
+{
+	var name:String;
 	var damage:Null<Float>;
 	var posture_damage:Null<Float>;
 	var stamina_damage:Null<Float>;
@@ -95,17 +140,36 @@ typedef AttackData =
 	var health_recover:Null<Float>;
 	var posture_recover:Null<Float>;
 	var step_based_timing:Null<Bool>;
-	var duration:Null<Float>;
 	var recovery:Null<Float>;
-	var is_unblockable:Null<Bool>;
-	var is_bash:Null<Bool>;
+	var hitstun:Null<Float>;
+	var sound:Null<String>;
 }
 
-typedef ChainData =
+typedef StartupEffectData =
 {
 	var name:String;
-	var direction_overrides:Array<String>;
-	var chain:Array<String>;
+	var uninterruptible_stance:Null<Bool>;
+	var can_block:Null<Bool>;
+	var can_parry:Null<Bool>;
+	var feint_direction:Null<String>;
+}
+
+typedef SoundData =
+{
+	var name:String;
+	var file_name:String;
+	var volume_min:Null<Float>;
+	var volume_max:Null<Float>;
+	var file_number_min:Null<Int>;
+	var file_number_max:Null<Int>;
+}
+
+typedef CharacterSounds =
+{
+	var struck:String;
+	var block:String;
+	var parry:String;
+	var out_of_stamina:String;
 }
 
 // End of changes
@@ -162,21 +226,27 @@ class Character extends FlxSprite
 	public var characterSprites:FlxTypedGroup<CharacterExtra> = new FlxTypedGroup<CharacterExtra>();
 	public var characterExtraArray:Array<String> = [];
 
-	public var soundEffects:Map<String, String> = new Map();
-	public var soundRandomPicks:Map<String, Array<Int>> = new Map();
-	public var soundVolumeVariance:Map<String, Array<Float>> = new Map();
-
-	public var attackArray:Array<AttackData> = [];
-	public var chainArray:Array<ChainData> = [];
+	public var attackMap:Map<String, AttackData> = new Map();
+	public var chainMap:Map<String, ChainData> = new Map();
+	public var attackEffectMap:Map<String, AttackEffectData> = new Map();
+	public var startupEffectMap:Map<String, StartupEffectData> = new Map();
+	public var soundMap:Map<String, SoundData> = new Map();
+	public var characterSounds:CharacterSounds = null;
 
 	public var currentChainName:String = 'neutral';
-	public var currentChain:ChainData = {name: 'neutral', direction_overrides: [], chain: []}
+	public var currentChain:ChainData = {
+		name: 'neutral',
+		directions: [],
+		input_chain: [],
+		attack_chain: []
+	}
 	public var placeInChain:Int = 0;
 	public var currentAttack:AttackData;
 
 	public var actionTimer:FlxTimer = new FlxTimer();
 	public var actionStepTimer:Int = 0;
-	public var currentAction:String = 'neutral';
+	public var currentAction(default, set):String = 'neutral';
+	public var blockCount:Int = 0;
 
 	// End changes
 	public function new(x:Float, y:Float, ?character:String = 'bf', ?isPlayer:Bool = false)
@@ -197,24 +267,29 @@ class Character extends FlxSprite
 			// case 'your character name in case you want to hardcode them instead':
 
 			default:
-				var characterPath:String = 'characters/' + curCharacter + '.json';
+				// Combat change
+				// The amount of stored character info and jsons is a little more complex, so this task is getting relegated to a function
+				/*
+					var characterPath:String = 'characters/' + curCharacter + '.json';
 
-				#if MODS_ALLOWED
-				var path:String = Paths.modFolders(characterPath);
-				if (!FileSystem.exists(path))
-				{
-					path = Paths.getPreloadPath(characterPath);
-				}
+					#if MODS_ALLOWED
+					var path:String = Paths.modFolders(characterPath);
+					if (!FileSystem.exists(path))
+					{
+						path = Paths.getPreloadPath(characterPath);
+					}
 
-				if (!FileSystem.exists(path))
-				#else
-				var path:String = Paths.getPreloadPath(characterPath);
-				if (!Assets.exists(path))
-				#end
-				{
-					path = Paths.getPreloadPath('characters/' + DEFAULT_CHARACTER +
-						'.json'); // If a character couldn't be found, change him to BF just to prevent a crash
-				}
+					if (!FileSystem.exists(path))
+					#else
+					var path:String = Paths.getPreloadPath(characterPath);
+					if (!Assets.exists(path))
+					#end
+					{
+						path = Paths.getPreloadPath('characters/' + DEFAULT_CHARACTER +
+							'.json'); // If a character couldn't be found, change him to BF just to prevent a crash
+					}
+				 */
+				var path:String = getValidCharacterPath(curCharacter);
 
 				#if MODS_ALLOWED
 				var rawJson = File.getContent(path);
@@ -280,50 +355,45 @@ class Character extends FlxSprite
 				// Combat changes
 				// Changing the death sound does not natively have a way to change it per character
 				// Changing death animations is possible by just defining the relevant animations in the json
+				//
+				// FUTURE NOTE:
+				// I got a better understanding of this, potential will returbn
 				if (json.death_soundName != null && isPlayer)
 					GameOverSubstate.deathSoundName = json.death_soundName;
 				if (json.death_characterName != null && isPlayer)
 					GameOverSubstate.characterName = json.death_characterName;
 
-				// Preferred to have some kind of null-check so the declared variables could be defaulted to
-				// I don't know how to navigate things well enough to figure out how to pull that off cleanly though
-				idleDefaultFrame = json.idle_defaultFrame;
-				hasReflexGuard = json.has_reflexGuard;
-				hasUnblockableNoteAttacks = json.has_unblockableNoteAttacks;
-				staminaCost = json.stamina_cost;
-				guardPosition = json.default_guard_position;
-				postureMax = json.posture_max;
-				postureRecoveryCoefficient = json.posture_recoveryCoefficient;
-				combatHealthMax = json.combat_healthMax;
-				special = json.special_attack;
+				// Not sure if there's a cleaner way to iterate through these
+				// Maybe check back once I make a combat json typedef later. Iteration could be possible there?
+				if (json.idle_defaultFrame != null)
+					idleDefaultFrame = json.idle_defaultFrame;
+				if (json.has_reflexGuard != null)
+					hasReflexGuard = json.has_reflexGuard;
+				if (json.has_unblockableNoteAttacks != null)
+					hasUnblockableNoteAttacks = json.has_unblockableNoteAttacks;
+				if (json.default_guard_position != null)
+					guardPosition = json.default_guard_position;
+				if (json.posture_max != null)
+					postureMax = json.posture_max;
+				if (json.posture_recoveryCoefficient != null)
+					postureRecoveryCoefficient = json.posture_recoveryCoefficient;
+				if (json.combat_healthMax != null)
+					combatHealthMax = json.combat_healthMax;
+				if (json.alternatingIdle != null)
+					alternatingIdle = json.alternatingIdle;
+
+				// These can get removed since attacks can be specific now
+				// Though I still need to do a sweep to make sure these are no longer used anywhere
 				if (isPlayer)
 					baseDamage = json.ifPlayer_damage;
 				else
 					baseDamage = json.ifEnemy_damage;
+				staminaCost = json.stamina_cost;
 				postureDamage = json.posture_damage;
-				alternatingIdle = json.alternatingIdle;
+				special = json.special_attack;
+				// End of stuff to delete
 
-				if (json.combatSoundEffects != null && json.soundsToPickFromRandom != null && json.soundsToVaryVolume != null)
-				{
-					for (i in 0...json.combatSoundEffects.length)
-					{
-						var curArray:Array<String> = json.combatSoundEffects[i];
-						soundEffects.set(curArray[0], curArray[1]);
-					}
-					for (i in 0...json.soundsToPickFromRandom.length)
-					{
-						var curArray:Array<Dynamic> = json.soundsToPickFromRandom[i];
-						soundRandomPicks.set(curArray[0], curArray[1]);
-					}
-					for (i in 0...json.soundsToVaryVolume.length)
-					{
-						var curArray:Array<Dynamic> = json.soundsToVaryVolume[i];
-						soundVolumeVariance.set(curArray[0], curArray[1]);
-					}
-				}
-
-				if (json.attacks != null && json.chains != null)
-					generateAttackAndChainArray(json.attacks, json.chains);
+				generateCombatArrays(json);
 				// End of changes
 
 				positionArray = json.position;
@@ -376,13 +446,29 @@ class Character extends FlxSprite
 				// trace('Loaded file to character ' + curCharacter);
 
 				// Combat change
-				characterExtraArray = json.characterExtras;
-				if (characterExtraArray != null && characterExtraArray.length > 0)
+				if (json.characterExtras != null)
 				{
-					for (i in characterExtraArray)
+					characterExtraArray = json.characterExtras;
+					if (characterExtraArray != null && characterExtraArray.length > 0)
 					{
-						new CharacterExtra(x, y, this, i);
+						for (i in characterExtraArray)
+						{
+							new CharacterExtra(x, y, this, i);
+						}
 					}
+				}
+
+				// This is where the idleDefaultFrame gets funky
+				if (json.idle_defaultFrame == null)
+				{
+					var defaultIdle:FlxAnimation = null;
+
+					defaultIdle = animation.getByName(Combat.appendDirection('idle', guardPosition));
+					if (defaultIdle == null)
+						defaultIdle = animation.getByName('idle');
+
+					if (defaultIdle != null)
+						idleDefaultFrame = defaultIdle.frames.length;
 				}
 				// End of changes
 		}
@@ -670,6 +756,9 @@ class Character extends FlxSprite
 
 			if (animToPlay.startsWith('idle'))
 			{
+				if (currentAction != 'neutral')
+					performAnim = false;
+
 				if (animation.curAnim.name.startsWith("sing") || animation.curAnim.name.startsWith("combat"))
 				{
 					if (!animation.finished)
@@ -766,7 +855,7 @@ class Character extends FlxSprite
 					case 0:
 						playAnim('idleLEFT');
 					case 1:
-					// Nah
+						// Nah
 					case 2:
 						playAnim('idleUP');
 					case 3:
@@ -797,27 +886,36 @@ class Character extends FlxSprite
 	// I've read other reasons for using WAV that implies advantages to MP3 that I'm unsure of, so take this advice with a grain of salt
 	public function playSoundEffect(sound:String):Void
 	{
-		var curSound:String = soundEffects.get(sound);
+		var curSound:Null<SoundData> = soundMap.get(sound);
+		if (curSound == null)
+			return;
+
+		var soundVolume:Null<Float> = curSound.volume_min;
+		if (soundVolume == null)
+			soundVolume = curSound.volume_max;
+		if (soundVolume == null)
+			soundVolume = 1;
+
+		if (curSound.volume_min != null && curSound.volume_max != null)
+			soundVolume = FlxG.random.float(curSound.volume_min, curSound.volume_max);
 
 		var soundNumber:String = '';
-		var soundVolume:Float = 1;
-
-		if (soundRandomPicks.exists(curSound))
+		if (curSound.file_number_min != null && curSound.file_number_max != null)
 		{
-			var numberArray:Array<Int> = soundRandomPicks.get(curSound);
-			soundNumber = '' + FlxG.random.int(numberArray[0], numberArray[1]);
+			if (curSound.file_number_min > curSound.file_number_max)
+			{
+				var dummyInt:Int = curSound.file_number_min;
+				curSound.file_number_min = curSound.file_number_max;
+				curSound.file_number_max = dummyInt;
+			}
+
+			soundNumber = '' + FlxG.random.int(curSound.file_number_min, curSound.file_number_max);
 		}
 
-		if (soundVolumeVariance.exists(curSound))
-		{
-			var numberArray:Array<Float> = soundVolumeVariance.get(curSound);
-			soundVolume = FlxG.random.float(numberArray[0], numberArray[1]);
-		}
-
-		if (Paths.sound(curSound + soundNumber).length <= 0)
-			FlxG.sound.play(Paths.sound(curSound + soundNumber, null, true), soundVolume);
+		if (Paths.sound(curSound.file_name + soundNumber).length <= 0)
+			FlxG.sound.play(Paths.sound(curSound.file_name + soundNumber, null, true), soundVolume);
 		else
-			FlxG.sound.play(Paths.sound(curSound + soundNumber), soundVolume);
+			FlxG.sound.play(Paths.sound(curSound.file_name + soundNumber), soundVolume);
 	}
 
 	// Used in update() to determine if a reset to idle is needed
@@ -857,15 +955,15 @@ class Character extends FlxSprite
 		}
 	}
 
-	function generateAttack(attackData:Null<AttackData>):AttackData
+	public function generateAttack(attackData:Null<AttackData>):AttackData
 	{
 		if (attackData == null)
 			attackData = {
 				name: null,
 				attack_animation_name: null,
 				startup_animation_name: null,
-				soundOnHit: null,
-				soundOnMiss: null,
+				sound_on_hit: null,
+				sound_on_miss: null,
 				not_an_attack: null,
 				direction: null,
 				damage: null,
@@ -877,16 +975,23 @@ class Character extends FlxSprite
 				step_based_timing: null,
 				duration: null,
 				recovery: null,
+				chain_duration: null,
+				hitstun: null,
 				is_unblockable: null,
-				is_bash: null
+				is_bash: null,
+				append_direction_to_anim_name: null,
+				on_hit: null,
+				on_block: null,
+				on_parry: null,
+				on_complete: null
 			}
 
 		var newAttack:AttackData = {
 			name: attackData.name,
 			attack_animation_name: attackData.attack_animation_name,
 			startup_animation_name: attackData.startup_animation_name,
-			soundOnHit: attackData.soundOnHit,
-			soundOnMiss: attackData.soundOnMiss,
+			sound_on_hit: null,
+			sound_on_miss: null,
 			not_an_attack: attackData.not_an_attack,
 			direction: attackData.direction,
 			damage: attackData.damage,
@@ -898,8 +1003,15 @@ class Character extends FlxSprite
 			step_based_timing: attackData.step_based_timing,
 			duration: attackData.duration,
 			recovery: attackData.recovery,
+			chain_duration: attackData.chain_duration,
+			hitstun: attackData.hitstun,
 			is_unblockable: attackData.is_unblockable,
-			is_bash: attackData.is_bash
+			is_bash: attackData.is_bash,
+			append_direction_to_anim_name: attackData.append_direction_to_anim_name,
+			on_hit: attackData.on_hit,
+			on_block: attackData.on_block,
+			on_parry: attackData.on_parry,
+			on_complete: attackData.on_complete
 		};
 
 		// These != null checks are to allow for attacks to be truncated a bit
@@ -914,16 +1026,19 @@ class Character extends FlxSprite
 		if (newAttack.startup_animation_name == null)
 			newAttack.startup_animation_name = 'combatWind';
 
-		if (newAttack.soundOnHit == null)
-			newAttack.soundOnHit = 'strike';
-		if (newAttack.soundOnMiss == null)
-			newAttack.soundOnMiss = 'whiff';
+		if (newAttack.sound_on_hit == null)
+			newAttack.sound_on_hit = 'hit';
+		if (newAttack.sound_on_miss == null)
+			newAttack.sound_on_miss = 'miss';
 
 		if (newAttack.not_an_attack == null)
 			newAttack.not_an_attack = false;
 
 		if (newAttack.direction == null)
 			newAttack.direction = 'ANY';
+
+		if (newAttack.append_direction_to_anim_name == null)
+			newAttack.append_direction_to_anim_name = false;
 
 		// To allow sing attacks to prune this variable
 		if (newAttack.is_unblockable == null)
@@ -933,7 +1048,7 @@ class Character extends FlxSprite
 		if (newAttack.damage == null)
 			newAttack.damage = 15;
 		if (newAttack.stamina_damage == null)
-			newAttack.stamina_damage = 0.5;
+			newAttack.stamina_damage = 0;
 		if (newAttack.is_bash == null)
 			newAttack.is_bash = false;
 
@@ -951,37 +1066,260 @@ class Character extends FlxSprite
 		if (newAttack.stamina_cost == null)
 			newAttack.posture_recover = 0;
 
-		// For attacks that occur instantly
 		if (newAttack.step_based_timing == null)
-			newAttack.step_based_timing = true;
+			newAttack.step_based_timing = false;
+
 		if (newAttack.duration == null)
 			newAttack.duration = 0;
 		if (newAttack.recovery == null)
 			newAttack.recovery = 0;
 
+		if (newAttack.chain_duration == null)
+		{
+			if (newAttack.step_based_timing)
+				newAttack.chain_duration = newAttack.recovery + 1;
+			else
+				newAttack.chain_duration = newAttack.recovery + 0.5;
+		}
+
+		if (newAttack.hitstun == null)
+		{
+			if (newAttack.step_based_timing)
+				newAttack.hitstun = 2;
+			else
+				newAttack.hitstun = 0.5;
+		}
+
 		return newAttack;
 	}
 
-	function generateAttackAndChainArray(attackDataArray:Array<AttackData>, chainDataArray:Array<ChainData>)
+	function generateCombatArrays(characterFile:CharacterFile)
 	{
+		var attackDataArray:Array<AttackData> = characterFile.attacks;
+		var chainDataArray:Array<ChainData> = characterFile.chains;
+		var attackEffectDataArray:Array<AttackEffectData> = characterFile.attack_effects;
+		var startupEffectDataArray:Array<StartupEffectData> = characterFile.startup_effects;
+		var soundsArrayData:Array<SoundData> = characterFile.sounds;
+		var characterSoundData:CharacterSounds = characterFile.character_sounds;
+
+		if (attackDataArray == null)
+			attackDataArray = [];
 		for (i in 0...attackDataArray.length)
 		{
 			var attackData:AttackData = attackDataArray[i];
 
-			attackArray.push(generateAttack(attackData));
+			attackMap.set(attackData.name, generateAttack(attackData));
 		}
 
+		if (chainDataArray == null)
+			chainDataArray = [];
 		for (i in 0...chainDataArray.length)
 		{
-			var chainData = chainDataArray[i];
+			var chainData:ChainData = chainDataArray[i];
 
 			var newChain:ChainData = {
 				name: chainData.name,
-				direction_overrides: chainData.direction_overrides,
-				chain: chainData.chain
+				directions: chainData.directions,
+				input_chain: chainData.input_chain,
+				attack_chain: chainData.attack_chain
 			};
 
-			chainArray.push(newChain);
+			if (newChain.name == null)
+				newChain.name = "nullChain" + i;
+
+			if (newChain.directions == null)
+				newChain.directions = [];
+
+			if (newChain.input_chain == null)
+				newChain.input_chain = [];
+
+			if (newChain.attack_chain == null)
+				newChain.attack_chain = ['basic_attack'];
+
+			chainMap.set(newChain.name, newChain);
 		}
+
+		if (attackEffectDataArray == null)
+			attackEffectDataArray = [];
+		for (i in 0...attackEffectDataArray.length)
+		{
+			var attackEffectData:AttackEffectData = attackEffectDataArray[i];
+
+			// Remember to update fillNullAttackEffectData() when implementing a new value!
+			var newAttackEffect:AttackEffectData = {
+				name: attackEffectData.name,
+				damage: attackEffectData.damage,
+				posture_damage: attackEffectData.posture_damage,
+				stamina_damage: attackEffectData.stamina_damage,
+				stamina_cost: attackEffectData.stamina_cost,
+				health_recover: attackEffectData.health_recover,
+				posture_recover: attackEffectData.posture_recover,
+				step_based_timing: attackEffectData.step_based_timing,
+				recovery: attackEffectData.recovery,
+				hitstun: attackEffectData.hitstun,
+				sound: attackEffectData.sound
+			}
+
+			attackEffectMap.set(newAttackEffect.name, newAttackEffect);
+		}
+
+		if (startupEffectDataArray == null)
+			startupEffectDataArray = [];
+		for (i in 0...startupEffectDataArray.length)
+		{
+			var startupEffectData:StartupEffectData = startupEffectDataArray[i];
+
+			var newStartupEffect:StartupEffectData = {
+				name: startupEffectData.name,
+				uninterruptible_stance: startupEffectData.uninterruptible_stance,
+				can_block: startupEffectData.can_block,
+				can_parry: startupEffectData.can_parry,
+				feint_direction: startupEffectData.feint_direction
+			}
+
+			startupEffectMap.set(newStartupEffect.name, newStartupEffect);
+		}
+
+		if (soundsArrayData == null)
+			soundsArrayData = [];
+		for (i in 0...soundsArrayData.length)
+		{
+			var soundData:SoundData = soundsArrayData[i];
+
+			var newSound:SoundData = {
+				name: soundData.name,
+				file_name: soundData.file_name,
+				volume_min: soundData.volume_min,
+				volume_max: soundData.volume_max,
+				file_number_min: soundData.file_number_min,
+				file_number_max: soundData.file_number_max
+			}
+
+			soundMap.set(newSound.name, newSound);
+		}
+
+		if (characterSoundData == null)
+			characterSoundData = {
+				struck: null,
+				block: null,
+				parry: null,
+				out_of_stamina: null
+			}
+
+		if (characterSoundData.struck == null)
+			characterSoundData.struck = 'hit';
+		if (characterSoundData.block == null)
+			characterSoundData.block = 'block';
+		if (characterSoundData.parry == null)
+			characterSoundData.parry = 'block';
+		if (characterSoundData.out_of_stamina == null)
+			characterSoundData.out_of_stamina = 'oos';
+
+		characterSounds = {
+			struck: characterSoundData.struck,
+			block: characterSoundData.block,
+			parry: characterSoundData.parry,
+			out_of_stamina: characterSoundData.out_of_stamina,
+		}
+	}
+
+	// Filling nulls is its own function since data being null in the first place is interpreted as deliberately excluded
+	public static function fillNullAttackEffectData(newAttackEffect:AttackEffectData):AttackEffectData
+	{
+		if (newAttackEffect.name == null)
+			newAttackEffect.name = 'nullAttackEffect';
+		if (newAttackEffect.damage == null)
+			newAttackEffect.damage = 0;
+		if (newAttackEffect.posture_damage == null)
+			newAttackEffect.posture_damage = 0;
+		if (newAttackEffect.stamina_damage == null)
+			newAttackEffect.stamina_damage = 0;
+		if (newAttackEffect.stamina_cost == null)
+			newAttackEffect.stamina_cost = 0;
+		if (newAttackEffect.health_recover == null)
+			newAttackEffect.health_recover = 0;
+		if (newAttackEffect.posture_recover == null)
+			newAttackEffect.posture_recover = 0;
+		if (newAttackEffect.step_based_timing == null)
+			newAttackEffect.step_based_timing = false;
+		if (newAttackEffect.recovery == null)
+			newAttackEffect.recovery = 0;
+		if (newAttackEffect.hitstun == null)
+			newAttackEffect.hitstun = 0;
+		if (newAttackEffect.sound == null)
+			newAttackEffect.sound = 'nullAttackSound';
+
+		return newAttackEffect;
+	}
+
+	// A json is searched for in a file named after the character in the characters file first
+	// Failing that, then a json in the characters file itself is searched for
+	public static function getValidCharacterPath(curCharacter:String, canBeNull:Bool = false, characterFolder:Null<String> = null):Null<String>
+	{
+		if (characterFolder == null)
+			characterFolder = curCharacter;
+
+		var characterPath:String = 'characters/' + characterFolder + '/' + curCharacter + '.json';
+		var validCharacterPath:Null<String> = getCharacterPath(characterPath);
+
+		if (validCharacterPath == null)
+		{
+			characterPath = 'characters/' + curCharacter + '.json';
+			validCharacterPath = getCharacterPath(characterPath);
+		}
+
+		if (!canBeNull)
+		{
+			if (validCharacterPath == null)
+			{
+				characterPath = 'characters/' + DEFAULT_CHARACTER + '/' + DEFAULT_CHARACTER + '.json';
+				validCharacterPath = getCharacterPath(characterPath);
+			}
+
+			if (validCharacterPath == null)
+				validCharacterPath = 'characters/' + DEFAULT_CHARACTER + '.json';
+		}
+		else
+			validCharacterPath = null;
+
+		return validCharacterPath;
+	}
+
+	public static function getCharacterPath(characterPath:String):Null<String>
+	{
+		#if MODS_ALLOWED
+		var path:String = Paths.modFolders(characterPath);
+		if (!FileSystem.exists(path))
+		{
+			path = Paths.getPreloadPath(characterPath);
+		}
+
+		if (!FileSystem.exists(path))
+		#else
+		var path:String = Paths.getPreloadPath(characterPath);
+		if (!Assets.exists(path))
+		#end
+		{
+			path = null;
+		}
+
+		return path;
+	}
+
+	/**
+	 * For debugging character actions
+	 */
+	function set_currentAction(Value:String):String
+	{
+		#if debug
+		if (isPlayer)
+			FlxG.watch.addQuick("BF Action", Value);
+		else
+			FlxG.watch.addQuick("Dad Action", Value);
+		#end
+
+		currentAction = Value;
+
+		return Value;
 	}
 }

@@ -3395,7 +3395,13 @@ class PlayState extends MusicBeatState
 		vocals.play();
 	}
 
-	public var paused:Bool = false;
+	// Combat change
+	// Because paused = true is done in several different places,
+	// A set function is used to flip all combat timers accordingly, since they otherwise still run while paused
+	// see set_paused() for the rest of what's being done here
+	//
+	// public var paused:Bool = false;
+	public var paused(default, set):Bool = false;
 	public var canReset:Bool = true;
 	var startedCountdown:Bool = false;
 	var canPause:Bool = true;
@@ -4021,6 +4027,11 @@ class PlayState extends MusicBeatState
 
 				vocals.stop();
 				FlxG.sound.music.stop();
+
+				// Combat change
+				boyfriend.actionTimer.cancel();
+				dad.actionTimer.cancel();
+				// End of changes
 
 				persistentUpdate = false;
 				persistentDraw = false;
@@ -6745,6 +6756,18 @@ class PlayState extends MusicBeatState
 		else
 			vocals = new FlxSound();
 	}
+
+	function set_paused(Value:Bool):Bool
+	{
+		for (flxTimer in COMBAT.timerArray)
+		{
+			if (flxTimer != null && !flxTimer.finished && flxTimer.time > 0)
+				flxTimer.active = !Value;
+		}
+
+		paused = Value;
+		return Value;
+	};
 
 	// End of changes
 

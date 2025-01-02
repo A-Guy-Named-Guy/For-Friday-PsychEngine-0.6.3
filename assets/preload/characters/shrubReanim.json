@@ -1,0 +1,836 @@
+{
+	"animations": [
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "idle",
+			"indices": [],
+			"name": "idleL"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "idleLEFT",
+			"indices": [],
+			"name": "idleL"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "idleUP",
+			"indices": [],
+			"name": "idleU"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "idleRIGHT",
+			"indices": [],
+			"name": "idleR"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singLEFT",
+			"indices": [],
+			"name": "singL"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singDOWN",
+			"indices": [],
+			"name": "singD"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singUP",
+			"indices": [],
+			"name": "singU"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singRIGHT",
+			"indices": [],
+			"name": "singR"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singLEFTmiss",
+			"indices": [],
+			"name": "missL"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singDOWNmiss",
+			"indices": [],
+			"name": "missD"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singUPmiss",
+			"indices": [],
+			"name": "missU"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singRIGHTmiss",
+			"indices": [],
+			"name": "missR"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatAttackLEFT",
+			"indices": [],
+			"name": "swingBasicL"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatAttackUP",
+			"indices": [],
+			"name": "swingBasicU"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatAttackRIGHT",
+			"indices": [],
+			"name": "swingBasicR"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatAttackLEFTunblockable",
+			"indices": [],
+			"name": "swingBasicL"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatAttackUPunblockable",
+			"indices": [],
+			"name": "swingBasicU"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatAttackRIGHTunblockable",
+			"indices": [],
+			"name": "swingBasicR"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatAttackSPECIAL",
+			"indices": [],
+			"name": "bashSwing"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindLEFT",
+			"indices": [],
+			"name": "windBasicL"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindUP",
+			"indices": [],
+			"name": "windBasicU"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindRIGHT",
+			"indices": [],
+			"name": "windBasicR"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindSPECIAL",
+			"indices": [],
+			"name": "bashWind"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindLEFTunblockable",
+			"indices": [],
+			"name": "windBasicL"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindUPunblockable",
+			"indices": [],
+			"name": "windBasicU"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindRIGHTunblockable",
+			"indices": [],
+			"name": "windBasicR"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindSPECIALunblockable",
+			"indices": [],
+			"name": "bashWind"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindshortLEFT",
+			"indices": [],
+			"name": "windBasicL"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindshortUP",
+			"indices": [],
+			"name": "windBasicU"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindshortRIGHT",
+			"indices": [],
+			"name": "windBasicR"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindshortSPECIAL",
+			"indices": [],
+			"name": "bashWind"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindshortLEFTunblockable",
+			"indices": [],
+			"name": "windBasicL"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindshortUPunblockable",
+			"indices": [],
+			"name": "windBasicU"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindshortRIGHTunblockable",
+			"indices": [],
+			"name": "windBasicR"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindshortSPECIALunblockable",
+			"indices": [],
+			"name": "bashWind"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatBlockLEFT",
+			"indices": [],
+			"name": "blockL"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatBlockUP",
+			"indices": [],
+			"name": "blockU"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatBlockRIGHT",
+			"indices": [],
+			"name": "blockR"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatParryLEFT",
+			"indices": [],
+			"name": "blockL"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatParryUP",
+			"indices": [],
+			"name": "blockU"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatParryRIGHT",
+			"indices": [],
+			"name": "blockR"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatSwapRightLEFT",
+			"indices": [],
+			"name": "swapRL"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatSwapLeftUP",
+			"indices": [],
+			"name": "swapLU"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatSwapUpRIGHT",
+			"indices": [],
+			"name": "swapUR"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatSwapRightUP",
+			"indices": [],
+			"name": "swapRU"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatSwapUpLEFT",
+			"indices": [],
+			"name": "swapUL"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatSwapLeftRIGHT",
+			"indices": [],
+			"name": "swapLR"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatReadyDOWN",
+			"indices": [],
+			"name": "bashWind"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatHitLEFT",
+			"indices": [],
+			"name": "hitL"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatHitUP",
+			"indices": [],
+			"name": "hitU"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatHitRIGHT",
+			"indices": [],
+			"name": "hitR"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatDodge",
+			"indices": [],
+			"name": "bashWind"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatStartupLEFT",
+			"indices": [],
+			"name": "shrub startupLeft"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatStartupUP",
+			"indices": [],
+			"name": "shrub startupUp"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatStartupRIGHT",
+			"indices": [],
+			"name": "shrub startupRight"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "firstDeath",
+			"indices": [],
+			"name": "shrubDeath"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "salute",
+			"indices": [],
+			"name": "shrub salute"
+		}
+	],
+	"no_antialiasing": false,
+	"image": "characters/shrubReanim",
+	"position": [
+		0,
+		0
+	],
+	"healthicon": "shrub",
+	"flip_x": false,
+	"healthbar_colors": [
+		40,
+		73,
+		31
+	],
+	"camera_position": [
+		-150,
+		150
+	],
+	"sing_duration": 4,
+	"scale": 1,
+	
+	"death_soundName": "fnf_loss_sfx-shrub",
+	"death_characterName": "shrubDeath",
+	"idle_defaultFrame": 9,
+	"has_reflexGuard": false,
+	"has_unblockableNoteAttacks": false,
+	"stamina_cost": 0.2,
+	"default_guard_position": 0,
+	"posture_max": 125,
+	"combat_healthMax": 120,
+	"special_attack": "bash",
+	"ifPlayer_damage": 5,
+	"ifEnemy_damage": 15,
+	"posture_damage": 3,
+	"alternatingIdle": false,
+
+	"combatSoundEffects": [["block", "stickHit"], ["strike", "strike"], ["parry", "stickParry"], ["oos", "oos"], ["postureBreak", "postureBreak"], ["bash", "bash"], ["miss", "whiff"], ["heal", "heal"]],
+	"soundsToPickFromRandom": [["whiff", [1, 3]], ["strike", [1, 4]]],
+	"soundsToVaryVolume": [["whiff", [0.9, 1]], ["strike", [0.7, 0.9]], ["stickHit", [0.6, 0.8]], ["stickParry", [0.5, 0.7]], ["postureBreak", [0.5, 0.7]], ["bash", [0.5, 0.7]], ["oos", [0.7, 0.9]]],
+
+	"sounds":
+	[
+		{
+			"name": "block",
+			"file_name": "whiff",
+			"volume_min": 0.9,
+			"volume_max": 1,
+			"file_number_min": 1,
+			"file_number_max": 3
+		},
+		{
+			"name": "strike",
+			"file_name": "strike",
+			"volume_min": 0.7,
+			"volume_max": 0.9,
+			"file_number_min": 1,
+			"file_number_max": 4
+		},
+		{
+			"name": "parry",
+			"file_name": "stickParry",
+			"volume_min": 0.6,
+			"volume_max": 0.8,
+			"file_number_min": 1,
+			"file_number_max": 3
+		},
+		{
+			"name": "oos",
+			"file_name": "oos",
+			"volume_min": 0.7,
+			"volume_max": 0.9
+		},
+		{
+			"name": "miss",
+			"file_name": "whiff",
+			"volume_min": 0.9,
+			"volume_max": 1,
+			"file_number_min": 1,
+			"file_number_max": 3
+		},
+		{
+			"name": "postureBreak",
+			"file_name": "postureBreak",
+			"volume_min": 0.5,
+			"volume_max": 0.7
+		},
+		{
+			"name": "bash",
+			"file_name": "bash",
+			"volume_min": 0.5,
+			"volume_max": 0.7
+		}
+	],
+
+	"attacks":
+	[
+		{
+			"name": "player_sing_attack",
+			"attack_animation_name": "combatAttack",
+			"startup_animation_name": "combatWind",
+			"direction": "ANY",
+			"damage": 5,
+			"stamina_cost": 0.2,
+			"is_unblockable": false
+		},
+		{
+			"name": "enemy_sing_attack",
+			"attack_animation_name": "combatAttack",
+			"startup_animation_name": "combatWind",
+			"direction": "ANY",
+			"damage": 15
+		},
+		{
+			"name": "player_sing_special",
+			"attack_animation_name": "combatAttack",
+			"startup_animation_name": "combatWind",
+			"direction": "ANY",
+			"damage": 0,
+			"posture_damage": 3,
+			"stamina_cost": 0.2,
+			"stamina_damage": 0.5,
+			"step_based_timing": true,
+			"duration": 0,
+			"recovery": 0,
+			"is_unblockable": false,
+			"is_bash": true
+		},
+		{
+			"name": "enemy_sing_special",
+			"attack_animation_name": "combatAttack",
+			"startup_animation_name": "combatWind",
+			"direction": "SPECIAL",
+			"stamina_damage": 0.5,
+			"is_bash": true
+		},
+		{
+			"name": "basic_attack",
+			"attack_animation_name": "combatAttack",
+			"startup_animation_name": "combatWind",
+			"direction": "ANY",
+			"damage": 15,
+			"stamina_damage": 0,
+			"step_based_timing": true,
+			"duration": 4,
+			"recovery": 4,
+			"is_unblockable": false
+		},
+		{
+			"name": "chain_attack",
+			"attack_animation_name": "combatAttack",
+			"startup_animation_name": "combatWind",
+			"direction": "ANY",
+			"damage": 15,
+			"stamina_damage": 0,
+			"step_based_timing": true,
+			"duration": 4,
+			"recovery": 2,
+			"is_unblockable": false
+		},
+		{
+			"name": "heavy_attack",
+			"attack_animation_name": "combatAttack",
+			"startup_animation_name": "combatWind",
+			"direction": "ANY",
+			"damage": 25,
+			"stamina_damage": 0,
+			"step_based_timing": true,
+			"duration": 4,
+			"recovery": 4,
+			"is_unblockable": true
+		},
+		{
+			"name": "bash",
+			"attack_animation_name": "combatAttack",
+			"startup_animation_name": "combatWind",
+			"soundOnHit": "bash",
+			"direction": "SPECIAL",
+			"damage": 0,
+			"stamina_damage": 0.5,
+			"step_based_timing": true,
+			"duration": 4,
+			"recovery": 4,
+			"is_unblockable": true,
+			"is_bash": true
+		}
+	],
+
+	"chains":
+	[
+		{
+			"name": "heavy_finisher",
+			"direction_overrides":
+			[
+			],
+			"chain":
+			[
+				"basic_attack",
+				"chain_attack",
+				"heavy_attack"
+			]
+		}
+	],
+
+	"characterExtras": [
+		"shrubEffects"
+	]
+}

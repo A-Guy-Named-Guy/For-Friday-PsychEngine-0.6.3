@@ -546,9 +546,10 @@
 			"startup_animation_name": "combatWind",
 			"direction": "ANY",
 			"damage": 12,
+			"stamina_cost": 0.3,
 			"step_based_timing": true,
-			"duration": 2,
-			"recovery": 2
+			"duration": 1,
+			"recovery": 1
 		},
 		{
 			"name": "heavy_attack",
@@ -556,6 +557,7 @@
 			"startup_animation_name": "combatWind",
 			"direction": "ANY",
 			"damage": 25,
+			"stamina_cost": 0.3,
 			"step_based_timing": true,
 			"duration": 4,
 			"recovery": 4,
