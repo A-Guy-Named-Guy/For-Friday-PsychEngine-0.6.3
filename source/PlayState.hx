@@ -1567,28 +1567,6 @@ class PlayState extends MusicBeatState
 			FlxG.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyPress);
 			FlxG.stage.addEventListener(KeyboardEvent.KEY_UP, onKeyRelease);
 		}
-		callOnLuas('onCreatePost', []);
-
-		super.create();
-
-		cacheCountdown();
-		cachePopUpScore();
-		for (key => type in precacheList)
-		{
-			// trace('Key $key is type $type');
-			switch (type)
-			{
-				case 'image':
-					Paths.image(key);
-				case 'sound':
-					Paths.sound(key);
-				case 'music':
-					Paths.music(key);
-			}
-		}
-		Paths.clearUnusedMemory();
-
-		CustomFadeTransition.nextCamera = camOther;
 
 		// Combat changes (a lot of em)
 		COMBAT = new Combat();
@@ -1635,8 +1613,8 @@ class PlayState extends MusicBeatState
 				COMBAT.timerIndicator.cameras = [camHUD];
 				COMBAT.timerArrowGroup.cameras = [camHUD];
 			}
-			if (COMBAT.postureBar != null)
-				COMBAT.postureBar.cameras = [camHUD];
+			if (COMBAT.enemyPostureBar != null)
+				COMBAT.enemyPostureBar.cameras = [camHUD];
 
 			// This is adding the combat UI, it's just that the order of the combat dialogue (and probably normal dialogue?) otherwise doesn't layer right
 			insert(0, COMBAT.combatUI);
@@ -1655,6 +1633,29 @@ class PlayState extends MusicBeatState
 			// Combat.singVictoryDisabled = WeekData.getCurrentWeek().singVictoryDisabled;
 			// Combat.combatVictoryDisabled = WeekData.getCurrentWeek().combatVictoryDisabled;
 		}
+
+		callOnLuas('onCreatePost', []);
+
+		super.create();
+
+		cacheCountdown();
+		cachePopUpScore();
+		for (key => type in precacheList)
+		{
+			// trace('Key $key is type $type');
+			switch (type)
+			{
+				case 'image':
+					Paths.image(key);
+				case 'sound':
+					Paths.sound(key);
+				case 'music':
+					Paths.music(key);
+			}
+		}
+		Paths.clearUnusedMemory();
+
+		CustomFadeTransition.nextCamera = camOther;
 		// End of changes
 	}
 
@@ -1912,7 +1913,13 @@ class PlayState extends MusicBeatState
 	{
 		#if LUA_ALLOWED
 		var doPush:Bool = false;
-		var luaFile:String = 'characters/' + name + '.lua';
+		// Combat change
+		// For character file support
+		// var luaFile:String = 'characters/' + name + '.lua';
+		var luaFile:String = 'characters/' + name + '/' + name + '.lua';
+		if (!Paths.characterFileExists(name, false, name, '.lua'))
+			luaFile = 'characters/' + name + '.lua';
+		// End of changes
 		#if MODS_ALLOWED
 		if (FileSystem.exists(Paths.modFolders(luaFile)))
 		{
@@ -3410,9 +3417,9 @@ class PlayState extends MusicBeatState
 	override public function update(elapsed:Float)
 	{
 		/*if (FlxG.keys.justPressed.NINE)
-		{
-			iconP1.swapOldIcon();
-	}*/
+			{
+				iconP1.swapOldIcon();
+		}*/
 		callOnLuas('onUpdate', [elapsed]);
 
 		switch (curStage)
@@ -3653,8 +3660,14 @@ class PlayState extends MusicBeatState
 				- iconOffset * 2;
 		}
 
-		if (health > 2)
-			health = 2;
+		// Combat change
+		// Lua functions allow the health bar to be altered
+		// if (health > 2)
+		//	health = 2;
+
+		if (health > healthBar.max)
+			health = healthBar.max;
+		// End of change
 
 		// Combat changes
 		// Changed to combat health correlations
@@ -3971,12 +3984,12 @@ class PlayState extends MusicBeatState
 
 		// 1 / 1000 chance for Gitaroo Man easter egg
 		/*if (FlxG.random.bool(0.1))
-		{
-			// gitaroo man easter egg
-			cancelMusicFadeTween();
-			MusicBeatState.switchState(new GitarooPause());
-		}
-		else { */
+			{
+				// gitaroo man easter egg
+				cancelMusicFadeTween();
+				MusicBeatState.switchState(new GitarooPause());
+			}
+			else { */
 		if (FlxG.sound.music != null)
 		{
 			FlxG.sound.music.pause();
@@ -4011,7 +4024,7 @@ class PlayState extends MusicBeatState
 	function doDeathCheck(?skipHealthCheck:Bool = false)
 	{
 		if (((skipHealthCheck && instakillOnMiss)
-			|| (health <= 0 && COMBAT.characterDeathByStamina)
+			|| (health <= 0 && boyfriend.deathByStamina)
 			|| (!SONG.disableCombat && boyfriend.combatHealth <= 0))
 			&& !practiceMode
 			&& !isDead
@@ -4445,7 +4458,7 @@ class PlayState extends MusicBeatState
 							boyfriendSpriteGroup = boyfriendSpriteGroupMap.get(value2);
 							if (!SONG.disableCombat)
 							{
-								COMBAT.generateHealthBar('player');
+								COMBAT.generateCombatBar('player', 'combatHealt');
 								boyfriend.combatHealth = storeCurBfHealth;
 							}
 
@@ -4496,7 +4509,7 @@ class PlayState extends MusicBeatState
 							dadSpriteGroup = dadSpriteGroupMap.get(value2);
 							if (!SONG.disableCombat)
 							{
-								COMBAT.generateHealthBar('enemy');
+								COMBAT.generateCombatBar('enemy', 'combatHealth');
 								dad.combatHealth = storeCurDadHealth;
 							}
 
@@ -4769,9 +4782,9 @@ class PlayState extends MusicBeatState
 		{
 			// Combat change
 			/*var achieve:String = checkForAchievement([
-				'week1_nomiss', 'week2_nomiss', 'week3_nomiss', 'week4_nomiss', 'week5_nomiss', 'week6_nomiss', 'week7_nomiss', 'ur_bad', 'ur_good', 'hype',
-				'two_keys', 'toastie', 'debugger'
-			]); */
+					'week1_nomiss', 'week2_nomiss', 'week3_nomiss', 'week4_nomiss', 'week5_nomiss', 'week6_nomiss', 'week7_nomiss', 'ur_bad', 'ur_good', 'hype',
+					'two_keys', 'toastie', 'debugger'
+				]); */
 
 			var achieve:String = checkForAchievement([
 				'dom_award',
@@ -5193,9 +5206,9 @@ class PlayState extends MusicBeatState
 		}
 		comboSpr.x = xThing + 50;
 		/*
-		trace(combo);
-		trace(seperatedScore);
-	 */
+			trace(combo);
+			trace(seperatedScore);
+		 */
 
 		coolText.text = Std.string(seperatedScore);
 		// add(coolText);
@@ -5543,12 +5556,12 @@ class PlayState extends MusicBeatState
 			// FlxG.log.add('played imss note');
 
 			/*boyfriend.stunned = true;
-
-			// get stunned for 1/60 of a second, makes you able to
-			new FlxTimer().start(1 / 60, function(tmr:FlxTimer)
-			{
-				boyfriend.stunned = false;
-		});*/
+	
+																																																				// get stunned for 1/60 of a second, makes you able to
+																																																				new FlxTimer().start(1 / 60, function(tmr:FlxTimer)
+																																																				{
+																																																					boyfriend.stunned = false;
+			});*/
 
 			if (boyfriend.hasMissAnimations)
 			{
@@ -6358,55 +6371,55 @@ class PlayState extends MusicBeatState
 				{
 					// Combat change
 					/*case 'ur_bad':
-						if (ratingPercent < 0.2 && !practiceMode)
-						{
-							unlock = true;
-						}
-					case 'ur_good':
-						if (ratingPercent >= 1 && !usedPractice)
-						{
-							unlock = true;
-						}
-					case 'roadkill_enthusiast':
-						if (Achievements.henchmenDeath >= 100)
-						{
-							unlock = true;
-						}
-					case 'oversinging':
-						if (boyfriend.holdTimer >= 10 && !usedPractice)
-						{
-							unlock = true;
-						}
-					case 'hype':
-						if (!boyfriendIdled && !usedPractice)
-						{
-							unlock = true;
-						}
-					case 'two_keys':
-						if (!usedPractice)
-						{
-							var howManyPresses:Int = 0;
-							for (j in 0...keysPressed.length)
-							{
-								if (keysPressed[j])
-									howManyPresses++;
-							}
-
-							if (howManyPresses <= 2)
+																																																																																							if (ratingPercent < 0.2 && !practiceMode)
+																																																																																							{
+																																																																																								unlock = true;
+																																																																																							}
+																																																																																						case 'ur_good':
+																																																																																							if (ratingPercent >= 1 && !usedPractice)
+																																																																																							{
+																																																																																								unlock = true;
+																																																																																							}
+																																																																																						case 'roadkill_enthusiast':
+																																																																																							if (Achievements.henchmenDeath >= 100)
+																																																																																							{
+																																																																																								unlock = true;
+																																																																																							}
+																																																																																						case 'oversinging':
+																																																																																							if (boyfriend.holdTimer >= 10 && !usedPractice)
+																																																																																							{
+																																																																																								unlock = true;
+																																																																																							}
+																																																																																						case 'hype':
+																																																																																							if (!boyfriendIdled && !usedPractice)
+																																																																																							{
+																																																																																								unlock = true;
+																																																																																							}
+																																																																																						case 'two_keys':
+																																																																																							if (!usedPractice)
+																																																																																							{
+																																																																																								var howManyPresses:Int = 0;
+																																																																																								for (j in 0...keysPressed.length)
+																																																																																								{
+																																																																																									if (keysPressed[j])
+																																																																																										howManyPresses++;
+																																																																																								}
+	
+																																																																																								if (howManyPresses <= 2)
+																																																																																								{
+																																																																																									unlock = true;
+																																																																																								}
+																																																																																							}
+																																																																																						case 'toastie':
+																																																																																							if (/*ClientPrefs.framerate <= 60 && */ /*!ClientPrefs.shaders && ClientPrefs.lowQuality && !ClientPrefs.globalAntialiasing)
 							{
 								unlock = true;
 							}
-						}
-					case 'toastie':
-						if (/*ClientPrefs.framerate <= 60 && */ /*!ClientPrefs.shaders && ClientPrefs.lowQuality && !ClientPrefs.globalAntialiasing)
-						{
-							unlock = true;
-						}
-					case 'debugger':
-						if (Paths.formatToSongPath(SONG.song) == 'test' && !usedPractice)
-						{
-							unlock = true;
-				}*/
+						case 'debugger':
+							if (Paths.formatToSongPath(SONG.song) == 'test' && !usedPractice)
+							{
+								unlock = true;
+					}*/
 
 					case 'dom_award':
 						if (SONG.song == "dominion" && storyDifficulty != 0 && !practiceMode)
@@ -6478,34 +6491,34 @@ class PlayState extends MusicBeatState
 	}
 
 	/*function cacheChartSongs():Void
-	{
-		if (SONG.chartArray == null)
-			return;
-
-		cachedSongArray = new Array<FlxSound>();
-
-		for (i in 0...SONG.chartArray.length)
-		{
-			var shouldLoop:Bool = false;
-			if (SONG.chartArray[i].chartName == 'Inst')
-				shouldLoop = true;
-
-			var cachedSong = new FlxSound().loadEmbedded(getMusicFile(false, SONG.chartArray[i].songFileName), shouldLoop, !shouldLoop);
-
-			switch (SONG.chartArray[i].chartName)
-			{
-				case 'Intro':
-					cachedSong.onComplete = onIntroComplete.bind();
-				case 'Inst':
-					cachedSong.onComplete = loopSong.bind();
-				case 'Outro':
-					cachedSong.onComplete = finishSong.bind();
-			}
-
-			cachedSongArray.push(cachedSong);
-		}
-
-}*/
+																		{
+																			if (SONG.chartArray == null)
+																				return;
+	
+																			cachedSongArray = new Array<FlxSound>();
+	
+																			for (i in 0...SONG.chartArray.length)
+																			{
+																				var shouldLoop:Bool = false;
+																				if (SONG.chartArray[i].chartName == 'Inst')
+																					shouldLoop = true;
+	
+																				var cachedSong = new FlxSound().loadEmbedded(getMusicFile(false, SONG.chartArray[i].songFileName), shouldLoop, !shouldLoop);
+	
+																				switch (SONG.chartArray[i].chartName)
+																				{
+																					case 'Intro':
+																						cachedSong.onComplete = onIntroComplete.bind();
+																					case 'Inst':
+																						cachedSong.onComplete = loopSong.bind();
+																					case 'Outro':
+																						cachedSong.onComplete = finishSong.bind();
+																				}
+	
+																				cachedSongArray.push(cachedSong);
+																			}
+	
+	}*/
 	// Generating an entire song at once tends to cause a lagspike,
 	// And there's not really a better way to just copy a note over without just referring to the original note object
 	//
@@ -6547,21 +6560,21 @@ class PlayState extends MusicBeatState
 				generateNote(songNotes, chart.unspawnNotes, section);
 
 			/*for (event in SONG.events) // Event Notes
-			{
-				for (i in 0...event[1].length)
 				{
-					var newEventNote:Array<Dynamic> = [event[0], event[1][i][0], event[1][i][1], event[1][i][2]];
-					var subEvent:EventNote = {
-						strumTime: newEventNote[0] + ClientPrefs.noteOffset,
-						event: newEventNote[1],
-						value1: newEventNote[2],
-						value2: newEventNote[3]
-					};
-					subEvent.strumTime -= eventNoteEarlyTrigger(subEvent);
-					curEventsCache.push(subEvent);
-					eventPushed(subEvent);
-				}
-		}*/
+					for (i in 0...event[1].length)
+					{
+						var newEventNote:Array<Dynamic> = [event[0], event[1][i][0], event[1][i][1], event[1][i][2]];
+						var subEvent:EventNote = {
+							strumTime: newEventNote[0] + ClientPrefs.noteOffset,
+							event: newEventNote[1],
+							value1: newEventNote[2],
+							value2: newEventNote[3]
+						};
+						subEvent.strumTime -= eventNoteEarlyTrigger(subEvent);
+						curEventsCache.push(subEvent);
+						eventPushed(subEvent);
+					}
+			}*/
 
 			// if (curEventsCache.length > 1)
 			//	curEventsCache.sort(sortByTime);
@@ -6574,12 +6587,12 @@ class PlayState extends MusicBeatState
 	}
 
 	/**
- * Trying to create a note with vanilla methods causes a lot of problems with improper data storage and weird behavior.
- * 
- * Therefore, a note needs to be generated fresh in a lot of cases.
- * @param noteData The data array that holds the note's information before its created.
- * @param storageList A note array to automatically add the note to. Due to handling sustain note generation being cumbersome, this is left in the newNote creation process.
- */
+	 * Trying to create a note with vanilla methods causes a lot of problems with improper data storage and weird behavior.
+	 * 
+	 * Therefore, a note needs to be generated fresh in a lot of cases.
+	 * @param noteData The data array that holds the note's information before its created.
+	 * @param storageList A note array to automatically add the note to. Due to handling sustain note generation being cumbersome, this is left in the newNote creation process.
+	 */
 	function generateNote(noteData:Dynamic, storageList:Array<Note>, section:SwagSection):Void
 	{
 		// Copied from Psych Engine note generation
@@ -6715,13 +6728,13 @@ class PlayState extends MusicBeatState
 		// FlxG.sound.playMusic(getMusicFile(), 1, false);
 
 		/*for (i in 0...cachedSongArray.length)
-		{
-			if (cachedSongArray[i].name == SONG.activeChart)
 			{
-				FlxG.sound.music = cachedSongArray[i];
-				break;
-			}
-	}*/
+				if (cachedSongArray[i].name == SONG.activeChart)
+				{
+					FlxG.sound.music = cachedSongArray[i];
+					break;
+				}
+		}*/
 
 		FlxG.sound.music.loadEmbedded(getMusicFile(), true, false, loopSong.bind());
 
@@ -6756,6 +6769,8 @@ class PlayState extends MusicBeatState
 		else
 			vocals = new FlxSound();
 	}
+
+	// End of the multi-chart related functions
 
 	function set_paused(Value:Bool):Bool
 	{

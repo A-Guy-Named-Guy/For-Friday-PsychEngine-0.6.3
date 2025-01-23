@@ -32,8 +32,21 @@ class Paths
 
 	#if MODS_ALLOWED
 	public static var ignoreModFolders:Array<String> = [
-		'characters', 'custom_events', 'custom_notetypes', 'data', 'songs', 'music', 'sounds', 'shaders', 'videos', 'images', 'stages', 'weeks', 'fonts',
-		'scripts', 'achievements'
+		'characters',
+		'custom_events',
+		'custom_notetypes',
+		'data',
+		'songs',
+		'music',
+		'sounds',
+		'shaders',
+		'videos',
+		'images',
+		'stages',
+		'weeks',
+		'fonts',
+		'scripts',
+		'achievements'
 	];
 	#end
 
@@ -137,6 +150,91 @@ class Paths
 
 		return getPreloadPath(file);
 	}
+
+	// Combat change
+	// To support characters in a folder named after the character
+	// A json is searched for in a file named after the character in the characters file first
+	// Failing that, then a json in the characters file itself is searched for
+	public static function getValidCharacterPath(curCharacter:String, canBeNull:Bool = false, characterFolder:Null<String> = null,
+			fileType:String = '.json'):Null<String>
+	{
+		if (characterFolder == null)
+			characterFolder = curCharacter;
+
+		var characterPath:String = 'characters/' + characterFolder + '/' + curCharacter + fileType;
+		var validCharacterPath:Null<String> = getCharacterPath(characterPath);
+
+		if (validCharacterPath == null)
+		{
+			characterPath = 'characters/' + curCharacter + fileType;
+			validCharacterPath = getCharacterPath(characterPath);
+		}
+
+		if (!canBeNull)
+		{
+			if (validCharacterPath == null)
+			{
+				characterPath = 'characters/' + Character.DEFAULT_CHARACTER + '/' + Character.DEFAULT_CHARACTER + fileType;
+				validCharacterPath = getCharacterPath(characterPath);
+			}
+
+			if (validCharacterPath == null)
+				validCharacterPath = 'characters/' + Character.DEFAULT_CHARACTER + fileType;
+		}
+		else
+			validCharacterPath = null;
+
+		return validCharacterPath;
+	}
+
+	public static function characterFileExists(curCharacter:String, canBeNull:Bool = false, characterFolder:Null<String> = null, fileType:String = '.json'):Bool
+	{
+		if (characterFolder == null)
+			characterFolder = curCharacter;
+
+		var characterPath:String = 'characters/' + characterFolder + '/' + curCharacter + fileType;
+
+		#if MODS_ALLOWED
+		var path:String = modFolders(characterPath);
+		if (FileSystem.exists(path))
+			return true;
+		else
+			path = getPreloadPath(characterPath);
+
+		if (FileSystem.exists(path))
+		#else
+		var path:String = getPreloadPath(characterPath);
+		if (Assets.exists(path))
+		#end
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	public static function getCharacterPath(characterPath:String):Null<String>
+	{
+		#if MODS_ALLOWED
+		var path:String = modFolders(characterPath);
+		if (!FileSystem.exists(path))
+		{
+			path = getPreloadPath(characterPath);
+		}
+
+		if (!FileSystem.exists(path))
+		#else
+		var path:String = getPreloadPath(characterPath);
+		if (!Assets.exists(path))
+		#end
+		{
+			path = null;
+		}
+
+		return path;
+	}
+
+	// End of change
 
 	static public function getLibraryPath(file:String, library = "preload")
 	{
@@ -436,7 +534,7 @@ class Paths
 				currentTrackedSounds.set(gottenPath, OpenFlAssets.getSound(folder + getPath('$path/$key.$localSoundExtension', SOUND, library)));
 			}
 			#end
-		localTrackedAssets.push(gottenPath);
+			localTrackedAssets.push(gottenPath);
 		return currentTrackedSounds.get(gottenPath);
 	}
 

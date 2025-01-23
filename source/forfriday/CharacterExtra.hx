@@ -132,9 +132,9 @@ class CharacterExtra extends FlxSprite
 							'.json'); // If a character couldn't be found, change him to BF just to prevent a crash
 					}
 				 */
-				var path:String = Character.getValidCharacterPath(thisSprite, true, character.curCharacter);
+				var path:String = Paths.getValidCharacterPath(thisSprite, true, character.curCharacter);
 				if (path == null)
-					path = Character.getValidCharacterPath(thisSprite, false, 'characterExtras');
+					path = Paths.getValidCharacterPath(thisSprite, false, 'characterExtras');
 
 				#if MODS_ALLOWED
 				var rawJson = File.getContent(path);

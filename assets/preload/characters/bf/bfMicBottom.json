@@ -1,0 +1,61 @@
+{
+	"animations": [
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatAttackLEFT",
+			"indices": [],
+			"name": "leftMicBottom",
+			"finishCallback": "finish"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatAttackRIGHT",
+			"indices": [],
+			"name": "rightMicBottom",
+			"finishCallback": "finish"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatAttackLEFTunblockable",
+			"indices": [],
+			"name": "leftMicUnblockableBottom",
+			"finishCallback": "fade"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatAttackRIGHTunblockable",
+			"indices": [],
+			"name": "rightMicUnblockableBottom",
+			"finishCallback": "fade"
+		}
+	],
+	"image": "effects/micBottom",
+	"global_offset": [
+		388,
+		171
+	],
+	"scale": 1,
+
+	"layer": -1,
+	"isEffect": true
+}

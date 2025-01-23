@@ -49,7 +49,7 @@ typedef CharacterFile =
 	var idle_defaultFrame:Null<Int>;
 	var has_reflexGuard:Null<Bool>;
 	var has_unblockableNoteAttacks:Null<Bool>;
-	var stamina_cost:Null<Float>;
+	var death_by_stamina:Null<Bool>;
 	var default_guard_position:Null<Int>;
 	var posture_max:Null<Float>;
 	var posture_recoveryCoefficient:Null<Float>;
@@ -125,8 +125,10 @@ typedef ChainData =
 	var name:String;
 
 	var directions:Null<Array<String>>;
-
+	var choice_weight:Null<Int>;
+	var include_sing_attacks:Null<Bool>;
 	var input_chain:Array<String>;
+
 	var attack_chain:Array<String>;
 }
 
@@ -210,19 +212,14 @@ class Character extends FlxSprite
 	public var idleDefaultFrame:Int = 10;
 	public var playerOneFlipSide:Bool = false;
 	public var alternatingIdle:Bool = false;
+	public var deathByStamina:Bool = false;
 	public var guardPosition:Int = 0;
-	public var isBashed = false;
 	public var hasReflexGuard = true;
-	public var hasUnblockableNoteAttacks = true;
-	public var special:String = 'recover';
 	public var postureMax:Float = 100;
-	public var posture:Float = 0;
+	public var posture(default, set):Float = 0;
 	public var postureRecoveryCoefficient:Float = 1;
 	public var combatHealthMax:Float = 100;
-	public var combatHealth:Float = 100;
-	public var baseDamage:Float = 2;
-	public var staminaCost:Float = 0.2;
-	public var postureDamage:Float = 3;
+	public var combatHealth(default, set):Float = 100;
 	public var characterSprites:FlxTypedGroup<CharacterExtra> = new FlxTypedGroup<CharacterExtra>();
 	public var characterExtraArray:Array<String> = [];
 
@@ -233,10 +230,11 @@ class Character extends FlxSprite
 	public var soundMap:Map<String, SoundData> = new Map();
 	public var characterSounds:CharacterSounds = null;
 
-	public var currentChainName:String = 'neutral';
 	public var currentChain:ChainData = {
 		name: 'neutral',
 		directions: [],
+		include_sing_attacks: false,
+		choice_weight: 1,
 		input_chain: [],
 		attack_chain: []
 	}
@@ -289,7 +287,7 @@ class Character extends FlxSprite
 							'.json'); // If a character couldn't be found, change him to BF just to prevent a crash
 					}
 				 */
-				var path:String = getValidCharacterPath(curCharacter);
+				var path:String = Paths.getValidCharacterPath(curCharacter);
 
 				#if MODS_ALLOWED
 				var rawJson = File.getContent(path);
@@ -369,8 +367,8 @@ class Character extends FlxSprite
 					idleDefaultFrame = json.idle_defaultFrame;
 				if (json.has_reflexGuard != null)
 					hasReflexGuard = json.has_reflexGuard;
-				if (json.has_unblockableNoteAttacks != null)
-					hasUnblockableNoteAttacks = json.has_unblockableNoteAttacks;
+				if (json.death_by_stamina != null)
+					deathByStamina = json.death_by_stamina;
 				if (json.default_guard_position != null)
 					guardPosition = json.default_guard_position;
 				if (json.posture_max != null)
@@ -381,17 +379,6 @@ class Character extends FlxSprite
 					combatHealthMax = json.combat_healthMax;
 				if (json.alternatingIdle != null)
 					alternatingIdle = json.alternatingIdle;
-
-				// These can get removed since attacks can be specific now
-				// Though I still need to do a sweep to make sure these are no longer used anywhere
-				if (isPlayer)
-					baseDamage = json.ifPlayer_damage;
-				else
-					baseDamage = json.ifEnemy_damage;
-				staminaCost = json.stamina_cost;
-				postureDamage = json.posture_damage;
-				special = json.special_attack;
-				// End of stuff to delete
 
 				generateCombatArrays(json);
 				// End of changes
@@ -749,7 +736,7 @@ class Character extends FlxSprite
 						performAnim = false;
 			}
 
-			if (isBashed && !animToPlay.startsWith('combatHit'))
+			if (currentAction == 'bashed' && !animToPlay.startsWith('combatHit'))
 			{
 				performAnim = false;
 			}
@@ -811,9 +798,7 @@ class Character extends FlxSprite
 			{
 				// Priority on the parry animation since it's a more deliberate action
 				if (Combat.checkCombatInfoAvailable() && isPlayer)
-					if (PlayState.instance.COMBAT.hasParried
-						&& animToPlay.startsWith('combatBlock')
-						|| animToPlay.startsWith('combatParry'))
+					if (currentAction == 'hasParried' && animToPlay.startsWith('combatBlock') || animToPlay.startsWith('combatParry'))
 						performAnim = false;
 			}
 		}
@@ -1027,7 +1012,7 @@ class Character extends FlxSprite
 			newAttack.startup_animation_name = 'combatWind';
 
 		if (newAttack.sound_on_hit == null)
-			newAttack.sound_on_hit = 'hit';
+			newAttack.sound_on_hit = '';
 		if (newAttack.sound_on_miss == null)
 			newAttack.sound_on_miss = 'miss';
 
@@ -1120,6 +1105,8 @@ class Character extends FlxSprite
 			var newChain:ChainData = {
 				name: chainData.name,
 				directions: chainData.directions,
+				include_sing_attacks: chainData.include_sing_attacks,
+				choice_weight: chainData.choice_weight,
 				input_chain: chainData.input_chain,
 				attack_chain: chainData.attack_chain
 			};
@@ -1129,6 +1116,12 @@ class Character extends FlxSprite
 
 			if (newChain.directions == null)
 				newChain.directions = [];
+
+			if (newChain.include_sing_attacks == null)
+				newChain.include_sing_attacks = false;
+
+			if (newChain.choice_weight == null)
+				newChain.choice_weight = 1;
 
 			if (newChain.input_chain == null)
 				newChain.input_chain = [];
@@ -1252,60 +1245,6 @@ class Character extends FlxSprite
 		return newAttackEffect;
 	}
 
-	// A json is searched for in a file named after the character in the characters file first
-	// Failing that, then a json in the characters file itself is searched for
-	public static function getValidCharacterPath(curCharacter:String, canBeNull:Bool = false, characterFolder:Null<String> = null):Null<String>
-	{
-		if (characterFolder == null)
-			characterFolder = curCharacter;
-
-		var characterPath:String = 'characters/' + characterFolder + '/' + curCharacter + '.json';
-		var validCharacterPath:Null<String> = getCharacterPath(characterPath);
-
-		if (validCharacterPath == null)
-		{
-			characterPath = 'characters/' + curCharacter + '.json';
-			validCharacterPath = getCharacterPath(characterPath);
-		}
-
-		if (!canBeNull)
-		{
-			if (validCharacterPath == null)
-			{
-				characterPath = 'characters/' + DEFAULT_CHARACTER + '/' + DEFAULT_CHARACTER + '.json';
-				validCharacterPath = getCharacterPath(characterPath);
-			}
-
-			if (validCharacterPath == null)
-				validCharacterPath = 'characters/' + DEFAULT_CHARACTER + '.json';
-		}
-		else
-			validCharacterPath = null;
-
-		return validCharacterPath;
-	}
-
-	public static function getCharacterPath(characterPath:String):Null<String>
-	{
-		#if MODS_ALLOWED
-		var path:String = Paths.modFolders(characterPath);
-		if (!FileSystem.exists(path))
-		{
-			path = Paths.getPreloadPath(characterPath);
-		}
-
-		if (!FileSystem.exists(path))
-		#else
-		var path:String = Paths.getPreloadPath(characterPath);
-		if (!Assets.exists(path))
-		#end
-		{
-			path = null;
-		}
-
-		return path;
-	}
-
 	/**
 	 * For debugging character actions
 	 */
@@ -1319,6 +1258,32 @@ class Character extends FlxSprite
 		#end
 
 		currentAction = Value;
+
+		return Value;
+	}
+
+	function set_combatHealth(Value:Float):Float
+	{
+		var priorHealth = combatHealth;
+		combatHealth = Value;
+
+		if (Value < priorHealth && priorHealth > 0 && combatHealth <= 0 && PlayState.instance != null)
+		{
+			PlayState.instance.callOnLuas('onCharacterDefeat', [isPlayer ? 'boyfriend' : 'dad']);
+		}
+
+		return Value;
+	}
+
+	function set_posture(Value:Float):Float
+	{
+		var priorPosture = posture;
+		posture = Value;
+
+		if (Value > priorPosture && priorPosture < postureMax && posture >= postureMax && PlayState.instance != null)
+		{
+			PlayState.instance.callOnLuas('onCharacterPostureBreak', [isPlayer ? 'boyfriend' : 'dad']);
+		}
 
 		return Value;
 	}

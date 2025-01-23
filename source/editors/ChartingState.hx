@@ -2955,7 +2955,13 @@ class ChartingState extends MusicBeatState
 
 	function loadHealthIconFromCharacter(char:String)
 	{
-		var characterPath:String = 'characters/' + char + '.json';
+		// Combat change
+		// Character file support
+		// var characterPath:String = 'characters/' + char + '.json';
+		var characterPath:String = 'characters/' + char + '/' + char + '.json';
+		if (!Paths.characterFileExists(char, false, char, '.json'))
+			characterPath = 'characters/' + char + '.json';
+		// End of changes
 		#if MODS_ALLOWED
 		var path:String = Paths.modFolders(characterPath);
 		if (!FileSystem.exists(path))

@@ -1,0 +1,79 @@
+{
+	"animations": [
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatBlockLEFT",
+			"indices": [],
+			"name": "leftDodgeFace"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatBlockUP",
+			"indices": [],
+			"name": "upDodgeFace"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatBlockRIGHT",
+			"indices": [],
+			"name": "rightDodgeFace"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatParryLEFT",
+			"indices": [],
+			"name": "leftParryFace"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatParryUP",
+			"indices": [],
+			"name": "upParryFace"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatParryRIGHT",
+			"indices": [],
+			"name": "rightParryFace"
+		}
+	],
+	"image": "effects/bfFace",
+	"global_offset": [
+		388,
+		171
+	],
+	"scale": 1,
+
+	"layer": 1,
+	"isEffect": false
+}

@@ -502,6 +502,63 @@
 	"soundsToPickFromRandom": [["whiff", [1, 3]], ["strike", [1, 4]]],
 	"soundsToVaryVolume": [["whiff", [0.9, 1]], ["strike", [0.7, 0.9]], ["heal" , [0.7, 0.9]], ["oos", [0.7, 0.9]]],
 
+	"sounds":
+	[
+		{
+			"name": "block",
+			"file_name": "whiff",
+			"volume_min": 0.9,
+			"volume_max": 1,
+			"file_number_min": 1,
+			"file_number_max": 3
+		},
+		{
+			"name": "hit",
+			"file_name": "strike",
+			"volume_min": 0.7,
+			"volume_max": 0.9,
+			"file_number_min": 1,
+			"file_number_max": 4
+		},
+		{
+			"name": "parry",
+			"file_name": "whiff",
+			"volume_min": 0.9,
+			"volume_max": 1,
+			"file_number_min": 1,
+			"file_number_max": 3
+		},
+		{
+			"name": "oos",
+			"file_name": "oos",
+			"volume_min": 0.7,
+			"volume_max": 0.9
+		},
+		{
+			"name": "miss",
+			"file_name": "whiff",
+			"volume_min": 0.9,
+			"volume_max": 1,
+			"file_number_min": 1,
+			"file_number_max": 3
+		},
+		{
+			"name": "heal",
+			"file_name": "heal",
+			"volume_min": 0.7,
+			"volume_max": 0.9
+		}
+	],
+
+	"character_sounds":
+	
+		{
+			"struck": "hit",
+			"block": "miss",
+			"parry": "miss",
+			"out_of_stamina": "oos"
+		},
+
 	"attacks":
 	[
 		{
@@ -528,7 +585,7 @@
 			"direction": "SPECIAL",
 			"damage": 0,
 			"stamina_cost": -0.6,
-			"health_recover": -40
+			"health_recover": 40
 		},
 		{
 			"name": "enemy_sing_special",
@@ -545,23 +602,59 @@
 			"attack_animation_name": "combatAttack",
 			"startup_animation_name": "combatWind",
 			"direction": "ANY",
-			"damage": 12,
-			"stamina_cost": 0.3,
+			"damage": 7,
+			"stamina_cost": 0.15,
 			"step_based_timing": true,
 			"duration": 1,
-			"recovery": 1
+			"recovery": 2,
+			"hitstun": 3,
+			"chain_duration": 4 
+		},
+		{
+			"name": "chain_attack",
+			"attack_animation_name": "combatAttack",
+			"startup_animation_name": "combatWind",
+			"direction": "ANY",
+			"damage": 15,
+			"stamina_cost": 0.15,
+			"step_based_timing": true,
+			"duration": 0,
+			"recovery": 2,
+			"hitstun": 3
 		},
 		{
 			"name": "heavy_attack",
 			"attack_animation_name": "combatAttack",
 			"startup_animation_name": "combatWind",
 			"direction": "ANY",
-			"damage": 25,
-			"stamina_cost": 0.3,
+			"damage": 12,
+			"stamina_cost": 0,
 			"step_based_timing": true,
-			"duration": 4,
-			"recovery": 4,
-			"is_unblockable": true
+			"duration": 3,
+			"recovery": 2,
+			"hitstun": 1,
+			"is_unblockable": false,
+			"on_complete": "heal_on_hit"
+		},
+		{
+			"name": "special_attack",
+			"attack_animation_name": "combatAttack",
+			"startup_animation_name": "combatWind",
+			"not_an_attack": true,
+			"direction": "SPECIAL",
+			"step_based_timing": true,
+			"duration": 2,
+			"on_complete": "health_trade"
+		},
+		{
+			"name": "recover_finisher",
+			"attack_animation_name": "combatAttack",
+			"startup_animation_name": "combatWind",
+			"not_an_attack": true,
+			"direction": "SPECIAL",
+			"step_based_timing": true,
+			"duration": 2,
+			"on_complete": "finisher_heal"
 		}
 	],
 
@@ -569,15 +662,60 @@
 	[
 		{
 			"name": "heavy_finisher",
-			"direction_overrides":
+			"directions":
 			[
 			],
-			"chain":
+			"input_chain":
+			[
+				"attack",
+				"attack",
+				"attack"
+			],
+			"attack_chain":
 			[
 				"basic_attack",
 				"basic_attack",
-				"heavy_attack"
+				"chain_attack"
 			]
+		},
+		{
+			"name": "attack_recovery",
+			"directions":
+			[
+			],
+			"input_chain":
+			[
+				"attack",
+				"attack",
+				"special"
+			],
+			"attack_chain":
+			[
+				"basic_attack",
+				"basic_attack",
+				"recover_finisher"
+			]
+		}
+	],
+
+	"attack_effects":
+	[
+		{
+			"name": "heal_on_hit",
+			"health_recover": 40,
+			"sound": "heal" 
+		},
+		{
+			"name": "health_trade",
+			"stamina_cost": -0.6,
+			"health_recover": -40,
+			"sound": "heal" 
+		},
+		{
+			"name": "finisher_heal",
+			"stamina_cost": -0.8,
+			"health_recover": 25,
+			"sound": "heal" 
 		}
 	],
 

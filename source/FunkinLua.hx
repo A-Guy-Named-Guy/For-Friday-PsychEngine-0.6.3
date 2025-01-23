@@ -1,5 +1,7 @@
 package;
 
+import Character.AttackData;
+import Character.ChainData;
 import Controls;
 import DialogueBoxPsych;
 import Type.ValueType;
@@ -21,9 +23,11 @@ import flixel.system.FlxSound;
 import flixel.text.FlxText;
 import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
+import flixel.ui.FlxBar;
 import flixel.util.FlxColor;
 import flixel.util.FlxSave;
 import flixel.util.FlxTimer;
+import forfriday.Combat;
 import openfl.Lib;
 import openfl.display.BitmapData;
 import openfl.display.BlendMode;
@@ -213,6 +217,11 @@ class FunkinLua
 		set('shadersEnabled', ClientPrefs.shaders);
 		set('scriptName', scriptName);
 		set('currentModDirectory', Paths.currentModDirectory);
+
+		// Combat change
+		set('boyfriend', PlayState.instance.boyfriend);
+		set('dad', PlayState.instance.dad);
+		// End of changes
 
 		#if windows
 		set('buildTarget', 'windows');
@@ -3274,61 +3283,457 @@ class FunkinLua
 
 		// Combat change
 		// New lua stuff :O
-
-		// Trying to inflict hitstun just kind of causes the enemy to fail to defend
-		// Best just to alter the hitstun of the attack itself
-		/*Lua_helper.add_callback(lua, "inflictHitstun", function(defenderName:String, duration:Float, forceTiming:String = '')
-			{
-				var defender:Character = null;
-				defender = retrieveCharacter(defenderName);
-
-				if (defender != null)
-					PlayState.instance.COMBAT.inflictHitstun(defender, duration, forceTiming);
-				else
-					luaTrace('Defender "$defenderName" was null, inflictHitstun failed!', false);
-
-				return true;
-		});*/
-
-		Lua_helper.add_callback(lua, "changeAttack", function(attackerName:String, attackName:String)
+		Lua_helper.add_callback(lua, "getCombatHealth", function(characterName:String)
 		{
-			var attacker:Character = null;
-			attacker = retrieveCharacter(attackerName);
+			return getCharacter(characterName).combatHealth;
+		});
+		Lua_helper.add_callback(lua, "setCombatHealth", function(characterName:String, health:Float)
+		{
+			getCharacter(characterName).combatHealth = health;
+		});
+		Lua_helper.add_callback(lua, "addCombatHealth", function(characterName:String, value:Float)
+		{
+			getCharacter(characterName).combatHealth += value;
+		});
+		Lua_helper.add_callback(lua, "getCombatHealthMax", function(characterName:String)
+		{
+			return getCharacter(characterName).combatHealthMax;
+		});
+		Lua_helper.add_callback(lua, "setCombatHealthMax", function(characterName:String, newHealthMax:Float, scaleHealth:Bool = true)
+		{
+			var character = getCharacter(characterName);
+			var characterBar = getCharacterBar(characterName, 'combatHealth');
 
-			if (attacker == null)
-				luaTrace('Attacker "$attackerName" ended up null!', false);
-			else if (attackerName == 'boyfriend')
-				PlayState.instance.COMBAT.determinePlayerAttack(attackName);
+			var characterHealth:Float = character.combatHealth;
+			var characterHealthMax:Float = character.combatHealthMax;
+
+			if (scaleHealth)
+				character.combatHealth = characterHealth * newHealthMax / characterHealthMax;
+
+			character.combatHealthMax = newHealthMax;
+			characterBar.setRange(0, character.combatHealthMax);
+		});
+		Lua_helper.add_callback(lua, "addCombatHealthMax", function(characterName:String, value:Float, addToHealth:Bool = true, scaleHealth:Bool = false)
+		{
+			var character = getCharacter(characterName);
+			var characterBar = getCharacterBar(characterName, 'combatHealth');
+
+			var characterHealth:Float = character.combatHealth;
+			var currentHealthMax:Float = character.combatHealthMax;
+			var newHealthMax:Float = currentHealthMax + value;
+
+			if (scaleHealth)
+				character.combatHealth = characterHealth * newHealthMax / currentHealthMax;
+
+			if (addToHealth)
+				character.combatHealth += value;
+
+			character.combatHealthMax = newHealthMax;
+			characterBar.setRange(0, character.combatHealthMax);
+		});
+
+		Lua_helper.add_callback(lua, "getPosture", function(characterName:String)
+		{
+			return getCharacter(characterName).posture;
+		});
+		Lua_helper.add_callback(lua, "setPosture", function(characterName:String, posture:Float)
+		{
+			getCharacter(characterName).posture = posture;
+		});
+		Lua_helper.add_callback(lua, "addPosture", function(characterName:String, value:Float)
+		{
+			getCharacter(characterName).posture += value;
+		});
+		Lua_helper.add_callback(lua, "getPostureMax", function(characterName:String)
+		{
+			return getCharacter(characterName).postureMax;
+		});
+		Lua_helper.add_callback(lua, "setPostureMax", function(characterName:String, newPostureMax:Float, scalePosture:Bool = true)
+		{
+			var character = getCharacter(characterName);
+			var characterBar = getCharacterBar(characterName, 'posture');
+
+			var posture:Float = character.posture;
+			var postureMax:Float = character.postureMax;
+
+			if (scalePosture)
+				character.posture = posture * newPostureMax / postureMax;
+
+			character.postureMax = newPostureMax;
+			characterBar.setRange(0, character.postureMax);
+		});
+		Lua_helper.add_callback(lua, "addPostureMax", function(characterName:String, value:Float, addToPosture:Bool = true, scalePosture:Bool = false)
+		{
+			var character = getCharacter(characterName);
+			var characterBar = getCharacterBar(characterName, 'posture');
+
+			var posture:Float = character.posture;
+			var currentPostureMax:Float = character.postureMax;
+			var newPostureMax:Float = currentPostureMax + value;
+
+			if (scalePosture)
+				character.posture = posture * newPostureMax / currentPostureMax;
+
+			if (addToPosture)
+				character.posture += value;
+
+			character.postureMax = newPostureMax;
+			characterBar.setRange(0, character.postureMax);
+		});
+
+		Lua_helper.add_callback(lua, "getStamina", function()
+		{
+			return PlayState.instance.health;
+		});
+		Lua_helper.add_callback(lua, "setStamina", function(health:Float)
+		{
+			PlayState.instance.health = health;
+		});
+		Lua_helper.add_callback(lua, "addStamina", function(value:Float)
+		{
+			PlayState.instance.health += value;
+		});
+		Lua_helper.add_callback(lua, "getStaminaMax", function()
+		{
+			return PlayState.instance.healthBar.max;
+		});
+		Lua_helper.add_callback(lua, "setStaminaMax", function(newStaminaMax:Float, scaleStamina:Bool = true)
+		{
+			var stamina:Float = PlayState.instance.health;
+			var staminaMax:Float = PlayState.instance.healthBar.max;
+
+			if (scaleStamina)
+				PlayState.instance.health = stamina * newStaminaMax / staminaMax;
+
+			PlayState.instance.healthBar.setRange(0, newStaminaMax);
+		});
+		Lua_helper.add_callback(lua, "addStaminaMax", function(value:Float, addToStamina:Bool = true, scaleStamina:Bool = false)
+		{
+			var stamina:Float = PlayState.instance.health;
+			var currentStaminaMax:Float = PlayState.instance.healthBar.max;
+			var newStaminaMax:Float = currentStaminaMax + value;
+
+			if (scaleStamina)
+				stamina = stamina * newStaminaMax / currentStaminaMax;
+
+			if (addToStamina)
+				stamina += value;
+
+			PlayState.instance.health = stamina;
+			PlayState.instance.healthBar.setRange(0, newStaminaMax);
+		});
+
+		Lua_helper.add_callback(lua, "setPostureMechanicMode", function(mode:String = 'disabled', resetPosture:Bool = false)
+		{
+			PlayState.instance.COMBAT.setPostureMechanicMode(mode, resetPosture);
+
+			// The game crashes unless this return is here
+			return true;
+		});
+
+		Lua_helper.add_callback(lua, "getAttackByName", function(attackerName:String, attackName:String)
+		{
+			return getCharacter(attackerName).attackMap.get(attackName);
+		});
+
+		Lua_helper.add_callback(lua, "setCurrentAttackByName", function(attackerName:String, attackName:String)
+		{
+			if (attackerName == 'boyfriend')
+				PlayState.instance.boyfriend.currentAttack = PlayState.instance.COMBAT.determinePlayerAttack(attackName);
 			else if (attackerName == 'dad')
 				PlayState.instance.COMBAT.luaChangeEnemyAttack(attackName);
+		});
+
+		Lua_helper.add_callback(lua, "setCurrentAttack", function(attackerName:String, attack:AttackData)
+		{
+			getCharacter(attackerName).currentAttack = attack;
+		});
+
+		Lua_helper.add_callback(lua, "getCurrentAttack", function(characterName:String)
+		{
+			return getCharacter(characterName).currentAttack;
+		});
+
+		Lua_helper.add_callback(lua, "getAttackParam", function(attack:AttackData, parameter:String)
+		{
+			return Reflect.getProperty(attack, parameter);
+		});
+
+		Lua_helper.add_callback(lua, "setCurrentAttackParam", function(attackerName:String, attack:AttackData, parameterName:String, newParameter:Dynamic)
+		{
+			var currentAttackParameter:Dynamic = Reflect.getProperty(attack, parameterName);
+
+			if (Type.typeof(currentAttackParameter) == Type.typeof(newParameter))
+				Reflect.setProperty(getCharacter(attackerName).currentAttack, parameterName, newParameter);
+			else
+				luaTrace('isOfType mismatch! Modifying parameter type ${Type.typeof(currentAttackParameter)}, new parameter type ${Type.typeof(newParameter)}');
+		});
+
+		Lua_helper.add_callback(lua, "getCurrentChain", function(characterName:String)
+		{
+			return getCharacter(characterName).currentChain;
+		});
+
+		Lua_helper.add_callback(lua, "getPlaceInChain", function(characterName:String)
+		{
+			return getCharacter(characterName).placeInChain;
+		});
+
+		Lua_helper.add_callback(lua, "getChainByName", function(characterName:String, chainName:String)
+		{
+			return getCharacter(characterName).chainMap.get(chainName);
+		});
+
+		Lua_helper.add_callback(lua, "setEnemyChainByName", function(chainName:String, startAttackImmediately:Bool = false)
+		{
+			var dad = getCharacter('dad');
+
+			dad.currentChain = dad.chainMap.get(chainName);
+			dad.placeInChain = 0;
+			if (startAttackImmediately)
+				PlayState.instance.COMBAT.chooseEnemyAttack();
+		});
+
+		Lua_helper.add_callback(lua, "setEnemyChain", function(chain:ChainData, startAttackImmediately:Bool = false)
+		{
+			var dad = getCharacter('dad');
+
+			dad.currentChain = chain;
+			dad.placeInChain = 0;
+			if (startAttackImmediately)
+				PlayState.instance.COMBAT.chooseEnemyAttack();
+		});
+
+		Lua_helper.add_callback(lua, "setCurrentChainParam", function(attackerName:String, chain:ChainData, parameterName:String, newParameter:Dynamic)
+		{
+			var currentChainParameter:Dynamic = Reflect.getProperty(chain, parameterName);
+
+			if (Type.typeof(currentChainParameter) == Type.typeof(newParameter))
+				Reflect.setProperty(getCharacter(attackerName).currentChain, parameterName, newParameter);
+			else
+				luaTrace('isOfType mismatch! Modifying parameter type ${Type.typeof(currentChainParameter)}, new parameter type ${Type.typeof(newParameter)}');
+		});
+
+		Lua_helper.add_callback(lua, "toggleEnemyOffense", function(enemyOnOffense:Null<Bool>)
+		{
+			if (PlayState.instance.COMBAT == null)
+			{
+				luaTrace('toggleEnemyOffense failed. Combat was not setup yet.');
+				return;
+			}
+
+			if (enemyOnOffense == null)
+				PlayState.instance.COMBAT.enemyOnOffense = !PlayState.instance.COMBAT.enemyOnOffense;
+			else
+				PlayState.instance.COMBAT.enemyOnOffense = enemyOnOffense;
+		});
+
+		Lua_helper.add_callback(lua, "cancelAction", function(character:Null<String>)
+		{
+			if (PlayState.instance.COMBAT == null)
+			{
+				luaTrace('cancelAttack failed. Combat was not setup yet.');
+				return true;
+			}
+
+			if (character == null)
+			{
+				cancelCharacterAction('boyfriend');
+				cancelCharacterAction('dad');
+			}
+			else
+				cancelCharacterAction(character);
 
 			return true;
 		});
+
+		Lua_helper.add_callback(lua, "togglePlayerControls", function(controlsActive:Null<Bool>)
+		{
+			// disableControls in the Combat class is static, so it defaults to false
+			// Therefore "disableControls" is the opposite of what would be expected
+			// In other words this makes true enable controls and false disable them instead of the other way around
+			controlsActive = !controlsActive;
+
+			if (controlsActive == null)
+				Combat.disableControls = !Combat.disableControls;
+			else
+				Combat.disableControls = controlsActive;
+		});
+
+		// Note for later:
+		// Write in documentation that this intentionally ignores stamina/vanilla health with the broad combatUI toggle
+		Lua_helper.add_callback(lua, "toggleCombatUIVisibility", function(nameOfUI:Null<String>, visibleUI:Null<Bool>)
+		{
+			if (PlayState.instance.COMBAT == null)
+			{
+				luaTrace('toggleCombatUIVisibility failed. Combat was not setup yet.');
+				return;
+			}
+
+			var toggle:Bool = false;
+
+			if (visibleUI == null)
+			{
+				toggle = true;
+				visibleUI = false;
+			}
+
+			switch (nameOfUI)
+			{
+				case 'playerHealth' | 'boyfriendHealth':
+					toggleUIVisibility('boyfriend', 'health', visibleUI, toggle);
+				case 'enemyHealth' | 'dadHealth':
+					toggleUIVisibility('dad', 'health', visibleUI, toggle);
+				case 'health':
+					toggleUIVisibility('boyfriend', 'health', visibleUI, toggle);
+					toggleUIVisibility('dad', 'health', visibleUI, toggle);
+				case 'playerPosture' | 'boyfriendPosture':
+					toggleUIVisibility('boyfriend', 'posture', visibleUI, toggle);
+				case 'enemyPosture' | 'dadPosture':
+					toggleUIVisibility('dad', 'posture', visibleUI, toggle);
+				case 'posture':
+					toggleUIVisibility('boyfriend', 'posture', visibleUI, toggle);
+					toggleUIVisibility('dad', 'posture', visibleUI, toggle);
+				case 'stamina':
+					toggleUIVisibility('boyfriend', 'stamina', visibleUI, toggle);
+				default:
+					PlayState.instance.COMBAT.combatUI.forEach(function(spr:FlxSprite)
+					{
+						if (toggle && spr != PlayState.instance.COMBAT.attackTypeIndicator)
+							spr.visible = !spr.visible
+						else
+							spr.visible = visibleUI;
+					});
+			}
+
+			return;
+		});
+
+		Lua_helper.add_callback(lua, "toggleActiveCombat",
+			function(combatActive:Null<Bool>, toggleCombatActive:Null<Bool>, toggleUI:Bool = false, cancelActions:Bool = false)
+			{
+				if (PlayState.instance.COMBAT == null)
+				{
+					luaTrace('setCombatIsActive failed. Combat was not setup yet.');
+					return true;
+				}
+
+				if (combatActive == null || toggleCombatActive != null && toggleCombatActive)
+				{
+					PlayState.instance.COMBAT.enemyOnOffense = !PlayState.instance.COMBAT.enemyOnOffense;
+					Combat.disableControls = !Combat.disableControls;
+					if (toggleUI)
+						PlayState.instance.COMBAT.combatUI.forEach(function(spr:FlxSprite)
+						{
+							if (spr != PlayState.instance.COMBAT.attackTypeIndicator)
+								spr.visible = !spr.visible;
+						});
+				}
+				else
+				{
+					PlayState.instance.COMBAT.enemyOnOffense = combatActive;
+					Combat.disableControls = !combatActive;
+					if (toggleUI)
+						PlayState.instance.COMBAT.combatUI.forEach(function(spr:FlxSprite)
+						{
+							if (spr != PlayState.instance.COMBAT.attackTypeIndicator)
+								spr.visible = combatActive;
+						});
+				}
+
+				if (cancelActions)
+				{
+					cancelCharacterAction('boyfriend');
+					cancelCharacterAction('dad');
+				}
+
+				return true;
+			});
 		// End of changes
 
 		call('onCreate', []);
 		#end
 	}
 
-	// Combat change
+	// Combat changes
 	// Lua internal functions
-	// Trying to set characters directly as variables results in null stuff
-	// So we're just gonna use strings and go off that
-	function retrieveCharacter(characterName:String):Character
+	function getCharacter(characterName:String):Character
 	{
 		var character:Character = null;
 
 		switch (characterName)
 		{
-			case 'boyfriend':
+			case 'boyfriend' | 'player':
 				character = PlayState.instance.boyfriend;
-			case 'dad':
+			case 'dad' | 'enemy':
 				character = PlayState.instance.dad;
-			case 'gf':
-				character = PlayState.instance.gf;
 		}
 
 		return character;
+	}
+
+	function getCharacterBar(characterName:String, barName:String):FlxBar
+	{
+		var characterBar:FlxBar = null;
+
+		switch (characterName)
+		{
+			case 'boyfriend':
+				switch (barName)
+				{
+					case 'combatHealth':
+						characterBar = PlayState.instance.COMBAT.combatPlayerHealthBar;
+					case 'posture':
+						characterBar = PlayState.instance.COMBAT.playerPostureBar;
+				}
+			case 'dad':
+				switch (barName)
+				{
+					case 'combatHealth':
+						characterBar = PlayState.instance.COMBAT.combatEnemyHealthBar;
+					case 'posture':
+						characterBar = PlayState.instance.COMBAT.enemyPostureBar;
+				}
+		}
+
+		return characterBar;
+	}
+
+	function cancelCharacterAction(character:String)
+	{
+		getCharacter(character).actionTimer.cancel();
+		getCharacter(character).currentAction = 'neutral';
+		getCharacter(character).dance();
+	}
+
+	function toggleUIVisibility(character:String, elementName:String, visibility:Bool, toggle:Bool)
+	{
+		switch (character)
+		{
+			case 'boyfriend':
+				switch (elementName)
+				{
+					case 'health':
+						if (toggle) PlayState.instance.COMBAT.combatPlayerHealthBar.visible = !PlayState.instance.COMBAT.combatPlayerHealthBar.visible; else
+							PlayState.instance.COMBAT.combatPlayerHealthBar.visible = visibility;
+					case 'posture':
+						if (toggle) PlayState.instance.COMBAT.playerPostureBar.visible = !PlayState.instance.COMBAT.playerPostureBar.visible; else
+							PlayState.instance.COMBAT.playerPostureBar.visible = visibility;
+					case 'stamina':
+						if (toggle) PlayState.instance.healthBar.visible = !PlayState.instance.healthBar.visible; else
+							PlayState.instance.healthBar.visible = visibility;
+				}
+			case 'dad':
+				switch (elementName)
+				{
+					case 'health':
+						if (toggle) PlayState.instance.COMBAT.combatEnemyHealthBar.visible = !PlayState.instance.COMBAT.combatEnemyHealthBar.visible; else
+							PlayState.instance.COMBAT.combatEnemyHealthBar.visible = visibility;
+					case 'posture':
+						if (toggle) PlayState.instance.COMBAT.enemyPostureBar.visible = !PlayState.instance.COMBAT.enemyPostureBar.visible; else
+							PlayState.instance.COMBAT.enemyPostureBar.visible = visibility;
+				}
+		}
 	}
 
 	// End of changes
