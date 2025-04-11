@@ -1,0 +1,1292 @@
+{
+	"animations": [
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "idle",
+			"indices": [],
+			"name": "idleL"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "idleLEFT",
+			"indices": [],
+			"name": "idleL"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "idleUP",
+			"indices": [],
+			"name": "idleU"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "idleRIGHT",
+			"indices": [],
+			"name": "idleR"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singLEFT",
+			"indices": [],
+			"name": "singL"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singDOWN",
+			"indices": [],
+			"name": "singD"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singUP",
+			"indices": [],
+			"name": "singU"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singRIGHT",
+			"indices": [],
+			"name": "singR"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singLEFTmiss",
+			"indices": [],
+			"name": "missL"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singDOWNmiss",
+			"indices": [],
+			"name": "missD"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singUPmiss",
+			"indices": [],
+			"name": "missU"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singRIGHTmiss",
+			"indices": [],
+			"name": "missR"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatAttackLEFT",
+			"indices": [],
+			"name": "swingBasicL"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatAttackUP",
+			"indices": [],
+			"name": "swingBasicU"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatAttackRIGHT",
+			"indices": [],
+			"name": "swingBasicR"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatAttackLEFTunblockable",
+			"indices": [],
+			"name": "swingBasicL"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatAttackUPunblockable",
+			"indices": [],
+			"name": "swingBasicU"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatAttackRIGHTunblockable",
+			"indices": [],
+			"name": "swingBasicR"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatAttackSPECIAL",
+			"indices": [],
+			"name": "bashSwing"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindLEFT",
+			"indices": [],
+			"name": "windBasicL"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindUP",
+			"indices": [],
+			"name": "windBasicU"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindRIGHT",
+			"indices": [],
+			"name": "windBasicR"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindSPECIAL",
+			"indices": [],
+			"name": "bashWind"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindLEFTunblockable",
+			"indices": [],
+			"name": "windBasicL"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindUPunblockable",
+			"indices": [],
+			"name": "windBasicU"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindRIGHTunblockable",
+			"indices": [],
+			"name": "windBasicR"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindSPECIALunblockable",
+			"indices": [],
+			"name": "bashWind"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindshortLEFT",
+			"indices": [],
+			"name": "windBasicL"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindshortUP",
+			"indices": [],
+			"name": "windBasicU"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindshortRIGHT",
+			"indices": [],
+			"name": "windBasicR"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindshortSPECIAL",
+			"indices": [],
+			"name": "bashWind"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindshortLEFTunblockable",
+			"indices": [],
+			"name": "windBasicL"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindshortUPunblockable",
+			"indices": [],
+			"name": "windBasicU"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindshortRIGHTunblockable",
+			"indices": [],
+			"name": "windBasicR"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatWindshortSPECIALunblockable",
+			"indices": [],
+			"name": "bashWind"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatBlockLEFT",
+			"indices": [],
+			"name": "blockL"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatBlockUP",
+			"indices": [],
+			"name": "blockU"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatBlockRIGHT",
+			"indices": [],
+			"name": "blockR"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatParryLEFT",
+			"indices": [],
+			"name": "blockL"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatParryUP",
+			"indices": [],
+			"name": "blockU"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatParryRIGHT",
+			"indices": [],
+			"name": "blockR"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatSwapRightLEFT",
+			"indices": [],
+			"name": "swapRL"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatSwapLeftUP",
+			"indices": [],
+			"name": "swapLU"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatSwapUpRIGHT",
+			"indices": [],
+			"name": "swapUR"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatSwapRightUP",
+			"indices": [],
+			"name": "swapRU"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatSwapUpLEFT",
+			"indices": [],
+			"name": "swapUL"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatSwapLeftRIGHT",
+			"indices": [],
+			"name": "swapLR"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatReadyDOWN",
+			"indices": [],
+			"name": "bashWind"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatHitLEFT",
+			"indices": [],
+			"name": "hitL"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatHitUP",
+			"indices": [],
+			"name": "hitU"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatHitRIGHT",
+			"indices": [],
+			"name": "hitR"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatDodge",
+			"indices": [],
+			"name": "bashWind"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "LchainWind1L",
+			"indices": [],
+			"name": "LchainWind1L"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "LchainWindAlt1L",
+			"indices": [],
+			"name": "LchainWindAlt1L"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "LchainSwing1L",
+			"indices": [],
+			"name": "LchainSwing1L"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "LchainWind2R",
+			"indices": [],
+			"name": "LchainWind2R"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "LchainSwing2R",
+			"indices": [],
+			"name": "Lchain2R"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "LchainWind3B",
+			"indices": [],
+			"name": "LchainWind3B"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "LchainSwing3B",
+			"indices": [],
+			"name": "LchainSwing3B"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "LchainWind4L",
+			"indices": [],
+			"name": "LchainWind4L"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "LchainSwing4L",
+			"indices": [],
+			"name": "LchainSwing4L"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "UchainWind1U",
+			"indices": [],
+			"name": "UchainWind1U"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "UchainSwing1U",
+			"indices": [],
+			"name": "UchainSwing1U"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "UchainWind2U",
+			"indices": [],
+			"name": "UchainWind2U"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "UchainSwing2U",
+			"indices": [],
+			"name": "UchainSwing2U"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "UchainWind3R",
+			"indices": [],
+			"name": "UchainWind3R"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "UchainSwing3R",
+			"indices": [],
+			"name": "UchainSwing3R"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "RchainWindR1",
+			"indices": [],
+			"name": "RchainWindR1"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "RchainSwing1R",
+			"indices": [],
+			"name": "RchainSwing1R"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "RchainWind2U",
+			"indices": [],
+			"name": "RchainWind2U"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "RchainSwing2U",
+			"indices": [],
+			"name": "RchainSwing2U"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "RchainWind3L",
+			"indices": [],
+			"name": "RchainWind3L"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "RchainSwing3L",
+			"indices": [],
+			"name": "RchainSwing3L"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "RmixupWind2R",
+			"indices": [],
+			"name": "RmixupWind2R"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "RmixupSwing2R",
+			"indices": [],
+			"name": "RmixupSwing2R"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "RmixupWind3L",
+			"indices": [],
+			"name": "RmixupWind3L"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "RmixupSwing3L",
+			"indices": [],
+			"name": "RmixupSwing3L"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "dodgeWindA",
+			"indices": [],
+			"name": "dodgeWindA"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "dodgeSwingA",
+			"indices": [],
+			"name": "dodgeSwingA"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "dodgeWindB",
+			"indices": [],
+			"name": "dodgeWindB"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "dodgeSwingB",
+			"indices": [],
+			"name": "dodgeSwingB"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatStartupLEFT",
+			"indices": [],
+			"name": "shrub startupLeft"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatStartupUP",
+			"indices": [],
+			"name": "shrub startupUp"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "combatStartupRIGHT",
+			"indices": [],
+			"name": "shrub startupRight"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "firstDeath",
+			"indices": [],
+			"name": "shrubDeath"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "salute",
+			"indices": [],
+			"name": "shrub salute"
+		}
+	],
+	"no_antialiasing": false,
+	"image": "characters/shrubReanim",
+	"position": [
+		-500,
+		-25
+	],
+	"healthicon": "shrub",
+	"flip_x": false,
+	"healthbar_colors": [
+		40,
+		73,
+		31
+	],
+	"camera_position": [
+		-150,
+		150
+	],
+	"sing_duration": 4,
+	"scale": 1,
+	
+	"death_soundName": "fnf_loss_sfx-shrub",
+	"death_characterName": "shrubDeath",
+	"idle_defaultFrame": 6,
+	"has_reflexGuard": false,
+	"has_unblockableNoteAttacks": false,
+	"stamina_cost": 0.2,
+	"default_guard_position": 3,
+	"posture_max": 125,
+	"combat_healthMax": 120,
+	"special_attack": "bash",
+	"ifPlayer_damage": 5,
+	"ifEnemy_damage": 15,
+	"posture_damage": 3,
+	"alternatingIdle": false,
+
+	"combatSoundEffects": [["block", "stickHit"], ["strike", "strike"], ["parry", "stickParry"], ["oos", "oos"], ["postureBreak", "postureBreak"], ["bash", "bash"], ["miss", "whiff"], ["heal", "heal"]],
+	"soundsToPickFromRandom": [["whiff", [1, 3]], ["strike", [1, 4]]],
+	"soundsToVaryVolume": [["whiff", [0.9, 1]], ["strike", [0.7, 0.9]], ["stickHit", [0.6, 0.8]], ["stickParry", [0.5, 0.7]], ["postureBreak", [0.5, 0.7]], ["bash", [0.5, 0.7]], ["oos", [0.7, 0.9]]],
+
+	"sounds":
+	[
+		{
+			"name": "block",
+			"file_name": "stickHit",
+			"volume_min": 0.6,
+			"volume_max": 0.8
+		},
+		{
+			"name": "hit",
+			"file_name": "strike",
+			"volume_min": 0.7,
+			"volume_max": 0.9,
+			"file_number_min": 1,
+			"file_number_max": 4
+		},
+		{
+			"name": "parry",
+			"file_name": "stickParry",
+			"volume_min": 0.6,
+			"volume_max": 0.8,
+			"file_number_min": 1,
+			"file_number_max": 3
+		},
+		{
+			"name": "oos",
+			"file_name": "oos",
+			"volume_min": 0.7,
+			"volume_max": 0.9
+		},
+		{
+			"name": "miss",
+			"file_name": "whiff",
+			"volume_min": 0.9,
+			"volume_max": 1,
+			"file_number_min": 1,
+			"file_number_max": 3
+		},
+		{
+			"name": "postureBreak",
+			"file_name": "postureBreak",
+			"volume_min": 0.5,
+			"volume_max": 0.7
+		},
+		{
+			"name": "bash",
+			"file_name": "bash",
+			"volume_min": 0.5,
+			"volume_max": 0.7
+		}
+	],
+
+	"character_sounds":
+	
+		{
+			"struck": "hit",
+			"block": "block",
+			"parry": "parry",
+			"out_of_stamina": "oos"
+		},
+
+	"attacks":
+	[
+		{
+			"name": "player_sing_attack",
+			"attack_animation_name": "combatAttack",
+			"startup_animation_name": "combatWind",
+			"direction": "ANY",
+			"damage": 5,
+			"stamina_cost": 0.2,
+			"is_unblockable": false
+		},
+		{
+			"name": "enemy_sing_attack",
+			"attack_animation_name": "combatAttack",
+			"startup_animation_name": "combatWind",
+			"direction": "ANY",
+			"damage": 15
+		},
+		{
+			"name": "player_sing_special",
+			"attack_animation_name": "combatAttack",
+			"startup_animation_name": "combatWind",
+			"direction": "ANY",
+			"damage": 0,
+			"posture_damage": 3,
+			"stamina_cost": 0.2,
+			"stamina_damage": 0.5,
+			"step_based_timing": true,
+			"duration": 0,
+			"recovery": 0,
+			"is_unblockable": false,
+			"is_bash": true
+		},
+		{
+			"name": "enemy_sing_special",
+			"attack_animation_name": "combatAttack",
+			"startup_animation_name": "combatWind",
+			"direction": "SPECIAL",
+			"stamina_damage": 0.5,
+			"is_bash": true
+		},
+		{
+			"name": "basic_attack",
+			"attack_animation_name": "combatAttack",
+			"startup_animation_name": "combatWind",
+			"direction": "ANY",
+			"damage": 15,
+			"duration": 0.5,
+			"recovery": 0.1
+		},
+		{
+			"name": "Lchain1L",
+			"attack_animation_name": "LchainSwing1L",
+			"startup_animation_name": "LchainWind1L",
+			"direction": "LEFT",
+			"damage": 7,
+			"duration": 0.250,
+			"recovery": 0.250
+		},
+		{
+			"name": "LchainAlt1L",
+			"attack_animation_name": "LchainSwing1L",
+			"startup_animation_name": "LchainWindAlt1L",
+			"direction": "LEFT",
+			"damage": 7,
+			"duration": 0.500,
+			"recovery": 0.250
+		},
+		{
+			"name": "Lchain2R",
+			"attack_animation_name": "LchainSwing2R",
+			"startup_animation_name": "LchainWind2R",
+			"direction": "RIGHT",
+			"damage": 4,
+			"duration": 0.250,
+			"recovery": 0.250
+		},
+		{
+			"name": "Lchain3B",
+			"attack_animation_name": "LchainSwing3B",
+			"startup_animation_name": "LchainWind3B",
+			"direction": "SPECIAL",
+			"damage": 5,
+			"stamina_damage": 0.5,
+			"is_bash": true,
+			"duration": 0.625,
+			"recovery": 0.375
+		},
+		{
+			"name": "Lchain4L",
+			"attack_animation_name": "LchainSwing4L",
+			"startup_animation_name": "LchainWind4L",
+			"direction": "LEFT",
+			"damage": 15,
+			"duration": 0.417,
+			"recovery": 1.5
+		},
+		{
+			"name": "Uchain1U",
+			"attack_animation_name": "UchainSwing1U",
+			"startup_animation_name": "UchainWind1U",
+			"direction": "UP",
+			"damage": 15,
+			"duration": 0.458,
+			"recovery": 0.333
+		},
+		{
+			"name": "Uchain2U",
+			"attack_animation_name": "UchainSwing2U",
+			"startup_animation_name": "UchainWind2U",
+			"direction": "UP",
+			"damage": 20,
+			"duration": 0.708,
+			"recovery": 0.542
+		},
+		{
+			"name": "Uchain3L",
+			"attack_animation_name": "UchainSwing3R",
+			"startup_animation_name": "UchainWind3R",
+			"direction": "LEFT",
+			"damage": 15,
+			"duration": 0.375,
+			"recovery": 1.5
+		},
+		{
+			"name": "RchainAlt1R",
+			"attack_animation_name": "combatAttackRIGHT",
+			"startup_animation_name": "combatWindRIGHT",
+			"direction": "RIGHT",
+			"damage": 15,
+			"duration": 0.458,
+			"recovery": 0.292
+		},
+		{
+			"name": "Rchain1R",
+			"attack_animation_name": "RchainSwing1R",
+			"startup_animation_name": "RchainWindR1",
+			"direction": "RIGHT",
+			"damage": 15,
+			"duration": 0.333,
+			"recovery": 0.292
+		},
+		{
+			"name": "Rchain2U",
+			"attack_animation_name": "RchainSwing2U",
+			"startup_animation_name": "RchainWind2U",
+			"direction": "UP",
+			"damage": 15,
+			"duration": 0.333,
+			"recovery": 0.292
+		},
+		{
+			"name": "Rchain3L",
+			"attack_animation_name": "RchainSwing3L",
+			"startup_animation_name": "RchainWind3L",
+			"direction": "LEFT",
+			"damage": 15,
+			"duration": 0.708,
+			"recovery": 1.5
+		},
+		{
+			"name": "Rmixup1R",
+			"attack_animation_name": "RchainSwing1R",
+			"startup_animation_name": "RchainWindR1",
+			"direction": "RIGHT",
+			"damage": 15,
+			"duration": 0.333,
+			"recovery": 0.375
+		},
+		{
+			"name": "Rmixup2R",
+			"attack_animation_name": "RmixupSwing2R",
+			"startup_animation_name": "RmixupWind2R",
+			"direction": "RIGHT",
+			"damage": 7,
+			"duration": 0.125,
+			"recovery": 0.250
+		},
+		{
+			"name": "Rmixup3L",
+			"attack_animation_name": "RmixupSwing3L",
+			"startup_animation_name": "RmixupWind3L",
+			"direction": "LEFT",
+			"damage": 7,
+			"duration": 0.125,
+			"recovery": 1.5
+		},
+		{
+			"name": "dodgeSwing",
+			"attack_animation_name": "dodgeSwingA",
+			"startup_animation_name": "dodgeWindA",
+			"direction": "LEFT",
+			"damage": 15,
+			"duration": 0.458,
+			"recovery": 1
+		}
+	],
+
+	"chains":
+	[
+		{
+			"name": "Lchain",
+			"choice_weight": 4,
+			"attack_chain":
+			[
+				"LchainAlt1L",
+				"Lchain2R",
+				"Lchain3B",
+				"Lchain4L"
+			]
+		},
+		{
+			"name": "Uchain",
+			"attack_chain":
+			[
+				"Uchain1U",
+				"Uchain2U",
+				"Uchain3L"
+			]
+		},
+		{
+			"name": "Rchain",
+			"attack_chain":
+			[
+				"RchainAlt1R",
+				"Rchain2U",
+				"Rchain3L"
+			]
+		},
+		{
+			"name": "dodgeChain",
+			"choice_weight": 0,
+			"attack_chain":
+			[
+				"dodgeSwing"
+			]
+		}
+	],
+
+	"characterExtras": [
+		"shrubEffects"
+	]
+}

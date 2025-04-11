@@ -1,12 +1,12 @@
 package forfriday;
 
-import PlayState;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.addons.effects.FlxSkewedSprite;
 import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.math.FlxMath;
 import flixel.util.FlxColor;
+import states.PlayState;
 
 using StringTools;
 

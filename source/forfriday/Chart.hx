@@ -1,21 +1,41 @@
 package forfriday;
 
-import Section.SwagSection;
+import backend.Song.SwagSection;
 
 typedef SwagChart =
 {
-	var chartName:String;
-	var chartNotes:Array<SwagSection>;
-	var songFileName:String;
-	var lengthOfChartInSections:Int;
+	var chartName:Null<String>;
+	var lengthOfChartInSections:Null<Int>;
+
+	var songFileName:Null<String>;
+	var voiceFileName:Null<String>;
+	var sourceFileName:Null<String>;
+	var chartNotes:Null<Array<SwagSection>>;
+	var chartEvents:Null<Array<Dynamic>>;
+
+	var chartBpm:Null<Float>;
+	var chartNeedsVoices:Null<Bool>;
+	var chartSpeed:Null<Float>;
+	var chartOffset:Null<Float>;
 }
 
 class Chart
 {
-	public var chartName:String = 'Inst';
-	public var songFileName:String = 'Inst';
-	public var chartNotes:Array<SwagSection>;
-	public var lengthOfChartInSections:Int;
+	public var chartName:Null<String> = 'Inst';
+	public var lengthOfChartInSections:Null<Int>;
 
-	public function new() {}
+	public var songFileName:Null<String> = 'Inst';
+	public var voiceFileName:Null<String> = 'Voices';
+	public var sourceFileName:Null<String> = '';
+	public var chartNotes:Null<Array<SwagSection>>;
+	public var chartEvents:Null<Array<Dynamic>>;
+
+	public var chartBpm:Null<Float>;
+	public var chartNeedsVoices:Null<Bool>;
+	public var chartSpeed:Null<Float>;
+	public var chartOffset:Null<Float>;
+
+	public function new()
+	{
+	}
 }

@@ -1,6 +1,5 @@
 package forfriday;
 
-import animateatlas.AtlasFrameMaker;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.animation.FlxBaseAnimation;
@@ -8,6 +7,7 @@ import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import haxe.Json;
+import objects.Character;
 import openfl.utils.Assets;
 
 using StringTools;
@@ -180,7 +180,7 @@ class CharacterExtra extends FlxSprite
 						frames = Paths.getSparrowAtlas(json.image);
 
 					case "texture":
-						frames = AtlasFrameMaker.construct(json.image);
+						// frames = AtlasFrameMaker.construct(json.image);
 				}
 				imageFile = json.image;
 
@@ -260,8 +260,9 @@ class CharacterExtra extends FlxSprite
 
 		if (animation.getByName(curAnim) != null)
 			playAnim(curAnim, true);
-		// alpha == 1 checks if something is in the middle of fading out
-		else if (alpha == 1)
+			// alpha == 1 checks if something is in the middle of fading out
+		// alpha == 0 is to make visibility as a check consistent
+		else if (alpha == 1 || alpha == 0)
 			visible = false;
 	}
 
@@ -274,19 +275,33 @@ class CharacterExtra extends FlxSprite
 
 		animation.play(AnimName, Force, Reversed, Frame);
 
-		// Offset logic tweaked a bit to add in a generalOffset component
-		var daOffset:Array<Float> = [0, 0];
-
-		if (animOffsets.exists(AnimName))
-			daOffset = animOffsets.get(AnimName);
-
-		offset.set(daOffset[0] + generalOffset[0], daOffset[1] + generalOffset[1]);
+		var daOffset:Array<Float> = determineOffset(AnimName);
+		offset.set(daOffset[0], daOffset[1]);
 
 		var daAngle:Float = 0;
 		if (animAngle.exists(AnimName))
 			daAngle += animAngle.get(AnimName);
 
 		angle = daAngle;
+	}
+
+	public function determineOffset(AnimName:String):Array<Float>
+	{
+		// Offset logic tweaked a bit to add in a generalOffset component
+		var daOffset:Array<Float> = [0, 0];
+
+		if (animOffsets.exists(AnimName))
+		{
+			var tempOffset = animOffsets.get(AnimName);
+
+			daOffset[0] = tempOffset[0];
+			daOffset[1] = tempOffset[1];
+		}
+
+		daOffset[0] += generalOffset[0];
+		daOffset[1] += generalOffset[1];
+
+		return daOffset;
 	}
 
 	public function addOffset(name:String, x:Float = 0, y:Float = 0)

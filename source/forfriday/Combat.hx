@@ -1,16 +1,11 @@
 package forfriday;
 
-import Character;
-import Song.SwagSong;
-import flash.geom.Rectangle;
+import backend.Song.SwagSong;
 import flixel.FlxBasic;
 import flixel.FlxG;
 import flixel.FlxSprite;
-import flixel.graphics.FlxGraphic;
-import flixel.graphics.frames.FlxImageFrame;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.group.FlxSpriteGroup;
-import flixel.math.FlxRect;
 import flixel.system.FlxSound;
 import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
@@ -18,8 +13,10 @@ import flixel.ui.FlxBar;
 import flixel.util.FlxColor;
 import flixel.util.FlxSort;
 import flixel.util.FlxTimer;
-import lime.math.Rectangle;
-import openfl.geom.Point;
+import forfriday.CharacterExtra;
+import objects.Bar;
+import objects.Character;
+import objects.Note;
 
 using StringTools;
 
@@ -27,26 +24,26 @@ using StringTools;
 //
 // Essentially, the main purpose of extending PlayState in this case is to allow access to private PlayState variables without having to turn them public
 // Variables like generatedMusic and healthBarBG probably should be public anyway but it's less engine stuff to have to monkey with
-class Combat extends PlayState
+class Combat extends FlxBasic
 {
+	var boyfriend:Character = null;
+	var dad:Character = null;
+	var controls:Controls = null;
+
 	public static var debugGodMode:Bool = false;
 
 	public var combatUI = new FlxTypedGroup<FlxSprite>();
 	public var timerArrowGroup = new FlxTypedGroup<TimeIndicator>();
 	public var timerIndicator:FlxTypedGroup<FlxSprite> = null;
 
-	public var combatPlayerHealthBarBG:AttachedSprite;
-	public var combatEnemyHealthBarBG:AttachedSprite;
-	public var combatPlayerHealthBar:FlxBar;
-	public var combatEnemyHealthBar:FlxBar;
+	public var combatPlayerHealthBar:Bar;
+	public var combatEnemyHealthBar:Bar;
 
-	public var playerPostureBarBG:AttachedSprite;
-	public var enemyPostureBarBG:AttachedSprite;
-	public var playerPostureBar:FlxBar;
-	public var enemyPostureBar:FlxBar;
+	public var playerPostureBar:Bar;
+	public var enemyPostureBar:Bar;
 
 	public var combatMechanics:Bool = true;
-	public var enemyOnOffense:Bool = true;
+	public var enemyOnOffense:Bool = false;
 
 	public var isDodge:Bool = false;
 	public var playerInputChainArray:Array<String> = [];
@@ -57,7 +54,7 @@ class Combat extends PlayState
 	public static var needCombatVictory:Array<String> = ['trial'];
 	public static var singVictoryDisabled:Array<String> = ['dominion', 'dominion-reversal'];
 	public static var combatVictoryDisabled:Array<String> = [''];
-	public static var combatNoteTypes:Array<String> = ['attack', 'wind', 'shortwind'];
+	public static var combatNoteTypes:Array<String> = ['attack', 'wind', 'shortwind', 'Attack Note', 'Attack Startup'];
 	public static var characterFlipSide:Bool = false;
 
 	var timerReady:Bool = false;
@@ -116,8 +113,8 @@ class Combat extends PlayState
 		// PlayState.instance.boyfriend used to be here like 150 times before
 		boyfriend = PlayState.instance.boyfriend;
 		dad = PlayState.instance.dad;
+		controls = PlayState.instance.controls;
 
-		// Combat change
 		// Null static values default to false (since static values can't be null)
 		// so for combat to be enabled by default the combat mechanic value of a song is the reverse of combatMechanics actually being true or not
 		if (PlayState.SONG.disableCombat)
@@ -149,7 +146,7 @@ class Combat extends PlayState
 			// Stamina uses vanilla health as resource
 			// So if the character doesn't die the vanilla way, makes sense to just fill the resource off the bat
 			if (!boyfriend.deathByStamina)
-				PlayState.instance.health = PlayState.instance.healthBar.max;
+				PlayState.instance.health = PlayState.instance.healthBar.bounds.max;
 
 			if (!boyfriend.hasReflexGuard)
 				playerGuardActive = true;
@@ -157,7 +154,7 @@ class Combat extends PlayState
 			generateCombatBar('player', 'combatHealth');
 			generateCombatBar('enemy', 'combatHealth');
 
-			PlayState.instance.iconP1.y = PlayState.instance.strumLine.y + 15;
+			PlayState.instance.iconP1.y = 65;
 			if (characterFlipSide)
 			{
 				PlayState.instance.iconP1.x = (FlxG.width / 2 - PlayState.instance.iconP1.width / 2);
@@ -166,12 +163,12 @@ class Combat extends PlayState
 			{
 				PlayState.instance.iconP1.x = FlxG.width / 2;
 			}
-			if (ClientPrefs.downScroll)
+			if (ClientPrefs.data.downScroll)
 				PlayState.instance.iconP1.y += 20;
 			PlayState.instance.iconP1.x -= 35;
 			PlayState.instance.iconP1.y += 10;
 
-			PlayState.instance.iconP2.y = PlayState.instance.strumLine.y - 15;
+			PlayState.instance.iconP2.y = 35;
 			if (characterFlipSide)
 			{
 				PlayState.instance.iconP2.x = FlxG.width / 2;
@@ -386,14 +383,14 @@ class Combat extends PlayState
 					dad.posture = dad.postureMax;
 			}
 
-			if (boyfriend.combatHealth >= combatPlayerHealthBar.max)
-				boyfriend.combatHealth = combatPlayerHealthBar.max;
+			if (boyfriend.combatHealth >= combatPlayerHealthBar.bounds.max)
+				boyfriend.combatHealth = combatPlayerHealthBar.bounds.max;
 
 			if (boyfriend.combatHealth < 0)
 				boyfriend.combatHealth = 0;
 
-			if (dad.combatHealth >= combatEnemyHealthBar.max)
-				dad.combatHealth = combatEnemyHealthBar.max;
+			if (dad.combatHealth >= combatEnemyHealthBar.bounds.max)
+				dad.combatHealth = combatEnemyHealthBar.bounds.max;
 
 			if (dad.combatHealth <= 0)
 			{
@@ -444,7 +441,7 @@ class Combat extends PlayState
 		for (i in 0...3)
 		{
 			var guardArrow:FlxSprite = new FlxSprite(50, 450);
-			if (ClientPrefs.downScroll)
+			if (ClientPrefs.data.downScroll)
 				guardArrow.y = 50;
 
 			var curGuard:String = 'left';
@@ -524,7 +521,7 @@ class Combat extends PlayState
 
 		if ((characterFlipSide && player == 1) || (!characterFlipSide && player == 0))
 		{
-			attackTypeIndicator.frames = Paths.getSparrowAtlas('notes/indicator');
+			attackTypeIndicator.frames = Paths.getSparrowAtlas('guards/fnfStyle/indicator');
 			attackTypeIndicator.animation.addByPrefix('specialIndicator', 'indicator bash', false);
 			attackTypeIndicator.animation.addByPrefix('unblockableIndicator', 'indicator unblockable', false);
 			attackTypeIndicator.antialiasing = true;
@@ -542,13 +539,8 @@ class Combat extends PlayState
 
 	public function generateCombatBar(character:String, barType:String):Void
 	{
-		var barBG:AttachedSprite = new AttachedSprite('healthBar');
-		barBG.x = 16;
-		barBG.y = 10;
-		barBG.scale.set(0.5, 1);
-		barBG.scrollFactor.set();
-		barBG.xAdd = -4;
-		barBG.yAdd = -4;
+		var barX:Float = 16;
+		var barY:Float = 10;
 
 		var barColorEmpty = 0xFFFF0000;
 		var barColorFill = 0xFF66FF33;
@@ -558,52 +550,42 @@ class Combat extends PlayState
 			case 'combatHealth':
 				// L i t e r a l l y  nothing
 			case 'posture':
-				barBG.y = PlayState.instance.healthBarBG.y - 36;
+				barY = PlayState.instance.healthBar.y - 36;
 				barColorEmpty = 0xFF503838;
 				barColorFill = 0xFFFDFF6E;
 		}
 
-		var barMax:Float = 100;
-		var barParent:Character = null;
+		var bar = null;
 
 		switch (character)
 		{
 			case 'player':
-				barParent = boyfriend;
-
-				barBG.x += FlxG.width / 2;
+				barX += FlxG.width / 2;
 
 				switch (barType)
 				{
 					case 'combatHealth':
-						barMax = boyfriend.combatHealthMax;
+						bar = new Bar(barX, barY, 'healthBar', function() return boyfriend.combatHealth, 0, boyfriend.combatHealthMax);
 					case 'posture':
-						barMax = boyfriend.postureMax;
+						bar = new Bar(barX, barY, 'healthBar', function() return boyfriend.posture, 0, boyfriend.postureMax);
 				}
 			case 'enemy':
-				barParent = dad;
-
 				if (characterFlipSide)
-					barBG.x += FlxG.width / 2;
+					barX += FlxG.width / 2;
 
 				switch (barType)
 				{
 					case 'combatHealth':
-						barMax = dad.combatHealthMax;
+						bar = new Bar(barX, barY, 'healthBar', function() return dad.combatHealth, 0, dad.combatHealthMax);
 					case 'posture':
-						barMax = dad.postureMax;
+						bar = new Bar(barX, barY, 'healthBar', function() return dad.posture, 0, dad.postureMax);
 				}
 		}
 
-		var bar:FlxBar = new FlxBar(barBG.x, barBG.y, RIGHT_TO_LEFT, Std.int(barBG.width - 8), Std.int(barBG.height - 8), barParent, barType, 0, barMax);
 		bar.scale.set(0.5, 1);
 		bar.scrollFactor.set();
-		bar.createFilledBar(barColorEmpty, barColorFill);
+		bar.setColors(barColorFill, barColorEmpty);
 
-		barBG.sprTracker = bar;
-		barBG.copyVisible = true;
-
-		combatUI.add(barBG);
 		combatUI.add(bar);
 
 		switch (character)
@@ -613,24 +595,18 @@ class Combat extends PlayState
 				{
 					case 'combatHealth':
 						combatPlayerHealthBar = bar;
-						combatPlayerHealthBarBG = barBG;
 					case 'posture':
 						playerPostureBar = bar;
-						playerPostureBarBG = barBG;
 				}
 			case 'enemy':
 				switch (barType)
 				{
 					case 'combatHealth':
 						combatEnemyHealthBar = bar;
-						combatEnemyHealthBarBG = barBG;
 					case 'posture':
 						enemyPostureBar = bar;
-						enemyPostureBarBG = barBG;
 				}
 		}
-
-		barBG.scale.set(0.5, 1);
 	}
 
 	function evaluateCombatNotes():Void
@@ -681,7 +657,7 @@ class Combat extends PlayState
 				{
 					switch (daNote.noteType)
 					{
-						case "attack":
+						case 'Attack Note' | "attack":
 							var ignoreIsBashed:Bool = false;
 							var forceUnblockable:Bool = false;
 							var deathNoteAttack:Bool = false;
@@ -709,7 +685,7 @@ class Combat extends PlayState
 
 							if (!daNote.isSustainNote && attackData != null)
 								executeEnemyAttack(attackData, ignoreIsBashed, daNote.noteData, forceUnblockable, deathNoteAttack);
-						case "wind":
+						case 'Attack Startup' | "wind":
 							if (dad.currentAction != 'bashed')
 							{
 								if (daNote.noteData != 1)
@@ -726,7 +702,7 @@ class Combat extends PlayState
 								dad.playAnim(appendDirection('combatWind', daNote.noteData, true) + (daNote.isUnblockable ? 'unblockable' : ''), true);
 							else
 								dad.playAnim(appendDirection('combatWindshort', daNote.noteData, true) + (daNote.isUnblockable ? 'unblockable' : ''), true);
-						case "normal":
+						default:
 							switch (daNote.noteData)
 							{
 								case 0:
@@ -874,6 +850,8 @@ class Combat extends PlayState
 				effectName = attack.on_block;
 			case 'onParry':
 				effectName = attack.on_parry;
+			case 'onMiss':
+				effectName = attack.on_miss;
 		}
 
 		var currentEffect:AttackEffectData = null;
@@ -1013,12 +991,12 @@ class Combat extends PlayState
 			{
 				if (PlayState.instance.health > (boyfriend.currentAttack.stamina_cost * 3)
 					&& PlayState.instance.health <= (boyfriend.currentAttack.stamina_cost * 4))
-					FlxG.sound.play('shared:assets/shared/sounds/oos.wav', 0.4);
+					boyfriend.playSoundEffect(boyfriend.characterSounds.out_of_stamina, 0.4);
 				else if (PlayState.instance.health > (boyfriend.currentAttack.stamina_cost * 2)
 					&& PlayState.instance.health <= (boyfriend.currentAttack.stamina_cost * 3))
-					FlxG.sound.play('shared:assets/shared/sounds/oos.wav', 0.7);
+					boyfriend.playSoundEffect(boyfriend.characterSounds.out_of_stamina, 0.7);
 				else if (PlayState.instance.health <= (boyfriend.currentAttack.stamina_cost * 2))
-					FlxG.sound.play('shared:assets/shared/sounds/oos.wav', 1);
+					boyfriend.playSoundEffect(boyfriend.characterSounds.out_of_stamina);
 			}
 
 			startPlayerAttack();
@@ -1136,6 +1114,9 @@ class Combat extends PlayState
 		else
 			boyfriend.currentAction = 'neutral';
 
+		if (!boyfriend.currentAttack.not_an_attack)
+			determineEnemyChain(true);
+
 		PlayState.instance.callOnLuas('onExecutingAttack', ['boyfriend', boyfriend.currentAttack]);
 
 		if (boyfriend.currentAttack.not_an_attack)
@@ -1143,7 +1124,18 @@ class Combat extends PlayState
 
 		PlayState.instance.callOnLuas('onAttacked', ['dad', boyfriend.currentAttack]);
 
-		if ((boyfriend.guardPosition == dad.guardPosition && !boyfriend.currentAttack.is_unblockable && dad.currentAction != 'bashed')
+		if (dad.currentAction == 'dodge')
+		{
+			dad.blockCount = 0;
+			dad.playAnim('combatDodge', true);
+
+			PlayState.instance.callOnLuas('onDodge', ['dad', boyfriend.currentAttack]);
+			PlayState.instance.callOnLuas('onMiss', ['boyfriend', boyfriend.currentAttack]);
+
+			applyAttackEffect(getAttackEffect(boyfriend, 'onMiss'), boyfriend);
+			boyfriend.playSoundEffect(boyfriend.currentAttack.sound_on_miss);
+		}
+		else if ((boyfriend.guardPosition == dad.guardPosition && !boyfriend.currentAttack.is_unblockable && dad.currentAction != 'bashed')
 			|| dad.currentAction == 'startup'
 			|| dad.currentAction == 'stepStartup'
 			|| dad.currentAction == 'recovery'
@@ -1169,11 +1161,9 @@ class Combat extends PlayState
 		}
 
 		updateGuardUI(enemyGuard, 'normal');
-
-		determineEnemyChain(true);
 	}
 
-	function determineEnemyChain(forceChainChange:Bool = false):Void
+	public function determineEnemyChain(forceChainChange:Bool = false):Void
 	{
 		if (dad.placeInChain > dad.currentChain.attack_chain.length - 1 || forceChainChange)
 		{
@@ -1226,6 +1216,22 @@ class Combat extends PlayState
 		}
 	}
 
+	public function resetEnemyChain():Void
+	{
+		dad.placeInChain = 0;
+		dad.currentChain =
+			{
+				dad.currentChain = {
+					name: 'neutral',
+					directions: [],
+					include_sing_attacks: false,
+					choice_weight: 1,
+					input_chain: [],
+					attack_chain: []
+				};
+			};
+	}
+
 	public function chooseEnemyAttack():Void
 	{
 		if (dad.placeInChain > dad.currentChain.attack_chain.length - 1)
@@ -1254,8 +1260,14 @@ class Combat extends PlayState
 		dad.currentAttack = dad.attackMap.get(attackName);
 	}
 
-	function startEnemyAttack():Void
+	public function startEnemyAttack(attack:Null<AttackData> = null):Void
 	{
+		if (attack != null)
+		{
+			dad.currentAttack = attack;
+			resetEnemyChain();
+		}
+
 		var currentDirection:Int = 0;
 
 		if (dad.currentAttack.duration > 0)
@@ -1300,7 +1312,7 @@ class Combat extends PlayState
 			}
 			else
 			{
-				changeAction(dad, 'startup', dad.currentAttack.recovery, function(tmr:FlxTimer)
+				changeAction(dad, 'startup', dad.currentAttack.duration, function(tmr:FlxTimer)
 				{
 					executeEnemyAttack();
 				});
@@ -1744,7 +1756,7 @@ class Combat extends PlayState
 
 		PlayState.instance.callOnLuas('onHit', ['dad', boyfriend.currentAttack]);
 
-		var effect:AttackEffectData = getAttackEffect(boyfriend, 'onComplete');
+		var effect:AttackEffectData = getAttackEffect(boyfriend, 'onHit');
 
 		// Intentionally done before potentially applying posture damage
 		if (enemyPostureMechanic && dad.posture >= dad.postureMax && dad.currentAction == 'bashed')
@@ -1943,7 +1955,7 @@ class Combat extends PlayState
 	 * Actions are tracked with the currentAction string and actionTimer, both of which are intended to change accordingly to each action.
 	 * This means actions are mutually exclusive with each other.
 	**/
-	function changeAction(character:Character, actionName:String, actionTimerDuration:Float, ?onComplete:FlxTimer->Void):Void
+	public function changeAction(character:Character, actionName:String, actionTimerDuration:Float, ?onComplete:FlxTimer->Void):Void
 	{
 		character.currentAction = actionName;
 		if (character.actionTimer.active)
@@ -2107,17 +2119,24 @@ class Combat extends PlayState
 	 * 
 	 * @param character 'dad' moves dad to front, otherwise defaults to boyfriend
 	 */
-	public function moveCharacterToFront(?character:String):Void
+	public function moveCharacterToFront(?foreCharacterName:String):Void
 	{
-		var group:FlxSpriteGroup;
+		var foreCharacter:FlxSpriteGroup;
+		var backCharacter:FlxSpriteGroup;
 
-		if (character == 'dad')
-			group = dadGroup;
+		if (foreCharacterName == 'dad')
+		{
+			foreCharacter = PlayState.instance.dadGroup;
+			backCharacter = PlayState.instance.boyfriendGroup;
+		}
 		else
-			group = boyfriendGroup;
+		{
+			foreCharacter = PlayState.instance.boyfriendGroup;
+			backCharacter = PlayState.instance.dadGroup;
+		}
 
-		if (PlayState.instance.spriteOrder.members.indexOf(group) == 0)
-			PlayState.instance.spriteOrder.members.reverse();
+		PlayState.instance.members.remove(foreCharacter);
+		PlayState.instance.members.insert(PlayState.instance.members.indexOf(backCharacter), foreCharacter);
 	}
 
 	function setupPostureMechanic():Void
@@ -2126,23 +2145,6 @@ class Combat extends PlayState
 
 		generateCombatBar('player', 'posture');
 		generateCombatBar('enemy', 'posture');
-
-		/*
-			enemyPostureBarBG = new AttachedSprite('healthBar');
-			enemyPostureBarBG.y = PlayState.instance.healthBarBG.y - 36;
-			enemyPostureBarBG.screenCenter(X);
-			enemyPostureBarBG.scrollFactor.set();
-			enemyPostureBarBG.xAdd = -4;
-			enemyPostureBarBG.yAdd = -4;
-			combatUI.add(enemyPostureBarBG);
-
-			enemyPostureBar = new FlxBar(enemyPostureBarBG.x + 4, enemyPostureBarBG.y + 4, RIGHT_TO_LEFT, Std.int(enemyPostureBarBG.width - 8),
-				Std.int(enemyPostureBarBG.height - 8), dad, 'posture', 0, dad.postureMax);
-			enemyPostureBar.scrollFactor.set();
-			enemyPostureBar.createFilledBar(0xFF503838, 0xFFFDFF6E);
-			combatUI.add(enemyPostureBar);
-			enemyPostureBarBG.sprTracker = enemyPostureBar;
-		 */
 
 		enemyPostureMechanic = true;
 	}
@@ -2154,38 +2156,29 @@ class Combat extends PlayState
 			case 'dad' | 'enemy':
 				enemyPostureMechanic = true;
 
-				enemyPostureBarBG.visible = true;
 				enemyPostureBar.visible = true;
-				longBar(enemyPostureBarBG, enemyPostureBar);
+				longBar(enemyPostureBar);
 
-				playerPostureBarBG.visible = false;
 				playerPostureBar.visible = false;
 			case 'boyfriend' | 'player':
 				enemyPostureMechanic = false;
 
-				enemyPostureBarBG.visible = false;
 				enemyPostureBar.visible = false;
 
-				playerPostureBarBG.visible = true;
 				playerPostureBar.visible = true;
-				longBar(playerPostureBarBG, playerPostureBar);
+				longBar(playerPostureBar);
 			case 'both':
 				enemyPostureMechanic = true;
 
-				enemyPostureBarBG.visible = true;
 				enemyPostureBar.visible = true;
-				shortBar(enemyPostureBarBG, enemyPostureBar, characterFlipSide);
+				shortBar(enemyPostureBar, characterFlipSide);
 
-				playerPostureBarBG.visible = true;
 				playerPostureBar.visible = true;
-				shortBar(playerPostureBarBG, playerPostureBar, !characterFlipSide);
+				shortBar(playerPostureBar, !characterFlipSide);
 			default:
 				enemyPostureMechanic = false;
 
-				enemyPostureBarBG.visible = false;
 				enemyPostureBar.visible = false;
-
-				playerPostureBarBG.visible = false;
 				playerPostureBar.visible = false;
 		}
 
@@ -2196,18 +2189,15 @@ class Combat extends PlayState
 		}
 	}
 
-	public function longBar(bgBar:AttachedSprite, bar:FlxBar)
+	public function longBar(bar:Bar)
 	{
 		bar.scale.set(1, 1);
-		bgBar.scale.set(1, 1);
 		bar.screenCenter(X);
 	}
 
-	public function shortBar(bgBar:AttachedSprite, bar:FlxBar, shiftToRight:Bool = false)
+	public function shortBar(bar:Bar, shiftToRight:Bool = false)
 	{
 		bar.scale.set(0.5, 1);
-		bgBar.scale.set(0.5, 1);
-
 		bar.x = 16;
 
 		if (shiftToRight)
@@ -2674,12 +2664,12 @@ class Combat extends PlayState
 			achievementCumulativeDamage += amount;
 
 		#if ACHIEVEMENTS_ALLOWED
-		var achieve:String = PlayState.instance.checkForAchievement(['bf_pain', 'shrub_pain']);
-		if (achieve != null)
-		{
-			PlayState.instance.startAchievement(achieve);
-			Achievements.unlockAchievement(achieve);
-		}
+		/*var achieve:String = PlayState.instance.checkForAchievement(['bf_pain', 'shrub_pain']);
+			if (achieve != null)
+			{
+				PlayState.instance.startAchievement(achieve);
+				Achievements.unlockAchievement(achieve);
+		}*/
 		#end
 	}
 }
