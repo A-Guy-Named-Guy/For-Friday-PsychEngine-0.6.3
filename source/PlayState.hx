@@ -1633,6 +1633,7 @@ class PlayState extends MusicBeatState
 			// Combat.singVictoryDisabled = WeekData.getCurrentWeek().singVictoryDisabled;
 			// Combat.combatVictoryDisabled = WeekData.getCurrentWeek().combatVictoryDisabled;
 		}
+		// End of changes
 
 		callOnLuas('onCreatePost', []);
 
@@ -1656,7 +1657,6 @@ class PlayState extends MusicBeatState
 		Paths.clearUnusedMemory();
 
 		CustomFadeTransition.nextCamera = camOther;
-		// End of changes
 	}
 
 	// Combat change
@@ -5557,10 +5557,10 @@ class PlayState extends MusicBeatState
 
 			/*boyfriend.stunned = true;
 	
-																																																				// get stunned for 1/60 of a second, makes you able to
-																																																				new FlxTimer().start(1 / 60, function(tmr:FlxTimer)
-																																																				{
-																																																					boyfriend.stunned = false;
+																																																							// get stunned for 1/60 of a second, makes you able to
+																																																							new FlxTimer().start(1 / 60, function(tmr:FlxTimer)
+																																																							{
+																																																								boyfriend.stunned = false;
 			});*/
 
 			if (boyfriend.hasMissAnimations)
@@ -6371,47 +6371,47 @@ class PlayState extends MusicBeatState
 				{
 					// Combat change
 					/*case 'ur_bad':
-																																																																																							if (ratingPercent < 0.2 && !practiceMode)
-																																																																																							{
-																																																																																								unlock = true;
-																																																																																							}
-																																																																																						case 'ur_good':
-																																																																																							if (ratingPercent >= 1 && !usedPractice)
-																																																																																							{
-																																																																																								unlock = true;
-																																																																																							}
-																																																																																						case 'roadkill_enthusiast':
-																																																																																							if (Achievements.henchmenDeath >= 100)
-																																																																																							{
-																																																																																								unlock = true;
-																																																																																							}
-																																																																																						case 'oversinging':
-																																																																																							if (boyfriend.holdTimer >= 10 && !usedPractice)
-																																																																																							{
-																																																																																								unlock = true;
-																																																																																							}
-																																																																																						case 'hype':
-																																																																																							if (!boyfriendIdled && !usedPractice)
-																																																																																							{
-																																																																																								unlock = true;
-																																																																																							}
-																																																																																						case 'two_keys':
-																																																																																							if (!usedPractice)
-																																																																																							{
-																																																																																								var howManyPresses:Int = 0;
-																																																																																								for (j in 0...keysPressed.length)
-																																																																																								{
-																																																																																									if (keysPressed[j])
-																																																																																										howManyPresses++;
-																																																																																								}
+																																																																																												if (ratingPercent < 0.2 && !practiceMode)
+																																																																																												{
+																																																																																													unlock = true;
+																																																																																												}
+																																																																																											case 'ur_good':
+																																																																																												if (ratingPercent >= 1 && !usedPractice)
+																																																																																												{
+																																																																																													unlock = true;
+																																																																																												}
+																																																																																											case 'roadkill_enthusiast':
+																																																																																												if (Achievements.henchmenDeath >= 100)
+																																																																																												{
+																																																																																													unlock = true;
+																																																																																												}
+																																																																																											case 'oversinging':
+																																																																																												if (boyfriend.holdTimer >= 10 && !usedPractice)
+																																																																																												{
+																																																																																													unlock = true;
+																																																																																												}
+																																																																																											case 'hype':
+																																																																																												if (!boyfriendIdled && !usedPractice)
+																																																																																												{
+																																																																																													unlock = true;
+																																																																																												}
+																																																																																											case 'two_keys':
+																																																																																												if (!usedPractice)
+																																																																																												{
+																																																																																													var howManyPresses:Int = 0;
+																																																																																													for (j in 0...keysPressed.length)
+																																																																																													{
+																																																																																														if (keysPressed[j])
+																																																																																															howManyPresses++;
+																																																																																													}
 	
-																																																																																								if (howManyPresses <= 2)
-																																																																																								{
-																																																																																									unlock = true;
-																																																																																								}
-																																																																																							}
-																																																																																						case 'toastie':
-																																																																																							if (/*ClientPrefs.framerate <= 60 && */ /*!ClientPrefs.shaders && ClientPrefs.lowQuality && !ClientPrefs.globalAntialiasing)
+																																																																																													if (howManyPresses <= 2)
+																																																																																													{
+																																																																																														unlock = true;
+																																																																																													}
+																																																																																												}
+																																																																																											case 'toastie':
+																																																																																												if (/*ClientPrefs.framerate <= 60 && */ /*!ClientPrefs.shaders && ClientPrefs.lowQuality && !ClientPrefs.globalAntialiasing)
 							{
 								unlock = true;
 							}
@@ -6491,32 +6491,32 @@ class PlayState extends MusicBeatState
 	}
 
 	/*function cacheChartSongs():Void
-																		{
-																			if (SONG.chartArray == null)
-																				return;
-	
-																			cachedSongArray = new Array<FlxSound>();
-	
-																			for (i in 0...SONG.chartArray.length)
 																			{
-																				var shouldLoop:Bool = false;
-																				if (SONG.chartArray[i].chartName == 'Inst')
-																					shouldLoop = true;
+																				if (SONG.chartArray == null)
+																					return;
 	
-																				var cachedSong = new FlxSound().loadEmbedded(getMusicFile(false, SONG.chartArray[i].songFileName), shouldLoop, !shouldLoop);
+																				cachedSongArray = new Array<FlxSound>();
 	
-																				switch (SONG.chartArray[i].chartName)
+																				for (i in 0...SONG.chartArray.length)
 																				{
-																					case 'Intro':
-																						cachedSong.onComplete = onIntroComplete.bind();
-																					case 'Inst':
-																						cachedSong.onComplete = loopSong.bind();
-																					case 'Outro':
-																						cachedSong.onComplete = finishSong.bind();
-																				}
+																					var shouldLoop:Bool = false;
+																					if (SONG.chartArray[i].chartName == 'Inst')
+																						shouldLoop = true;
 	
-																				cachedSongArray.push(cachedSong);
-																			}
+																					var cachedSong = new FlxSound().loadEmbedded(getMusicFile(false, SONG.chartArray[i].songFileName), shouldLoop, !shouldLoop);
+	
+																					switch (SONG.chartArray[i].chartName)
+																					{
+																						case 'Intro':
+																							cachedSong.onComplete = onIntroComplete.bind();
+																						case 'Inst':
+																							cachedSong.onComplete = loopSong.bind();
+																						case 'Outro':
+																							cachedSong.onComplete = finishSong.bind();
+																					}
+	
+																					cachedSongArray.push(cachedSong);
+																				}
 	
 	}*/
 	// Generating an entire song at once tends to cause a lagspike,

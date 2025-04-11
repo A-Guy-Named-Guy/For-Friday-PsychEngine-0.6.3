@@ -288,6 +288,7 @@ class Character extends FlxSprite
 					}
 				 */
 				var path:String = Paths.getValidCharacterPath(curCharacter);
+				// End of change
 
 				#if MODS_ALLOWED
 				var rawJson = File.getContent(path);
