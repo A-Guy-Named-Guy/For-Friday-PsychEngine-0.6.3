@@ -122,8 +122,8 @@ class Paths
 	// To support characters in a folder named after the character
 	// A json is searched for in a file named after the character in the characters file first
 	// Failing that, then a json in the characters file itself is searched for
-	public static function getValidCharacterPath(curCharacter:String, canBeNull:Bool = false, characterFolder:Null<String> = null,
-			fileType:String = '.json'):Null<String>
+	public static function getValidCharacterPath(curCharacter:String, canBeNull:Bool = false, characterFolder:Null<String> = null, fileType:String = '.json',
+			isEffect:Bool = false):Null<String>
 	{
 		if (characterFolder == null)
 			characterFolder = curCharacter;
@@ -131,13 +131,27 @@ class Paths
 		var characterPath:String = 'characters/' + characterFolder + '/' + curCharacter + fileType;
 		var validCharacterPath:Null<String> = getCharacterPath(characterPath);
 
+		if (validCharacterPath == null && isEffect)
+		{
+			characterPath = 'characters/characterExtras/' + curCharacter + fileType;
+			validCharacterPath = getCharacterPath(characterPath);
+		}
+
 		if (validCharacterPath == null)
 		{
 			characterPath = 'characters/' + curCharacter + fileType;
 			validCharacterPath = getCharacterPath(characterPath);
 		}
 
-		if (!canBeNull)
+		if (validCharacterPath == null && !canBeNull && isEffect)
+		{
+			validCharacterPath = getCharacterPath('characters/bf/bfFace.json');
+			if (validCharacterPath == null)
+				validCharacterPath = getCharacterPath('characters/characterExtras/bfFace.json');
+			if (validCharacterPath == null)
+				validCharacterPath = getCharacterPath('characters/bfFace.json');
+		}
+		if (validCharacterPath == null && !canBeNull)
 		{
 			if (validCharacterPath == null)
 			{
@@ -148,8 +162,6 @@ class Paths
 			if (validCharacterPath == null)
 				validCharacterPath = 'characters/' + Character.DEFAULT_CHARACTER + fileType;
 		}
-		else
-			validCharacterPath = null;
 
 		return validCharacterPath;
 	}

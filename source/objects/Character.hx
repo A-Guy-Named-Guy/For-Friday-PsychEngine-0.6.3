@@ -64,7 +64,7 @@ typedef CombatFile =
 	var attacks:Array<AttackData>;
 	var chains:Array<ChainData>;
 	var attack_effects:Null<Array<AttackEffectData>>;
-	var startup_effects:Null<Array<StartupEffectData>>;
+	var defense_effects:Null<Array<DefendEffectData>>;
 	var sounds:Null<Array<SoundData>>;
 	var character_sounds:CharacterSounds;
 }
@@ -96,6 +96,7 @@ typedef AttackData =
 
 	var is_unblockable:Null<Bool>;
 	var is_bash:Null<Bool>;
+	var is_feint:Null<Bool>;
 
 	var append_direction_to_anim_name:Null<Bool>;
 
@@ -104,6 +105,10 @@ typedef AttackData =
 	var on_parry:Null<String>;
 	var on_miss:Null<String>;
 	var on_complete:Null<String>;
+
+	var on_startup_defense:Null<String>;
+	var on_recovery_defense:Null<String>;
+	var on_defense:Null<String>;
 }
 
 typedef ChainData =
@@ -133,13 +138,13 @@ typedef AttackEffectData =
 	var sound:Null<String>;
 }
 
-typedef StartupEffectData =
+typedef DefendEffectData =
 {
 	var name:String;
-	var uninterruptible_stance:Null<Bool>;
+	var uninterruptible:Null<Bool>;
 	var can_block:Null<Bool>;
 	var can_parry:Null<Bool>;
-	var feint_direction:Null<String>;
+	var can_dodge:Null<Bool>;
 }
 
 typedef SoundData =
@@ -173,7 +178,10 @@ class Character extends FlxSprite
 	public var debugMode:Bool = false;
 	public var extraData:Map<String, Dynamic> = new Map<String, Dynamic>();
 
-	public var isPlayer:Bool = false;
+	// Combat change
+	// public var isPlayer:Bool = false;
+	public var isPlayer(default, set):Bool = false;
+	// End of change
 	public var curCharacter:String = DEFAULT_CHARACTER;
 
 	public var holdTimer:Float = 0;
@@ -213,6 +221,7 @@ class Character extends FlxSprite
 	public var alternatingIdle:Bool = false;
 	public var deathByStamina:Bool = false;
 	public var guardPosition:Int = 0;
+	public var defaultGuardPosition:Int = 0;
 	public var hasReflexGuard = true;
 	public var postureMax:Float = 100;
 	public var posture(default, set):Float = 0;
@@ -226,7 +235,7 @@ class Character extends FlxSprite
 	public var attackMap:Map<String, AttackData> = new Map();
 	public var chainMap:Map<String, ChainData> = new Map();
 	public var attackEffectMap:Map<String, AttackEffectData> = new Map();
-	public var startupEffectMap:Map<String, StartupEffectData> = new Map();
+	public var defendEffectMap:Map<String, DefendEffectData> = new Map();
 	public var soundMap:Map<String, SoundData> = new Map();
 	public var characterSounds:CharacterSounds = null;
 
@@ -244,7 +253,6 @@ class Character extends FlxSprite
 	public var actionTimer:FlxTimer = new FlxTimer();
 	public var actionStepTimer:Int = 0;
 	public var currentAction(default, set):String = 'neutral';
-	public var blockCount:Int = 0;
 
 	// End of changes
 
@@ -426,13 +434,7 @@ class Character extends FlxSprite
 		if (json.characterExtras != null)
 		{
 			characterExtraArray = json.characterExtras;
-			if (characterExtraArray != null && characterExtraArray.length > 0)
-			{
-				for (i in characterExtraArray)
-				{
-					new CharacterExtra(x, y, this, i);
-				}
-			}
+			generateCharacterExtras();
 		}
 		// End of change
 
@@ -796,41 +798,41 @@ class Character extends FlxSprite
 
 	// Combat change*
 	// Note that EVERY function from here on is a combat change
-	//
-	// Centralizes checks for whether an animation should be allowed to play, or if the animation currently active shouldn't be interrupted.
 	function animCanBeInterrupted(animToPlay:String):Bool
 	{
 		var performAnim:Bool = true;
 
-		// It seems animation.curAnim is the culprit for crashes if a playAnim() is not done for a character on construction
 		if (animation.curAnim != null)
 		{
-			switch (curCharacter)
-			{
-				case 'shrub':
-					if (animToPlay.startsWith('idle') && Conductor.songPosition >= 0 && animation.curAnim.name == 'salute')
-						performAnim = false;
-				case 'shrubSerious':
-					if (animToPlay.startsWith('idle') && animation.curAnim.name == 'transition')
-						performAnim = false;
-			}
+			/*
+				var idleActionBlacklist:Array<String> = [
+					'startup',
+					'stepStartup',
+					'recovery',
+					'stepRecovery',
+					'blockStun',
+					'defending',
+					'hitstun',
+					'swappingGuard',
+					'bashed'
+				];
 
-			if (currentAction == 'bashed' && !animToPlay.startsWith('combatHit'))
-			{
-				performAnim = false;
-			}
+				switch (curCharacter)
+				{
+					case 'shrub':
+						if (animToPlay.startsWith('idle') && Conductor.songPosition >= 0 && animation.curAnim.name == 'salute')
+							performAnim = false;
+					case 'shrubSerious':
+						if (animToPlay.startsWith('idle') && animation.curAnim.name == 'transition')
+							performAnim = false;
+				}
 
-			if (animToPlay.startsWith('idle'))
-			{
-				if (currentAction != 'neutral')
-					performAnim = false;
-
-				if (animation.curAnim.name.startsWith("sing") || animation.curAnim.name.startsWith("combat"))
+				if (animToPlay.startsWith('idle') && idleActionBlacklist.contains(currentAction))
 				{
 					if (!animation.finished)
 						performAnim = false;
 				}
-			}
+			 */
 
 			// Hitting a direction can end up overriding singing anims without this check
 			if (animToPlay.startsWith('combatReady') || animToPlay.startsWith('combatSwap'))
@@ -891,9 +893,6 @@ class Character extends FlxSprite
 	{
 		if (!hasReflexGuard)
 		{
-			// Be careful reading this, as the redundant alternatingIdle checks and that return are necessary
-			// Basically it'll default to a standard idle unless it needs to animate the second part (like from an inhale to exhale animation)
-			// The return is just to keep it from interrupting the animation
 			if (alternatingIdle
 				&& animation.curAnim.name.startsWith('idle')
 				&& !animation.curAnim.name.startsWith('idleDown')
@@ -929,6 +928,22 @@ class Character extends FlxSprite
 		}
 		else
 			playAnim('idle');
+	}
+
+	public function generateCharacterExtras()
+	{
+		if (characterSprites.length > 0)
+		{
+			characterSprites.forEach(function(extra:CharacterExtra)
+			{
+				extra.destroy();
+			});
+			characterSprites.clear();
+		}
+
+		if (characterExtraArray.length > 0)
+			for (name in characterExtraArray)
+				new CharacterExtra(x, y, this, name);
 	}
 
 	// Handles animating extra sprites, such as bf's alternate faces when blocking and parrying
@@ -993,12 +1008,11 @@ class Character extends FlxSprite
 	{
 		if (animation.curAnim != null)
 		{
+			if (!animation.curAnim.finished)
+				return;
+
 			if (animation.curAnim.name.startsWith("combatDodge"))
 			{
-				if (Combat.checkCombatInfoAvailable())
-					if (PlayState.instance.COMBAT.isDodge)
-						return;
-
 				if (hasReflexGuard)
 				{
 					playAnim('idle', true, false, idleDefaultFrame);
@@ -1019,139 +1033,58 @@ class Character extends FlxSprite
 
 			if (hasReflexGuard)
 			{
-				if (animation.curAnim.name.startsWith("combatReady") && animation.finished)
+				if (animation.curAnim.name.startsWith("combatReady"))
 					playAnim('idle', true, false, idleDefaultFrame);
 			}
 		}
 	}
 
-	public function generateAttack(attackData:Null<AttackData>):AttackData
+	public static function generateAttack(attackData:Null<AttackData> = null, ?existingAttack:Null<AttackData>):AttackData
 	{
-		if (attackData == null)
-			attackData = {
-				name: null,
-				attack_animation_name: null,
-				startup_animation_name: null,
-				sound_on_hit: null,
-				sound_on_miss: null,
-				not_an_attack: null,
-				direction: null,
-				damage: null,
-				posture_damage: null,
-				stamina_damage: null,
-				stamina_cost: null,
-				health_recover: null,
-				posture_recover: null,
-				step_based_timing: null,
-				duration: null,
-				recovery: null,
-				chain_duration: null,
-				hitstun: null,
-				is_unblockable: null,
-				is_bash: null,
-				append_direction_to_anim_name: null,
-				on_hit: null,
-				on_block: null,
-				on_parry: null,
-				on_miss: null,
-				on_complete: null
-			}
-
 		var newAttack:AttackData = {
-			name: attackData.name,
-			attack_animation_name: attackData.attack_animation_name,
-			startup_animation_name: attackData.startup_animation_name,
-			sound_on_hit: null,
-			sound_on_miss: null,
-			not_an_attack: attackData.not_an_attack,
-			direction: attackData.direction,
-			damage: attackData.damage,
-			posture_damage: attackData.posture_damage,
-			stamina_damage: attackData.stamina_damage,
-			stamina_cost: attackData.stamina_cost,
-			health_recover: attackData.health_recover,
-			posture_recover: attackData.posture_recover,
-			step_based_timing: attackData.step_based_timing,
-			duration: attackData.duration,
-			recovery: attackData.recovery,
-			chain_duration: attackData.chain_duration,
-			hitstun: attackData.hitstun,
-			is_unblockable: attackData.is_unblockable,
-			is_bash: attackData.is_bash,
-			append_direction_to_anim_name: attackData.append_direction_to_anim_name,
-			on_hit: attackData.on_hit,
-			on_block: attackData.on_block,
-			on_parry: attackData.on_parry,
-			on_miss: attackData.on_miss,
-			on_complete: attackData.on_complete
+			name: attackData?.name,
+			attack_animation_name: attackData?.attack_animation_name ?? existingAttack?.attack_animation_name ?? 'combatAttack',
+			startup_animation_name: attackData?.startup_animation_name ?? existingAttack?.startup_animation_name ?? 'combatWind',
+			sound_on_hit: attackData?.sound_on_hit ?? existingAttack?.sound_on_hit ?? '',
+			sound_on_miss: attackData?.sound_on_miss ?? existingAttack?.sound_on_miss ?? 'miss',
+			not_an_attack: attackData?.not_an_attack ?? existingAttack?.not_an_attack ?? false,
+			direction: attackData?.direction ?? existingAttack?.direction ?? 'ANY',
+
+			damage: attackData?.damage ?? existingAttack?.damage ?? 15,
+			posture_damage: attackData?.posture_damage ?? existingAttack?.posture_damage ?? 3,
+			stamina_damage: attackData?.stamina_damage ?? existingAttack?.stamina_damage ?? 0,
+			stamina_cost: attackData?.stamina_cost ?? existingAttack?.stamina_cost ?? 0.2,
+			health_recover: attackData?.health_recover ?? existingAttack?.health_recover ?? 0,
+			posture_recover: attackData?.posture_recover ?? existingAttack?.posture_recover ?? 0,
+
+			step_based_timing: attackData?.step_based_timing ?? existingAttack?.step_based_timing ?? false,
+			duration: attackData?.duration ?? existingAttack?.duration ?? 1,
+			recovery: attackData?.recovery ?? existingAttack?.recovery ?? 1,
+			chain_duration: attackData?.chain_duration ?? existingAttack?.chain_duration,
+			hitstun: attackData?.hitstun ?? existingAttack?.hitstun,
+
+			is_unblockable: attackData?.is_unblockable ?? existingAttack?.is_unblockable ?? false,
+			is_bash: attackData?.is_bash ?? existingAttack?.is_bash ?? false,
+			is_feint: attackData?.is_feint ?? existingAttack?.is_feint ?? false,
+			append_direction_to_anim_name: attackData?.append_direction_to_anim_name ?? existingAttack?.append_direction_to_anim_name ?? false,
+
+			on_hit: attackData?.on_hit ?? existingAttack?.on_hit,
+			on_block: attackData?.on_block ?? existingAttack?.on_block,
+			on_parry: attackData?.on_parry ?? existingAttack?.on_parry,
+			on_complete: attackData?.on_complete ?? existingAttack?.on_complete,
+
+			on_miss: attackData?.on_miss ?? existingAttack?.on_miss,
+			on_startup_defense: attackData?.on_startup_defense ?? existingAttack?.on_startup_defense,
+			on_recovery_defense: attackData?.on_recovery_defense ?? existingAttack?.on_recovery_defense,
+			on_defense: attackData?.on_defense ?? existingAttack?.on_defense,
 		};
-
-		// These != null checks are to allow for attacks to be truncated a bit
-
-		if (newAttack.name == null)
-			newAttack.name = 'player_sing_attack';
-		if (newAttack.direction == null)
-			newAttack.direction = 'ANY';
-
-		if (newAttack.attack_animation_name == null)
-			newAttack.attack_animation_name = 'combatAttack';
-		if (newAttack.startup_animation_name == null)
-			newAttack.startup_animation_name = 'combatWind';
-
-		if (newAttack.sound_on_hit == null)
-			newAttack.sound_on_hit = '';
-		if (newAttack.sound_on_miss == null)
-			newAttack.sound_on_miss = 'miss';
-
-		if (newAttack.not_an_attack == null)
-			newAttack.not_an_attack = false;
-
-		if (newAttack.direction == null)
-			newAttack.direction = 'ANY';
-
-		if (newAttack.append_direction_to_anim_name == null)
-			newAttack.append_direction_to_anim_name = false;
-
-		// To allow sing attacks to prune this variable
-		if (newAttack.is_unblockable == null)
-			newAttack.is_unblockable = false;
-
-		// Above stat plus not_an_attack makes these unused
-		if (newAttack.damage == null)
-			newAttack.damage = 15;
-		if (newAttack.stamina_damage == null)
-			newAttack.stamina_damage = 0;
-		if (newAttack.is_bash == null)
-			newAttack.is_bash = false;
-
-		// Enemy attacks don't need this, and players without posture mechanics
-		if (newAttack.posture_damage == null)
-			newAttack.posture_damage = 3;
-
-		// For enemy attacks, since enemies don't use stamina
-		if (newAttack.stamina_cost == null)
-			newAttack.stamina_cost = 0.2;
-
-		// Healing attacks are likely not the broad norm
-		if (newAttack.health_recover == null)
-			newAttack.health_recover = 0;
-		if (newAttack.stamina_cost == null)
-			newAttack.posture_recover = 0;
-
-		if (newAttack.step_based_timing == null)
-			newAttack.step_based_timing = false;
-
-		if (newAttack.duration == null)
-			newAttack.duration = 0;
-		if (newAttack.recovery == null)
-			newAttack.recovery = 0;
 
 		if (newAttack.chain_duration == null)
 		{
 			if (newAttack.step_based_timing)
-				newAttack.chain_duration = newAttack.recovery + 1;
+				newAttack.chain_duration = newAttack.recovery + 2;
 			else
-				newAttack.chain_duration = newAttack.recovery + 0.5;
+				newAttack.chain_duration = newAttack.recovery + 0.33;
 		}
 
 		if (newAttack.hitstun == null)
@@ -1159,10 +1092,24 @@ class Character extends FlxSprite
 			if (newAttack.step_based_timing)
 				newAttack.hitstun = 2;
 			else
-				newAttack.hitstun = 0.5;
+				newAttack.hitstun = 0.33;
 		}
 
 		return newAttack;
+	}
+
+	public static function generateChain():ChainData
+	{
+		var newChain:ChainData = {
+			name: "nullChain",
+			directions: [],
+			include_sing_attacks: false,
+			choice_weight: 1,
+			input_chain: [],
+			attack_chain: []
+		};
+
+		return newChain;
 	}
 
 	function generateCombatArrays(characterFile:CombatFile)
@@ -1170,7 +1117,7 @@ class Character extends FlxSprite
 		var attackDataArray:Array<AttackData> = characterFile.attacks;
 		var chainDataArray:Array<ChainData> = characterFile.chains;
 		var attackEffectDataArray:Array<AttackEffectData> = characterFile.attack_effects;
-		var startupEffectDataArray:Array<StartupEffectData> = characterFile.startup_effects;
+		var defendEffectDataArray:Array<DefendEffectData> = characterFile.defense_effects;
 		var soundsArrayData:Array<SoundData> = characterFile.sounds;
 		var characterSoundData:CharacterSounds = characterFile.character_sounds;
 
@@ -1178,30 +1125,25 @@ class Character extends FlxSprite
 			for (i in 0...attackDataArray.length)
 			{
 				var attackData:AttackData = attackDataArray[i];
+				var existingAttack = attackMap.get(attackData.name);
 
-				attackMap.set(attackData.name, generateAttack(attackData));
+				attackMap.set(attackData.name, generateAttack(attackData, attackMap.get(attackData.name)));
 			}
 
 		if (chainDataArray != null)
 			for (i in 0...chainDataArray.length)
 			{
 				var chainData:ChainData = chainDataArray[i];
+				var existingChain = chainMap.get(chainData.name);
 
 				var newChain:ChainData = {
-					name: chainData.name,
-					directions: chainData.directions,
-					include_sing_attacks: chainData.include_sing_attacks,
-					choice_weight: chainData.choice_weight,
-					input_chain: chainData.input_chain,
-					attack_chain: chainData.attack_chain
+					name: chainData?.name ?? existingChain?.name ?? "nullChain" + i,
+					directions: chainData?.directions ?? existingChain?.directions ?? [],
+					include_sing_attacks: chainData?.include_sing_attacks ?? existingChain?.include_sing_attacks ?? false,
+					choice_weight: chainData?.choice_weight ?? existingChain?.choice_weight ?? 1,
+					input_chain: chainData?.input_chain ?? existingChain?.input_chain ?? [],
+					attack_chain: chainData?.attack_chain ?? existingChain?.attack_chain ?? ['basic_attack']
 				};
-
-				newChain.name = newChain.name ?? "nullChain" + i;
-				newChain.directions = newChain.directions ?? [];
-				newChain.include_sing_attacks = newChain.include_sing_attacks ?? false;
-				newChain.choice_weight = newChain.choice_weight ?? 1;
-				newChain.input_chain = newChain.input_chain ?? [];
-				newChain.attack_chain = newChain.attack_chain ?? ['basic_attack'];
 
 				chainMap.set(newChain.name, newChain);
 			}
@@ -1210,39 +1152,40 @@ class Character extends FlxSprite
 			for (i in 0...attackEffectDataArray.length)
 			{
 				var attackEffectData:AttackEffectData = attackEffectDataArray[i];
+				var existingAttackEffect = attackEffectMap.get(attackEffectData.name);
 
-				// Remember to update fillNullAttackEffectData() when implementing a new value!
 				var newAttackEffect:AttackEffectData = {
-					name: attackEffectData.name,
-					damage: attackEffectData.damage,
-					posture_damage: attackEffectData.posture_damage,
-					stamina_damage: attackEffectData.stamina_damage,
-					stamina_cost: attackEffectData.stamina_cost,
-					health_recover: attackEffectData.health_recover,
-					posture_recover: attackEffectData.posture_recover,
-					step_based_timing: attackEffectData.step_based_timing,
-					recovery: attackEffectData.recovery,
-					hitstun: attackEffectData.hitstun,
-					sound: attackEffectData.sound
+					name: attackEffectData?.name ?? existingAttackEffect?.name,
+					damage: attackEffectData?.damage ?? existingAttackEffect?.damage,
+					posture_damage: attackEffectData?.posture_damage ?? existingAttackEffect?.posture_damage,
+					stamina_damage: attackEffectData?.stamina_damage ?? existingAttackEffect?.stamina_damage,
+					stamina_cost: attackEffectData?.stamina_cost ?? existingAttackEffect?.stamina_cost,
+					health_recover: attackEffectData?.health_recover ?? existingAttackEffect?.health_recover,
+					posture_recover: attackEffectData?.posture_recover ?? existingAttackEffect?.posture_recover,
+					step_based_timing: attackEffectData?.step_based_timing ?? existingAttackEffect?.step_based_timing,
+					recovery: attackEffectData?.recovery ?? existingAttackEffect?.recovery,
+					hitstun: attackEffectData?.hitstun ?? existingAttackEffect?.hitstun,
+					sound: attackEffectData?.sound ?? existingAttackEffect?.sound
 				}
 
 				attackEffectMap.set(newAttackEffect.name, newAttackEffect);
 			}
 
-		if (startupEffectDataArray != null)
-			for (i in 0...startupEffectDataArray.length)
+		if (defendEffectDataArray != null)
+			for (i in 0...defendEffectDataArray.length)
 			{
-				var startupEffectData:StartupEffectData = startupEffectDataArray[i];
+				var defendEffectData:DefendEffectData = defendEffectDataArray[i];
+				var existingDefendEffect = defendEffectMap.get(defendEffectData.name);
 
-				var newStartupEffect:StartupEffectData = {
-					name: startupEffectData.name,
-					uninterruptible_stance: startupEffectData.uninterruptible_stance,
-					can_block: startupEffectData.can_block,
-					can_parry: startupEffectData.can_parry,
-					feint_direction: startupEffectData.feint_direction
+				var newStartupEffect:DefendEffectData = {
+					name: defendEffectData?.name ?? existingDefendEffect?.name,
+					uninterruptible: defendEffectData?.uninterruptible ?? existingDefendEffect?.uninterruptible,
+					can_block: defendEffectData?.can_block ?? existingDefendEffect?.can_block,
+					can_parry: defendEffectData?.can_parry ?? existingDefendEffect?.can_parry,
+					can_dodge: defendEffectData?.can_dodge ?? existingDefendEffect?.can_dodge
 				}
 
-				startupEffectMap.set(newStartupEffect.name, newStartupEffect);
+				defendEffectMap.set(newStartupEffect.name, newStartupEffect);
 			}
 
 		if (soundsArrayData != null)
@@ -1283,24 +1226,6 @@ class Character extends FlxSprite
 		}
 	}
 
-	// Filling nulls is its own function since data being null in the first place is interpreted as deliberately excluded
-	public static function fillNullAttackEffectData(newAttackEffect:AttackEffectData):AttackEffectData
-	{
-		newAttackEffect.name = newAttackEffect.name ?? 'nullAttackEffect';
-		newAttackEffect.damage = newAttackEffect.damage ?? 0;
-		newAttackEffect.posture_damage = newAttackEffect.posture_damage ?? 0;
-		newAttackEffect.stamina_damage = newAttackEffect.stamina_damage ?? 0;
-		newAttackEffect.stamina_cost = newAttackEffect.stamina_cost ?? 0;
-		newAttackEffect.health_recover = newAttackEffect.health_recover ?? 0;
-		newAttackEffect.posture_recover = newAttackEffect.posture_recover ?? 0;
-		newAttackEffect.step_based_timing = newAttackEffect.step_based_timing ?? false;
-		newAttackEffect.recovery = newAttackEffect.recovery ?? 0;
-		newAttackEffect.hitstun = newAttackEffect.hitstun ?? 0;
-		newAttackEffect.sound = newAttackEffect.sound ?? 'nullAttackSound';
-
-		return newAttackEffect;
-	}
-
 	public function switchCombatJson(combatJson:CombatFile)
 	{
 		if (combatJson == null)
@@ -1323,7 +1248,7 @@ class Character extends FlxSprite
 				attacks: null,
 				chains: null,
 				attack_effects: null,
-				startup_effects: null,
+				defense_effects: null,
 				sounds: null,
 				character_sounds: null
 			};
@@ -1332,11 +1257,15 @@ class Character extends FlxSprite
 		idleDefaultFrame = combatJson.idle_defaultFrame ?? idleDefaultFrame ?? 10;
 		hasReflexGuard = combatJson.has_reflexGuard ?? hasReflexGuard ?? true;
 		deathByStamina = combatJson.death_by_stamina ?? deathByStamina ?? false;
-		guardPosition = combatJson.default_guard_position ?? guardPosition ?? 0;
 		postureMax = combatJson.posture_max ?? postureMax ?? 100;
 		postureRecoveryCoefficient = combatJson.posture_recoveryCoefficient ?? postureRecoveryCoefficient ?? 1;
 		combatHealthMax = combatJson.combat_healthMax ?? combatHealthMax ?? 100;
 		alternatingIdle = combatJson.alternatingIdle ?? alternatingIdle ?? false;
+
+		guardPosition = combatJson.default_guard_position ?? guardPosition ?? 0;
+		if (guardPosition == 1 || guardPosition < 0 || guardPosition > 3)
+			guardPosition = 0;
+		defaultGuardPosition = guardPosition;
 
 		generateCombatArrays(combatJson);
 	}
@@ -1380,6 +1309,22 @@ class Character extends FlxSprite
 		{
 			PlayState.instance.callOnLuas('onCharacterPostureBreak', [isPlayer ? 'boyfriend' : 'dad']);
 		}
+
+		return Value;
+	}
+
+	function set_isPlayer(Value:Bool):Bool
+	{
+		if (isPlayer != Value)
+		{
+			characterSprites.forEach(function(cha:CharacterExtra)
+			{
+				cha.isPlayer = Value;
+				cha.flipX = !cha.flipX;
+			});
+		}
+
+		isPlayer = Value;
 
 		return Value;
 	}

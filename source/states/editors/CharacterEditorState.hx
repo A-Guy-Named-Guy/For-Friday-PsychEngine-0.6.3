@@ -4,11 +4,15 @@ import flixel.graphics.FlxGraphic;
 import flixel.system.debug.interaction.tools.Pointer.GraphicCursorCross;
 import flixel.util.FlxDestroyUtil;
 import forfriday.CharacterExtra;
+import haxe.Json;
 import objects.Bar;
 import objects.Character;
 import objects.HealthIcon;
+import openfl.display.Bitmap;
+import openfl.display.BitmapData;
 import openfl.events.Event;
 import openfl.events.IOErrorEvent;
+import openfl.geom.Matrix;
 import openfl.net.FileReference;
 import openfl.utils.Assets;
 import states.editors.content.Prompt;
@@ -19,6 +23,31 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 	// Combat changes
 	var characterGroup:FlxSpriteGroup = new FlxSpriteGroup();
 	var ghostGroup:FlxSpriteGroup = new FlxSpriteGroup();
+
+	var curEffect:Null<CharacterExtra>;
+	var curAttack:Null<AttackData>;
+	var curChain:Null<ChainData>;
+
+	var attacks:Array<AttackData> = [];
+	var chains:Array<ChainData> = [];
+	var chainProgress:Int = 0;
+	var curChainNum:Int = 0;
+	var tempDirectionArray:Array<String> = ['NONE'];
+
+	var currentEditMode:String = 'character';
+	var previousUICharacterBoxTab:String = '';
+
+	var textPages:Array<String>;
+	var curPage:Int = 0;
+
+	var labelMap:Map<Int, String> = new Map<Int, String>();
+	var labelTabMap:Map<Int, String> = new Map<Int, String>();
+	var labelledTextGroup:FlxTypedGroup<FlxText> = new FlxTypedGroup<FlxText>();
+
+	var hoverElapsed:Float = 0;
+
+	var labelBackground:FlxSprite;
+	var labelText:FlxText;
 	// End of changes
 	var character:Character;
 
@@ -44,7 +73,10 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 	var _char:String = null;
 	var _goToPlayState:Bool = true;
 
-	var anims = null;
+	// Combat change
+	// var anims = null;
+	var anims:Array<Dynamic> = null;
+	// End of change
 	var animsTxt:FlxText;
 	var curAnim = 0;
 
@@ -167,6 +199,10 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 		if (ClientPrefs.data.cacheOnGPU)
 			Paths.clearUnusedMemory();
 
+		// Combat change
+		setupLabelSystem();
+		// End of change
+
 		super.create();
 	}
 
@@ -190,8 +226,11 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 			"",
 			"OTHER",
 			"F12 - Toggle Silhouettes",
-			"Hold Shift - Move Offsets 10x faster and Camera 4x faster",
-			"Hold Control - Move camera 4x slower"
+			// Combat change
+			// "Hold Shift - Move Offsets 10x faster and Camera 4x faster",
+			// "Hold Control - Move camera 4x slower"
+			"Hold Shift - Move Offsets 10x faster and Camera, Anims, and Attacks 4x faster",
+			"Hold Control - Move camera 4x slower and Flip Anims/Attacks by page" // End of change
 		];
 
 		helpBg = new FlxSprite().makeGraphic(1, 1, FlxColor.BLACK);
@@ -209,7 +248,10 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 			if (txt.length < 1)
 				continue;
 
-			var helpText:FlxText = new FlxText(0, 0, 600, txt, 16);
+			// Combat change
+			// var helpText:FlxText = new FlxText(0, 0, 600, txt, 16);
+			var helpText:FlxText = new FlxText(0, 0, 1500, txt, 16);
+			// End of change
 			helpText.setFormat(null, 16, FlxColor.WHITE, CENTER, OUTLINE_FAST, FlxColor.BLACK);
 			helpText.borderColor = FlxColor.BLACK;
 			helpText.scrollFactor.set();
@@ -261,7 +303,8 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 		else
 			add(characterGroup);
 
-		addCharacterExtras(reload);
+		addCharacterExtras();
+		fillCombatData();
 		// End of change
 		updateCharacterPositions();
 		reloadAnimList();
@@ -271,11 +314,17 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 
 	function makeUIMenu()
 	{
+		// Combat change
+		// UI_box = new PsychUIBox(FlxG.width - 275, 25, 250, 120, ['Ghost', 'Settings']);
 		UI_box = new PsychUIBox(FlxG.width - 275, 25, 250, 120, ['Ghost', 'Settings']);
+		// End of change
 		UI_box.scrollFactor.set();
 		UI_box.cameras = [camHUD];
 
-		UI_characterbox = new PsychUIBox(UI_box.x - 100, UI_box.y + UI_box.height + 10, 350, 280, ['Animations', 'Character']);
+		// Combat change
+		// UI_characterbox = new PsychUIBox(UI_box.x - 100, UI_box.y + UI_box.height + 10, 350, 280, ['Animations', 'Character']);
+		UI_characterbox = new PsychUIBox(UI_box.x - 100, UI_box.y + UI_box.height + 10, 350, 280,
+			['Animations', 'Character', 'Effect Anim', 'Effect', 'Attacks']);
 		UI_characterbox.scrollFactor.set();
 		UI_characterbox.cameras = [camHUD];
 		add(UI_characterbox);
@@ -285,6 +334,11 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 		addSettingsUI();
 		addAnimationsUI();
 		addCharacterUI();
+		// Combat change
+		addEffectAnimUI();
+		addEffectUI();
+		addAttackUI();
+		// End of change
 
 		UI_box.selectedName = 'Settings';
 		UI_characterbox.selectedName = 'Character';
@@ -299,6 +353,10 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 		// var hideGhostButton:PsychUIButton = null;
 		var makeGhostButton:PsychUIButton = new PsychUIButton(25, 15, "Make Ghost", function()
 		{
+			// Combat change
+			anims = character.animationsArray;
+			// End of change
+
 			var anim = anims[curAnim];
 			if (!character.isAnimationNull())
 			{
@@ -314,82 +372,65 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 						ghost.animation.pause();
 					 */
 					var characterExtraIsVisible = false;
-					characterGroup.forEach(function(spr:FlxSprite)
+					for (member in characterGroup)
 					{
-						if (spr.visible && Std.isOfType(spr, CharacterExtra))
+						if (member.visible && Std.isOfType(member, CharacterExtra))
 						{
 							characterExtraIsVisible = true;
-							return;
+							break;
 						}
-					});
+					}
 
 					if (characterExtraIsVisible)
 					{
-						var createdBaseSprite = false;
-						/*
-							var dummySprite:FlxSprite = new FlxSprite(character.x, character.y);
-							character.updateFramePixels();
-							dummySprite.loadGraphic(character.framePixels, false, 0, 0, true);
-							var dummierSprite:FlxSprite = new FlxSprite(dummySprite.x + 50, dummySprite.y + 50);
-							dummierSprite.makeGraphic(50, 50);
-							dummySprite.stamp(dummierSprite);
-							add(dummySprite);
-						 */
+						var farthestLeftPoint:Int = 0;
+						var farthestRightPoint:Int = 0;
+						var farthestTopPoint:Int = 0;
+						var farthestBottomPoint:Int = 0;
+
 						characterGroup.sort(PlayState.sortByZ);
 
-						characterGroup.forEach(function(spr:FlxSprite)
+						for (member in characterGroup)
 						{
-							if (spr.visible)
-							{
-								if (!createdBaseSprite)
-								{
-									// To do:
-									// Need to increase the dimensions of the frame if the characterExtras clip out of bounds
-									spr.updateFramePixels();
-									ghost.loadGraphic(spr.framePixels, false, spr.frameWidth, spr.frameHeight, true);
-									ghost.x = spr.x;
-									ghost.y = spr.y;
-									if (spr == character)
-									{
-										var offset = character.animOffsets.get(character.animation.curAnim.name);
-										ghost.x += offset[0];
-										ghost.y += offset[1];
-									}
-									else
-									{
-										for (member in character.characterSprites)
-										{
-											if (spr == member)
-											{
-												var offset = member.determineOffset(character.animation.curAnim.name);
-												ghost.x += offset[0];
-												ghost.y += offset[1];
-											}
-										}
-									}
+							if (!member.visible)
+								continue;
 
-									createdBaseSprite = true;
-								}
-								else
-								{
-									// var offset:Array<Float> = [0, 0];
-									// if (Std.isOfType(spr, CharacterExtra))
-									//	offset = spr.determineOffset(spr.anim.curAnim.name);
-									// spr.useFramePixels = true;
-									// var test:FlxSprite = new FlxSprite();
-									// test.makeGraphic(100, 100);
-									ghost.stamp(spr);
-								}
-							}
-						});
+							if (member.x < farthestLeftPoint || farthestLeftPoint == 0)
+								farthestLeftPoint = Std.int(member.x);
+							if (member.x + member.frameWidth > farthestRightPoint || farthestRightPoint == 0)
+								farthestRightPoint = Std.int(member.x + member.frameWidth);
+							if (member.y < farthestTopPoint || farthestTopPoint == 0)
+								farthestTopPoint = Std.int(member.y);
+							if (member.y + member.frameHeight > farthestBottomPoint || farthestBottomPoint == 0)
+								farthestBottomPoint = Std.int(member.y + member.frameHeight);
+						}
+
+						var newWidth:Int = farthestRightPoint - farthestLeftPoint;
+						var newHeight:Int = farthestBottomPoint - farthestTopPoint;
+
+						// loadGraphic doesn't let you change the width/height of the original image
+						// So the bitmap needs to get created and sorted out first
+						var ghostBitmap:BitmapData = new BitmapData(newWidth, newHeight, true, 0);
+
+						for (member in characterGroup)
+						{
+							if (!member.visible)
+								continue;
+
+							member.drawFrame();
+							ghostBitmap.draw(member.framePixels);
+						}
+
+						ghost.loadGraphic(ghostBitmap, false, 0, 0, true);
+
+						var offset = character.animOffsets.get(character.animation.curAnim.name);
+						ghost.x += offset[0];
+						ghost.y += offset[1];
 					}
 					else
 					{
-						ghost.loadGraphic(character.graphic);
-						ghost.frames.frames = character.frames.frames;
-						ghost.animation.copyFrom(character.animation);
-						ghost.animation.play(character.animation.curAnim.name, true, false, character.animation.curAnim.curFrame);
-						ghost.animation.pause();
+						character.drawFrame();
+						ghost.loadGraphic(character.framePixels);
 					}
 					// End of change
 				}
@@ -440,6 +481,11 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 					hideGhostButton.alpha = 1; */
 				trace('created ghost image');
 			}
+
+			// Combat change
+			currentEditMode = determineCurrentEditMode();
+			reloadAnimList();
+			// End of change
 		});
 
 		/*hideGhostButton = new PsychUIButton(20 + makeGhostButton.width, makeGhostButton.y, "Hide Ghost", function() {
@@ -503,6 +549,15 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 			updatePointerPos();
 			reloadCharacterOptions();
 			reloadCharacterDropDown();
+			if (currentEditMode == 'attack')
+			{
+				curAnim = 0;
+				assignAttackData(curAttack, attacks[0]);
+				fillTempDirectionArray();
+				animateAttack(true);
+				updateAttackText();
+				updateAttackOptions();
+			}
 		});
 
 		var templateCharacter:PsychUIButton = new PsychUIButton(140, 50, "Load Template", function()
@@ -563,6 +618,20 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 				reloadCharacterOptions();
 				reloadCharacterDropDown();
 				updatePointerPos();
+
+				// Combat change
+				reloadEffectDropDown();
+
+				if (currentEditMode == 'attack')
+				{
+					curAnim = 0;
+					assignAttackData(curAttack, attacks[0]);
+					fillTempDirectionArray();
+					animateAttack(true);
+					updateAttackText();
+					updateAttackOptions();
+				}
+				// End of change
 			}
 		else
 		{
@@ -595,7 +664,13 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 		animationNameInputText = new PsychUIInputText(animationInputText.x, animationInputText.y + 35, 150, '', 8);
 		animationIndicesInputText = new PsychUIInputText(animationNameInputText.x, animationNameInputText.y + 40, 250, '', 8);
 		animationFramerate = new PsychUINumericStepper(animationInputText.x + 170, animationInputText.y, 1, 24, 0, 240, 0);
-		animationLoopCheckBox = new PsychUICheckBox(animationNameInputText.x + 170, animationNameInputText.y - 1, "Should it Loop?", 100);
+		// Combat change
+		// animationLoopCheckBox = new PsychUICheckBox(animationNameInputText.x + 170, animationNameInputText.y - 1, "Should it Loop?", 100);
+		animationLoopCheckBox = new PsychUICheckBox(animationNameInputText.x + 170, animationNameInputText.y - 1, "Should it Loop?", 100, function()
+		{
+			character.animation.curAnim.looped = animationLoopCheckBox.checked;
+		});
+		// End of change
 
 		animationDropDown = new PsychUIDropDownMenu(15, animationInputText.y - 55, [''], function(selectedAnimation:Int, pressed:String)
 		{
@@ -607,6 +682,10 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 
 			var indicesStr:String = anim.indices.toString();
 			animationIndicesInputText.text = indicesStr.substr(1, indicesStr.length - 2);
+
+			// Combat change
+			updateCurAnim(selectedAnimation);
+			// End of change
 		});
 
 		var addUpdateButton:PsychUIButton = new PsychUIButton(70, animationIndicesInputText.y + 60, "Add/Update", function()
@@ -817,6 +896,15 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 		tab_group.add(new FlxText(positionXStepper.x, positionXStepper.y - 18, 100, 'Character X/Y:'));
 		tab_group.add(new FlxText(positionCameraXStepper.x, positionCameraXStepper.y - 18, 100, 'Camera X/Y:'));
 		tab_group.add(new FlxText(healthColorStepperR.x, healthColorStepperR.y - 18, 100, 'Health Bar R/G/B:'));
+
+		// Combat change
+		var tabName:String = 'Character';
+
+		tab_group.add(createHoverLabel(new FlxText(saveCharacterButton.x, saveCharacterButton.y - 15, 0, 'v*'),
+			"Saving a character json also saves their combat information\n
+			Parameters that cannot be edited here (Raw combat stats and such) are still preserved on saving\nif they previously existed", tabName));
+		// End of change
+
 		tab_group.add(imageInputText);
 		tab_group.add(reloadImage);
 		tab_group.add(decideIconColor);
@@ -922,6 +1010,61 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 				updateHealthBar();
 				unsavedProgress = true;
 			}
+			// Combat change
+			else if (sender == effectScaleStepper)
+			{
+				if (curEffect != null)
+				{
+					reloadEffectImage();
+					curEffect.jsonScale = sender.value;
+					curEffect.scale.set(curEffect.jsonScale, curEffect.jsonScale);
+					curEffect.updateHitbox();
+					updateEffectPositions();
+					updatePointerPos(false);
+					unsavedProgress = true;
+				}
+			}
+			else if (sender == effectPositionXStepper)
+			{
+				if (curEffect != null)
+				{
+					curEffect.generalOffset[0] = effectPositionXStepper.value;
+					updateEffectPositions();
+					unsavedProgress = true;
+				}
+			}
+			else if (sender == effectPositionYStepper)
+			{
+				if (curEffect != null)
+				{
+					curEffect.generalOffset[1] = effectPositionYStepper.value;
+					updateEffectPositions();
+					unsavedProgress = true;
+				}
+			}
+			else if (sender == effectLayerStepper)
+			{
+				if (curEffect != null)
+				{
+					curEffect.layer = sender.value;
+					curEffect.zDepth = curEffect.layer;
+					characterGroup.sort(PlayState.sortByZ);
+				}
+			}
+			else if (sender == effectAnimationAngle)
+			{
+				if (curEffect != null)
+					curEffect.angle = sender.value;
+			}
+			else if (sender == attackStartDurationStepper)
+			{
+				curAttack.duration = attackStartDurationStepper.value;
+			}
+			else if (sender == attackEndDurationStepper)
+			{
+				curAttack.recovery = attackEndDurationStepper.value;
+			}
+			// End of change
 		}
 	}
 
@@ -992,6 +1135,9 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 		positionCameraYStepper.value = character.cameraPosition[1];
 		reloadAnimationDropDown();
 		updateHealthBar();
+		// Combat change
+		reloadEffectOptions();
+		// End of change
 	}
 
 	var holdingArrowsTime:Float = 0;
@@ -1051,165 +1197,375 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 		if (lastZoom != FlxG.camera.zoom)
 			cameraZoomText.text = 'Zoom: ' + FlxMath.roundDecimal(FlxG.camera.zoom, 2) + 'x';
 
-		// CHARACTER CONTROLS
-		var changedAnim:Bool = false;
-		if (anims.length > 1)
-		{
-			if (FlxG.keys.justPressed.W && (changedAnim = true))
-				curAnim--;
-			else if (FlxG.keys.justPressed.S && (changedAnim = true))
-				curAnim++;
-
-			if (changedAnim)
+		// Combat change
+		/*
+					// CHARACTER CONTROLS
+			var changedAnim:Bool = false;
+			if (anims.length > 1)
 			{
-				undoOffsets = null;
-				curAnim = FlxMath.wrap(curAnim, 0, anims.length - 1);
-				character.playAnim(anims[curAnim].anim, true);
-				updateText();
-			}
-		}
+				if (FlxG.keys.justPressed.W && (changedAnim = true))
+					curAnim--;
+				else if (FlxG.keys.justPressed.S && (changedAnim = true))
+					curAnim++;
 
-		var changedOffset = false;
-		var moveKeysP = [
-			FlxG.keys.justPressed.LEFT,
-			FlxG.keys.justPressed.RIGHT,
-			FlxG.keys.justPressed.UP,
-			FlxG.keys.justPressed.DOWN
-		];
-		var moveKeys = [
-			FlxG.keys.pressed.LEFT,
-			FlxG.keys.pressed.RIGHT,
-			FlxG.keys.pressed.UP,
-			FlxG.keys.pressed.DOWN
-		];
-		if (moveKeysP.contains(true))
-		{
-			character.offset.x += ((moveKeysP[0] ? 1 : 0) - (moveKeysP[1] ? 1 : 0)) * shiftMultBig;
-			character.offset.y += ((moveKeysP[2] ? 1 : 0) - (moveKeysP[3] ? 1 : 0)) * shiftMultBig;
-			changedOffset = true;
-		}
-
-		if (moveKeys.contains(true))
-		{
-			holdingArrowsTime += elapsed;
-			if (holdingArrowsTime > 0.6)
-			{
-				holdingArrowsElapsed += elapsed;
-				while (holdingArrowsElapsed > (1 / 60))
+				if (changedAnim)
 				{
-					character.offset.x += ((moveKeys[0] ? 1 : 0) - (moveKeys[1] ? 1 : 0)) * shiftMultBig;
-					character.offset.y += ((moveKeys[2] ? 1 : 0) - (moveKeys[3] ? 1 : 0)) * shiftMultBig;
-					holdingArrowsElapsed -= (1 / 60);
-					changedOffset = true;
+					undoOffsets = null;
+					curAnim = FlxMath.wrap(curAnim, 0, anims.length - 1);
+					character.playAnim(anims[curAnim].anim, true);
+					updateText();
 				}
 			}
-		}
-		else
-			holdingArrowsTime = 0;
 
-		if (FlxG.mouse.pressedRight && (FlxG.mouse.deltaScreenX != 0 || FlxG.mouse.deltaScreenY != 0))
-		{
-			character.offset.x -= FlxG.mouse.deltaScreenX;
-			character.offset.y -= FlxG.mouse.deltaScreenY;
-			changedOffset = true;
-		}
+			var changedOffset = false;
+			var moveKeysP = [
+				FlxG.keys.justPressed.LEFT,
+				FlxG.keys.justPressed.RIGHT,
+				FlxG.keys.justPressed.UP,
+				FlxG.keys.justPressed.DOWN
+			];
+			var moveKeys = [
+				FlxG.keys.pressed.LEFT,
+				FlxG.keys.pressed.RIGHT,
+				FlxG.keys.pressed.UP,
+				FlxG.keys.pressed.DOWN
+			];
 
-		if (FlxG.keys.pressed.CONTROL)
-		{
-			if (FlxG.keys.justPressed.C)
+			if (moveKeysP.contains(true))
 			{
-				copiedOffset[0] = character.offset.x;
-				copiedOffset[1] = character.offset.y;
+				character.offset.x += ((moveKeysP[0] ? 1 : 0) - (moveKeysP[1] ? 1 : 0)) * shiftMultBig;
+				character.offset.y += ((moveKeysP[2] ? 1 : 0) - (moveKeysP[3] ? 1 : 0)) * shiftMultBig;
 				changedOffset = true;
 			}
-			else if (FlxG.keys.justPressed.V)
-			{
-				undoOffsets = [character.offset.x, character.offset.y];
-				character.offset.x = copiedOffset[0];
-				character.offset.y = copiedOffset[1];
-				changedOffset = true;
-			}
-			else if (FlxG.keys.justPressed.R)
-			{
-				undoOffsets = [character.offset.x, character.offset.y];
-				character.offset.set(0, 0);
-				changedOffset = true;
-			}
-			else if (FlxG.keys.justPressed.Z && undoOffsets != null)
-			{
-				character.offset.x = undoOffsets[0];
-				character.offset.y = undoOffsets[1];
-				changedOffset = true;
-			}
-		}
 
-		var anim = anims[curAnim];
-		if (changedOffset && anim != null && anim.offsets != null)
-		{
-			anim.offsets[0] = Std.int(character.offset.x);
-			anim.offsets[1] = Std.int(character.offset.y);
-
-			character.addOffset(anim.anim, character.offset.x, character.offset.y);
-			updateText();
-		}
-
-		var txt = 'ERROR: No Animation Found';
-		var clr = FlxColor.RED;
-		if (!character.isAnimationNull())
-		{
-			if (FlxG.keys.pressed.A || FlxG.keys.pressed.D)
+			if (moveKeys.contains(true))
 			{
-				holdingFrameTime += elapsed;
-				if (holdingFrameTime > 0.5)
-					holdingFrameElapsed += elapsed;
+				holdingArrowsTime += elapsed;
+				if (holdingArrowsTime > 0.6)
+				{
+					holdingArrowsElapsed += elapsed;
+					while (holdingArrowsElapsed > (1 / 60))
+					{
+						character.offset.x += ((moveKeys[0] ? 1 : 0) - (moveKeys[1] ? 1 : 0)) * shiftMultBig;
+						character.offset.y += ((moveKeys[2] ? 1 : 0) - (moveKeys[3] ? 1 : 0)) * shiftMultBig;
+						holdingArrowsElapsed -= (1 / 60);
+						changedOffset = true;
+					}
+				}
 			}
 			else
-				holdingFrameTime = 0;
+				holdingArrowsTime = 0;
 
-			if (FlxG.keys.justPressed.SPACE)
-				character.playAnim(character.getAnimationName(), true);
-
-			var frames:Int = -1;
-			var length:Int = -1;
-			if (!character.isAnimateAtlas && character.animation.curAnim != null)
+			if (FlxG.mouse.pressedRight && (FlxG.mouse.deltaScreenX != 0 || FlxG.mouse.deltaScreenY != 0))
 			{
-				frames = character.animation.curAnim.curFrame;
-				length = character.animation.curAnim.numFrames;
-			}
-			else if (character.isAnimateAtlas && character.atlas.anim != null)
-			{
-				frames = character.atlas.anim.curFrame;
-				length = character.atlas.anim.length;
+				character.offset.x -= FlxG.mouse.deltaScreenX;
+				character.offset.y -= FlxG.mouse.deltaScreenY;
+				changedOffset = true;
 			}
 
-			if (length >= 0)
-			{
-				if (FlxG.keys.justPressed.A || FlxG.keys.justPressed.D || holdingFrameTime > 0.5)
+				if (FlxG.keys.pressed.CONTROL)
 				{
-					var isLeft = false;
-					if ((holdingFrameTime > 0.5 && FlxG.keys.pressed.A) || FlxG.keys.justPressed.A)
-						isLeft = true;
-					character.animPaused = true;
-
-					if (holdingFrameTime <= 0.5 || holdingFrameElapsed > 0.1)
+					if (FlxG.keys.justPressed.C)
 					{
-						frames = FlxMath.wrap(frames + Std.int(isLeft ? -shiftMult : shiftMult), 0, length - 1);
-						if (!character.isAnimateAtlas)
-							character.animation.curAnim.curFrame = frames;
-						else
-							character.atlas.anim.curFrame = frames;
-						holdingFrameElapsed -= 0.1;
+						copiedOffset[0] = character.offset.x;
+						copiedOffset[1] = character.offset.y;
+						changedOffset = true;
+					}
+					else if (FlxG.keys.justPressed.V)
+					{
+						undoOffsets = [character.offset.x, character.offset.y];
+						character.offset.x = copiedOffset[0];
+						character.offset.y = copiedOffset[1];
+						changedOffset = true;
+					}
+					else if (FlxG.keys.justPressed.R)
+					{
+						undoOffsets = [character.offset.x, character.offset.y];
+						character.offset.set(0, 0);
+						changedOffset = true;
+					}
+					else if (FlxG.keys.justPressed.Z && undoOffsets != null)
+					{
+						character.offset.x = undoOffsets[0];
+						character.offset.y = undoOffsets[1];
+						changedOffset = true;
 					}
 				}
 
-				txt = 'Frames: ( $frames / ${length - 1} )';
-				// if(character.animation.curAnim.paused) txt += ' - PAUSED';
-				clr = FlxColor.WHITE;
+				var anim = anims[curAnim];
+				if (changedOffset && anim != null && anim.offsets != null)
+				{
+					anim.offsets[0] = Std.int(character.offset.x);
+					anim.offsets[1] = Std.int(character.offset.y);
+
+					character.addOffset(anim.anim, character.offset.x, character.offset.y);
+					updateText();
+				}
+
+							var txt = 'ERROR: No Animation Found';
+			var clr = FlxColor.RED;
+			if (!character.isAnimationNull())
+			{
+				if (FlxG.keys.pressed.A || FlxG.keys.pressed.D)
+				{
+					holdingFrameTime += elapsed;
+					if (holdingFrameTime > 0.5)
+						holdingFrameElapsed += elapsed;
+				}
+				else
+					holdingFrameTime = 0;
+
+				if (FlxG.keys.justPressed.SPACE)
+					character.playAnim(character.getAnimationName(), true);
+
+				var frames:Int = -1;
+				var length:Int = -1;
+				if (!character.isAnimateAtlas && character.animation.curAnim != null)
+				{
+					frames = character.animation.curAnim.curFrame;
+					length = character.animation.curAnim.numFrames;
+				}
+				else if (character.isAnimateAtlas && character.atlas.anim != null)
+				{
+					frames = character.atlas.anim.curFrame;
+					length = character.atlas.anim.length;
+				}
+
+				if (length >= 0)
+				{
+					if (FlxG.keys.justPressed.A || FlxG.keys.justPressed.D || holdingFrameTime > 0.5)
+					{
+						var isLeft = false;
+						if ((holdingFrameTime > 0.5 && FlxG.keys.pressed.A) || FlxG.keys.justPressed.A)
+							isLeft = true;
+						character.animPaused = true;
+
+						if (holdingFrameTime <= 0.5 || holdingFrameElapsed > 0.1)
+						{
+							frames = FlxMath.wrap(frames + Std.int(isLeft ? -shiftMult : shiftMult), 0, length - 1);
+							if (!character.isAnimateAtlas)
+								character.animation.curAnim.curFrame = frames;
+							else
+								character.atlas.anim.curFrame = frames;
+							holdingFrameElapsed -= 0.1;
+						}
+					}
+
+					txt = 'Frames: ( $frames / ${length - 1} )';
+					// if(character.animation.curAnim.paused) txt += ' - PAUSED';
+					clr = FlxColor.WHITE;
+				}
+			}
+
+			if (txt != frameAdvanceText.text)
+			frameAdvanceText.text = txt;
+			frameAdvanceText.color = clr;
+		 */
+
+		if (FlxG.mouse.overlaps(labelledTextGroup, camHUD))
+		{
+			labelledTextGroup.forEach(function(txt:FlxText)
+			{
+				if (FlxG.mouse.overlaps(txt, camHUD))
+				{
+					if (UI_characterbox.selectedTab != null && labelTabMap.get(txt.ID) == UI_characterbox.selectedTab.name)
+					{
+						// A bit of breathing room that moving the cursor doesn't immediately trip the label
+						// Buuut I want the label to come up fairly accidentally so it naturally gets taught
+						// Very easy for this feature to get glossed over if we had to rely on a short blurb somewhere
+						hoverElapsed += elapsed;
+						if (hoverElapsed >= 0.07)
+						{
+							updateLabel(labelMap.get(txt.ID));
+							hoverElapsed = 0.07;
+						}
+					}
+					return;
+				}
+			});
+		}
+		else
+		{
+			labelBackground.active = labelBackground.visible = false;
+			labelText.active = labelText.visible = false;
+			hoverElapsed = 0;
+		}
+
+		if (UI_characterbox.selectedTab != null
+			&& previousUICharacterBoxTab != UI_characterbox.selectedTab.name
+			&& determineCurrentEditMode() != currentEditMode)
+		{
+			previousUICharacterBoxTab = UI_characterbox.selectedTab.name;
+			currentEditMode = determineCurrentEditMode();
+
+			if (currentEditMode == 'attack')
+			{
+				curAnim = 0;
+				assignAttackData(curAttack, attacks[0]);
+				fillTempDirectionArray();
+				animateAttack(true);
+				updateAttackText();
+				updateAttackOptions();
+			}
+			else
+			{
+				curChain = null;
+				reloadAnimList();
 			}
 		}
-		if (txt != frameAdvanceText.text)
+
+		if (currentEditMode == 'attack')
+		{
+			var changedAnim:Bool = false;
+			if (attacks.length > 1 || chains.length > 1)
+			{
+				if (FlxG.keys.justPressed.W && (changedAnim = true))
+					curAnim--;
+				else if (FlxG.keys.justPressed.S && (changedAnim = true))
+					curAnim++;
+
+				if (FlxG.keys.pressed.CONTROL)
+				{
+					if (FlxG.keys.justPressed.W || FlxG.keys.justPressed.S)
+					{
+						changedAnim = true;
+
+						if (curAnim == 1 || curAnim % 20 != 1)
+						{
+							if (FlxG.keys.justPressed.W)
+							{
+								curAnim -= 20;
+							}
+							if (FlxG.keys.justPressed.S)
+							{
+								if (curAnim == 1)
+									++curAnim;
+								curAnim += 20;
+							}
+
+							curAnim -= curAnim % 20;
+							++curAnim;
+						}
+
+						if (curAnim == 1)
+							--curAnim;
+					}
+				}
+				else if (FlxG.keys.pressed.SHIFT)
+				{
+					if (FlxG.keys.justPressed.W)
+						curAnim -= 3;
+					if (FlxG.keys.justPressed.S)
+						curAnim += 3;
+				}
+
+				if (changedAnim)
+				{
+					var changedChain = false;
+					if (curChain != null)
+					{
+						if (curAnim > curChain.attack_chain.length - 1)
+						{
+							curAnim = 0;
+							++curChainNum;
+							changedChain = true;
+						}
+						else if (curAnim < 0)
+						{
+							curAnim = 0;
+							--curChainNum;
+							changedChain = true;
+						}
+
+						if (curChainNum > chains.length - 1 || curChainNum < 0)
+							curChain = null;
+						else if (changedChain)
+							assignChainData(chains[curChainNum], curChain);
+
+						if (curChainNum < 0)
+							curAnim = attacks.length - 1;
+					}
+					else
+					{
+						if (curAnim > attacks.length - 1)
+						{
+							curAnim = 0;
+							curChainNum = 0;
+							assignChainData(chains[curChainNum], curChain);
+						}
+						else if (curAnim < 0)
+						{
+							curAnim = 0;
+							curChainNum = chains.length - 1;
+							assignChainData(chains[curChainNum], curChain);
+						}
+					}
+
+					if (curChain != null)
+					{
+						for (attack in attacks)
+						{
+							if (attack.name == curChain.attack_chain[curAnim])
+							{
+								assignAttackData(curAttack, attack);
+								break;
+							}
+						}
+					}
+					else
+					{
+						assignAttackData(curAttack, attacks[curAnim]);
+						fillTempDirectionArray();
+					}
+
+					if (curChain == null)
+						animateAttack(true);
+
+					updateAttackText();
+					updateAttackOptions();
+				}
+			}
+
+			if (!FlxG.keys.pressed.CONTROL
+				&& ((curAttack.append_direction_to_anim_name || curAttack.direction == 'ANY')
+					&& (FlxG.keys.justPressed.A || FlxG.keys.justPressed.D)))
+			{
+				var tempAnim:Int = directionDropDown.list.indexOf(tempDirectionArray[0]);
+				if (curChain != null)
+					tempAnim = directionDropDown.list.indexOf(tempDirectionArray[curAnim]);
+
+				var arrayShift:Int = -1;
+				if (FlxG.keys.justPressed.D)
+					arrayShift = 1;
+
+				tempAnim += arrayShift;
+
+				if (tempAnim > directionDropDown.list.length - 1)
+					tempAnim = 2;
+				else if (tempAnim < 2)
+					tempAnim = directionDropDown.list.length - 1;
+
+				if (curChain != null)
+					tempDirectionArray[curAnim] = directionDropDown.list[tempAnim];
+				else
+					tempDirectionArray[0] = directionDropDown.list[tempAnim];
+			}
+
+			var txt:String = 'Anim Direction Override: ';
+
+			if (curChain != null)
+				txt += tempDirectionArray[curAnim];
+			else
+				txt += tempDirectionArray[0];
+
 			frameAdvanceText.text = txt;
-		frameAdvanceText.color = clr;
+
+			if (FlxG.keys.justPressed.SPACE)
+				animateAttack(true);
+		}
+		else
+			evaluateCharacterControls(elapsed, shiftMult, ctrlMult, shiftMultBig);
+		// End of change
 
 		// OTHER CONTROLS
 		if (FlxG.keys.justPressed.F12)
@@ -1315,16 +1671,47 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 		#end
 	}
 
+	// Combat change
+
+	/*
+		inline function reloadAnimList()
+		{
+			anims = character.animationsArray;
+			if (anims.length > 0)
+				character.playAnim(anims[0].anim, true);
+			curAnim = 0;
+
+			updateText();
+			if (animationDropDown != null)
+				reloadAnimationDropDown();
+	}*/
 	inline function reloadAnimList()
 	{
-		anims = character.animationsArray;
-		if (anims.length > 0)
-			character.playAnim(anims[0].anim, true);
-		curAnim = 0;
+		if (currentEditMode == 'effect' && curEffect != null)
+		{
+			anims = curEffect.animationsArray;
+			if (anims.length > 0 && character.animation.getByName(anims[0].anim) != null)
+				character.playAnim(anims[0].anim, true);
+			else
+				character.playAnim(character.animationsArray[0].anim, true);
+			curAnim = 0;
 
-		updateText();
-		if (animationDropDown != null)
-			reloadAnimationDropDown();
+			updateText();
+			if (effectAnimationDropDown != null)
+				reloadEffectAnimationDropDown();
+		}
+		else
+		{
+			anims = character.animationsArray;
+			if (anims.length > 0)
+				character.playAnim(anims[0].anim, true);
+			curAnim = 0;
+
+			updateText();
+			if (animationDropDown != null)
+				reloadAnimationDropDown();
+		}
+		// End of change
 	}
 
 	inline function updateText()
@@ -1332,21 +1719,53 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 		animsTxt.removeFormat(selectedFormat);
 
 		var intendText:String = '';
+		// Combat change
+		var formatStart:Int = 0;
+		var formatEnd:Int = 0;
+		textPages = [];
+		// End of change
 		for (num => anim in anims)
 		{
-			if (num > 0)
+			// Combat change
+			// if (num > 0)
+			if (intendText != '')
 				intendText += '\n';
 
 			if (num == curAnim)
 			{
-				var n:Int = intendText.length;
+				// Combat change
+				// var n:Int = intendText.length;
+				// intendText += anim.anim + ": " + anim.offsets;
+				// animsTxt.addFormat(selectedFormat, n, intendText.length);
+				formatStart = intendText.length;
 				intendText += anim.anim + ": " + anim.offsets;
-				animsTxt.addFormat(selectedFormat, n, intendText.length);
+				formatEnd = intendText.length;
+
+				curPage = textPages.length;
+				// End of change
 			}
 			else
 				intendText += anim.anim + ": " + anim.offsets;
+
+			// Combat change
+			if (num != 0 && num % 20 == 0)
+			{
+				textPages.push(intendText);
+				intendText = '';
+			}
+			// End of change
 		}
-		animsTxt.text = intendText;
+		// Combat change
+		// animsTxt.text = intendText;
+		if (intendText != '')
+			textPages.push(intendText);
+		intendText = 'Current Page: ${curPage + 1}/${textPages.length}\n\n';
+		formatStart += intendText.length;
+		formatEnd += intendText.length;
+
+		animsTxt.text = intendText + textPages[curPage];
+		animsTxt.addFormat(selectedFormat, formatStart, formatEnd);
+		// End of change
 	}
 
 	inline function updateCharacterPositions()
@@ -1495,7 +1914,10 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 			"no_antialiasing": character.noAntialiasing,
 			"healthbar_colors": character.healthColorArray,
 			"vocals_file": character.vocalsFile,
-			"_editor_isPlayer": character.isPlayer
+			"_editor_isPlayer": character.isPlayer,
+
+			// Combat change
+			"combat_data": generateCombatFile() // End of change
 		};
 
 		var data:String = PsychJsonPrinter.print(json, ['offsets', 'position', 'healthbar_colors', 'camera_position', 'indices']);
@@ -1510,27 +1932,1719 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 		}
 	}
 
-	// Combat change
-	function addCharacterExtras(reload:Bool = false)
+	// Combat changes
+	var effectAnimationDropDown:PsychUIDropDownMenu;
+
+	var effectAnimationInputText:PsychUIInputText;
+	var effectAnimationNameInputText:PsychUIInputText;
+	var effectAnimationIndicesInputText:PsychUIInputText;
+
+	var effectAnimationFramerate:PsychUINumericStepper;
+	var effectAnimationLoopCheckBox:PsychUICheckBox;
+	var effectAnimationAngle:PsychUINumericStepper;
+
+	function addEffectAnimUI()
 	{
-		characterGroup.forEach(function(spr:FlxSprite)
+		var tab_group = UI_characterbox.getTab('Effect Anim').menu;
+
+		effectAnimationInputText = new PsychUIInputText(15, 85, 80, '', 8);
+		effectAnimationNameInputText = new PsychUIInputText(effectAnimationInputText.x, effectAnimationInputText.y + 35, 150, '', 8);
+		effectAnimationIndicesInputText = new PsychUIInputText(effectAnimationNameInputText.x, effectAnimationNameInputText.y + 40, 250, '', 8);
+		effectAnimationFramerate = new PsychUINumericStepper(effectAnimationInputText.x + 170, effectAnimationInputText.y, 1, 24, 0, 240, 0);
+		effectAnimationAngle = new PsychUINumericStepper(effectAnimationFramerate.x + 70, effectAnimationFramerate.y, 1, 0, -360, 360, 3);
+
+		effectAnimationLoopCheckBox = new PsychUICheckBox(effectAnimationNameInputText.x + 170, effectAnimationNameInputText.y - 1, "Should it Loop?", 100,
+			function()
+			{
+				if (curEffect != null)
+					curEffect.animation.curAnim.looped = effectAnimationLoopCheckBox.checked;
+			});
+
+		effectAnimationDropDown = new PsychUIDropDownMenu(15, effectAnimationInputText.y - 55, [''], function(selectedAnimation:Int, pressed:String)
 		{
-			remove(spr);
-			spr.destroy();
+			if (curEffect == null)
+				return;
+			var anim:SpriteAnimArray = curEffect.animationsArray[selectedAnimation];
+			effectAnimationInputText.text = anim.anim;
+			effectAnimationNameInputText.text = anim.name;
+			effectAnimationLoopCheckBox.checked = anim.loop;
+			effectAnimationFramerate.value = anim.fps;
+			effectAnimationAngle.value = anim.angle;
+
+			if (curEffect.animAngle.get(anim.anim) != null)
+				effectAnimationAngle.value = curEffect.animAngle.get(anim.anim);
+			else
+				effectAnimationAngle.value = 0;
+
+			var indicesStr:String = anim.indices.toString();
+			effectAnimationIndicesInputText.text = indicesStr.substr(1, indicesStr.length - 2);
+
+			updateCurAnim(selectedAnimation);
 		});
+
+		var addUpdateButton:PsychUIButton = new PsychUIButton(70, effectAnimationIndicesInputText.y + 60, "Add/Update", function()
+		{
+			if (curEffect == null)
+				return;
+
+			var indicesText:String = effectAnimationIndicesInputText.text.trim();
+			var indices:Array<Int> = [];
+			if (indicesText.length > 0)
+			{
+				var indicesStr:Array<String> = effectAnimationIndicesInputText.text.trim().split(',');
+				if (indicesStr.length > 0)
+				{
+					for (ind in indicesStr)
+					{
+						if (ind.contains('-'))
+						{
+							var splitIndices:Array<String> = ind.split('-');
+							var indexStart:Int = Std.parseInt(splitIndices[0]);
+							if (Math.isNaN(indexStart) || indexStart < 0)
+								indexStart = 0;
+
+							var indexEnd:Int = Std.parseInt(splitIndices[1]);
+							if (Math.isNaN(indexEnd) || indexEnd < indexStart)
+								indexEnd = indexStart;
+
+							for (index in indexStart...indexEnd + 1)
+								indices.push(index);
+						}
+						else
+						{
+							var index:Int = Std.parseInt(ind);
+							if (!Math.isNaN(index) && index > -1)
+								indices.push(index);
+						}
+					}
+				}
+			}
+
+			var lastAnim:String = (curEffect.animationsArray[curAnim] != null) ? curEffect.animationsArray[curAnim].anim : '';
+			var lastOffsets:Array<Int> = [0, 0];
+			for (anim in curEffect.animationsArray)
+				if (effectAnimationInputText.text == anim.anim)
+				{
+					lastOffsets = anim.offsets;
+					if (curEffect.hasAnimation(effectAnimationInputText.text))
+						curEffect.animation.remove(effectAnimationInputText.text);
+					curEffect.animationsArray.remove(anim);
+				}
+
+			var addedAnim:SpriteAnimArray = newEffectAnim(effectAnimationInputText.text, effectAnimationNameInputText.text);
+			addedAnim.fps = Math.round(effectAnimationFramerate.value);
+			addedAnim.loop = effectAnimationLoopCheckBox.checked;
+			addedAnim.indices = indices;
+			addedAnim.offsets = lastOffsets;
+			addedAnim.angle = effectAnimationAngle.value;
+			addEffectAnimation(addedAnim.anim, addedAnim.name, addedAnim.fps, addedAnim.loop, addedAnim.indices, addedAnim.angle);
+			curEffect.animationsArray.push(addedAnim);
+
+			reloadAnimList();
+			@:arrayAccess curAnim = Std.int(Math.max(0, curEffect.animationsArray.indexOf(addedAnim)));
+			character.playAnim(addedAnim.anim, true);
+			trace('Added/Updated animation: ' + effectAnimationInputText.text);
+		});
+
+		var removeButton:PsychUIButton = new PsychUIButton(180, effectAnimationIndicesInputText.y + 60, "Remove", function()
+		{
+			for (anim in curEffect.animationsArray)
+				if (effectAnimationInputText.text == anim.anim)
+				{
+					var resetAnim:Bool = false;
+					if (anim.anim == curEffect.getAnimationName())
+						resetAnim = true;
+					if (curEffect.hasAnimation(anim.anim))
+					{
+						curEffect.animation.remove(anim.anim);
+						curEffect.animOffsets.remove(anim.anim);
+						curEffect.animationsArray.remove(anim);
+					}
+
+					if (resetAnim && curEffect.animationsArray.length > 0)
+					{
+						curAnim = FlxMath.wrap(curAnim, 0, anims.length - 1);
+						curEffect.playAnim(anims[curAnim].anim, true);
+					}
+					reloadAnimList();
+					trace('Removed animation: ' + effectAnimationInputText.text);
+					break;
+				}
+		});
+		reloadAnimList();
+		effectAnimationDropDown.selectedLabel = anims[0] != null ? anims[0].anim : '';
+
+		tab_group.add(new FlxText(effectAnimationDropDown.x, effectAnimationDropDown.y - 18, 100, 'Animations:'));
+		tab_group.add(new FlxText(effectAnimationFramerate.x, effectAnimationFramerate.y - 18, 100, 'Framerate:'));
+		tab_group.add(new FlxText(effectAnimationNameInputText.x, effectAnimationNameInputText.y - 18, 150, 'Animation Symbol Name/Tag:'));
+		tab_group.add(new FlxText(effectAnimationIndicesInputText.x, effectAnimationIndicesInputText.y - 18, 170, 'ADVANCED - Animation Indices:'));
+		tab_group.add(new FlxText(effectAnimationAngle.x, effectAnimationAngle.y - 18, 0, 'Rotation Angle:'));
+
+		tab_group.add(createHoverLabel(new FlxText(effectAnimationInputText.x, effectAnimationInputText.y - 18, 0, 'Animation name*:'),
+			"An effect plays its animation according to its parent character\nSo when boyfriend plays an animation like 'idle',\nthe effect would play animation 'idle'\n
+		Effects are made invisible when not playing an animation",
+			'Effect Anim'));
+
+		tab_group.add(effectAnimationInputText);
+		tab_group.add(effectAnimationNameInputText);
+		tab_group.add(effectAnimationIndicesInputText);
+		tab_group.add(effectAnimationFramerate);
+		tab_group.add(effectAnimationAngle);
+		tab_group.add(effectAnimationLoopCheckBox);
+		tab_group.add(addUpdateButton);
+		tab_group.add(removeButton);
+		tab_group.add(effectAnimationDropDown);
+	}
+
+	var effectImageInputText:PsychUIInputText;
+	var effectNameInputText:PsychUIInputText;
+	var effectDropDown:PsychUIDropDownMenu;
+
+	var effectScaleStepper:PsychUINumericStepper;
+	var effectPositionXStepper:PsychUINumericStepper;
+	var effectPositionYStepper:PsychUINumericStepper;
+
+	var effectLayerStepper:PsychUINumericStepper;
+	var effectFlipXCheckBox:PsychUICheckBox;
+	var effectNoAntialiasingCheckBox:PsychUICheckBox;
+
+	function addEffectUI()
+	{
+		var tab_group = UI_characterbox.getTab('Effect').menu;
+
+		effectImageInputText = new PsychUIInputText(15, 30, 200, curEffect != null ? curEffect.imageFile : '', 8);
+
+		effectNameInputText = new PsychUIInputText(15, effectImageInputText.y + 40, 75, '', 8);
+
+		var reloadImage:PsychUIButton = new PsychUIButton(effectImageInputText.x + 210, effectImageInputText.y - 3, "Reload Image", function()
+		{
+			if (curEffect == null)
+				return;
+			var lastAnim = curEffect.getAnimationName();
+			curEffect.imageFile = effectImageInputText.text;
+			reloadEffectImage();
+			if (!character.isAnimationNull())
+				character.playAnim(lastAnim, true);
+		});
+
+		effectDropDown = new PsychUIDropDownMenu(reloadImage.x, effectNameInputText.y + 5, [''], function(index:Int, intended:String)
+		{
+			if (intended == null || intended.length < 1)
+				return;
+
+			for (member in character.characterSprites)
+			{
+				if (member.thisSprite == intended)
+				{
+					curEffect = member;
+					break;
+				}
+			}
+
+			reloadAnimList();
+			reloadEffectOptions();
+			reloadEffectDropDown();
+			updatePointerPos();
+		});
+		reloadEffectDropDown();
+
+		effectScaleStepper = new PsychUINumericStepper(15, 185, 0.1, 1, 0.05, 10, 2);
+
+		effectLayerStepper = new PsychUINumericStepper(15, 145, 1, 1);
+
+		effectFlipXCheckBox = new PsychUICheckBox(95, 145, "Flip X", 50);
+		if (curEffect != null)
+			effectFlipXCheckBox.checked = curEffect.flipX;
+		if (character.isPlayer)
+			flipXCheckBox.checked = !flipXCheckBox.checked;
+		effectFlipXCheckBox.onClick = function()
+		{
+			if (curEffect == null)
+				return;
+			curEffect.originalFlipX = !curEffect.originalFlipX;
+			curEffect.flipX = (curEffect.originalFlipX != character.isPlayer);
+		};
+
+		effectNoAntialiasingCheckBox = new PsychUICheckBox(effectFlipXCheckBox.x, effectFlipXCheckBox.y + 40, "No Antialiasing", 80);
+		if (curEffect != null)
+			effectNoAntialiasingCheckBox.checked = curEffect.noAntialiasing;
+		effectNoAntialiasingCheckBox.onClick = function()
+		{
+			if (curEffect == null)
+				return;
+			curEffect.antialiasing = false;
+			if (!effectNoAntialiasingCheckBox.checked && ClientPrefs.data.antialiasing)
+				curEffect.antialiasing = true;
+			curEffect.noAntialiasing = effectNoAntialiasingCheckBox.checked;
+		};
+
+		effectPositionXStepper = new PsychUINumericStepper(effectFlipXCheckBox.x + 110, effectFlipXCheckBox.y, 10,
+			curEffect != null ? curEffect.generalOffset[0] : 0, -9000, 9000, 0);
+		effectPositionYStepper = new PsychUINumericStepper(effectPositionXStepper.x + 70, effectPositionXStepper.y, 10,
+			curEffect != null ? curEffect.generalOffset[1] : 0, -9000, 9000, 0);
+
+		var deleteCurrentExtra:PsychUIButton = new PsychUIButton(15, effectScaleStepper.y + 40, "Delete Effect", function()
+		{
+			if (curEffect == null)
+				return;
+			characterGroup.remove(curEffect, true);
+			character.characterExtraArray.remove(curEffect.thisSprite);
+			character.characterSprites.remove(curEffect, true);
+			curEffect.destroy();
+			curEffect = character.characterSprites.members[0];
+			reloadEffectDropDown();
+			reloadAnimList();
+			reloadEffectOptions();
+			updateEffectPositions();
+			updatePointerPos();
+		});
+		deleteCurrentExtra.normalStyle.bgColor = FlxColor.RED;
+		deleteCurrentExtra.normalStyle.textColor = FlxColor.WHITE;
+
+		var createEffectButton:PsychUIButton = new PsychUIButton(effectNoAntialiasingCheckBox.x + 25, deleteCurrentExtra.y, "Load/Create", function()
+		{
+			if (!character.characterExtraArray.contains(effectNameInputText.text))
+			{
+				if (effectNameInputText.text != '')
+					curEffect = new CharacterExtra(character.x, character.y, character, effectNameInputText.text);
+				else
+					curEffect = new CharacterExtra(character.x, character.y, character, 'attackTypeShine');
+
+				characterGroup.add(curEffect);
+				character.characterExtraArray.push(curEffect.thisSprite);
+			}
+			else
+				return;
+
+			reloadEffectDropDown();
+			reloadAnimList();
+			reloadEffectOptions();
+			updateEffectPositions();
+			updatePointerPos();
+		});
+
+		var saveEffectButton:PsychUIButton = new PsychUIButton(reloadImage.x, createEffectButton.y, "Save Effect As", function()
+		{
+			if (curEffect == null)
+				return;
+			saveEffect();
+		});
+
+		tab_group.add(new FlxText(15, effectNameInputText.y - 18, 100, 'Effect Name:'));
+		tab_group.add(new FlxText(effectLayerStepper.x, effectLayerStepper.y - 18, 0, 'Layer:'));
+		tab_group.add(new FlxText(15, effectImageInputText.y - 18, 100, 'Image file name:'));
+		tab_group.add(new FlxText(15, effectScaleStepper.y - 18, 100, 'Scale:'));
+		tab_group.add(new FlxText(effectDropDown.x, effectDropDown.y - 18, 100, 'Current Effect:'));
+
+		var tabName:String = 'Effect';
+
+		tab_group.add(createHoverLabel(new FlxText(createEffectButton.x, createEffectButton.y - 15, 0, 'v*'),
+			"Loads a json to add an effect, searching with the name in the Effect Name field\n
+			First the character's file is searched,\nThen the characterExtra folder,\nThen the characters folder itself\n
+			This means multiple jsons with the same name will take precedence in this order", tabName));
+		tab_group.add(createHoverLabel(new FlxText(effectPositionXStepper.x, effectPositionXStepper.y - 18, 0, 'General Offset*:'),
+			"The postion of an effect (Their x, y) is always locked to the position of the character\nThe general offset instead fills this purpose,\nand acts the same as an animation offset applied to all animations",
+			tabName));
+
+		tab_group.add(deleteCurrentExtra);
+		tab_group.add(effectNameInputText);
+		tab_group.add(effectImageInputText);
+		tab_group.add(reloadImage);
+		tab_group.add(effectScaleStepper);
+		tab_group.add(effectFlipXCheckBox);
+		tab_group.add(effectLayerStepper);
+		tab_group.add(effectNoAntialiasingCheckBox);
+		tab_group.add(effectPositionXStepper);
+		tab_group.add(effectPositionYStepper);
+		tab_group.add(saveEffectButton);
+		tab_group.add(createEffectButton);
+		tab_group.add(effectDropDown);
+	}
+
+	var attackDropDown:PsychUIDropDownMenu;
+	var attackNameInputText:PsychUIInputText;
+	var attackStartAnimInputText:PsychUIInputText;
+	var attackEndAnimInputText:PsychUIInputText;
+	var attackStartDurationStepper:PsychUINumericStepper;
+	var attackEndDurationStepper:PsychUINumericStepper;
+	var directionDropDown:PsychUIDropDownMenu;
+	var appendDirectionCheckBox:PsychUICheckBox;
+	var chainDropDown:PsychUIDropDownMenu;
+	var chainNameInputText:PsychUIInputText;
+
+	function addAttackUI()
+	{
+		var tab_group = UI_characterbox.getTab('Attacks').menu;
+
+		attackNameInputText = new PsychUIInputText(15, 72, 80, '', 8);
+
+		attackStartAnimInputText = new PsychUIInputText(15, attackNameInputText.y + 35, 80, '', 8);
+		attackEndAnimInputText = new PsychUIInputText(attackStartAnimInputText.x + 100, attackStartAnimInputText.y, 85, '', 8);
+		attackStartDurationStepper = new PsychUINumericStepper(attackStartAnimInputText.x, attackStartAnimInputText.y + 35, 0.042, 0, 0, 999, 3, 70);
+		attackEndDurationStepper = new PsychUINumericStepper(attackEndAnimInputText.x, attackStartDurationStepper.y, 0.042, 0, 0, 999, 3, 70);
+
+		attackDropDown = new PsychUIDropDownMenu(15, 30, [''], function(selectedAttack:Int, pressed:String)
+		{
+			if (attacks[selectedAttack] == null)
+				return;
+			var getAttack = attacks[selectedAttack];
+			attackStartAnimInputText.text = getAttack.startup_animation_name;
+			attackEndAnimInputText.text = getAttack.attack_animation_name;
+			attackStartDurationStepper.value = getAttack.duration;
+			attackEndDurationStepper.value = getAttack.recovery;
+			directionDropDown.selectedLabel = getAttack.direction;
+
+			assignAttackData(curAttack, getAttack);
+			fillTempDirectionArray();
+			updateAttackOptions();
+			updateAttackAnim(selectedAttack);
+		});
+
+		var addAttack:PsychUIButton = new PsychUIButton(attackStartDurationStepper.x, attackStartDurationStepper.y + 27, "Add/Update Atk", function()
+		{
+			var attackExists = false;
+			for (attack in attacks)
+			{
+				if (attack.name == attackNameInputText.text || attackNameInputText.text == '' && attack.name == curAttack.name)
+				{
+					curAttack.startup_animation_name = attackStartAnimInputText.text;
+					curAttack.attack_animation_name = attackEndAnimInputText.text;
+					assignAttackData(attack, curAttack);
+
+					attackExists = true;
+					break;
+				}
+			}
+			if (!attackExists)
+			{
+				if (attackNameInputText.text == '')
+					return;
+
+				var newAttack:AttackData = Character.generateAttack();
+				assignAttackData(newAttack, curAttack);
+				newAttack.name = attackNameInputText.text;
+				newAttack.startup_animation_name = attackStartAnimInputText.text;
+				newAttack.attack_animation_name = attackEndAnimInputText.text;
+				attacks.push(newAttack);
+
+				curAttack.name = newAttack.name;
+				curAttack.startup_animation_name = newAttack.startup_animation_name;
+				curAttack.attack_animation_name = newAttack.attack_animation_name;
+
+				curChain = null;
+				curAnim = attacks.length - 1;
+			}
+
+			updateAttackOptions();
+			if (curChain == null)
+			{
+				fillTempDirectionArray();
+				updateAttackAnim(curAnim);
+			}
+		});
+		var deleteAttack:PsychUIButton = new PsychUIButton(attackStartDurationStepper.x, addAttack.y + 30, "Delete Attack", function()
+		{
+			if (curAttack == null)
+				return;
+
+			for (chain in chains)
+			{
+				while (chain.attack_chain.contains(curAttack.name))
+					chain.attack_chain.remove(curAttack.name);
+
+				if (chain.attack_chain.length == 0)
+					chain.attack_chain.push('NO ATTACKS');
+			}
+			curChain = null;
+
+			for (attack in attacks)
+			{
+				if (attack.name == curAttack.name)
+				{
+					curAnim = attacks.indexOf(attack);
+					attacks.remove(attack);
+					if (attacks.length == 0)
+					{
+						attacks.push(Character.generateAttack());
+						attacks[0].name = 'NO ATTACK';
+						curAnim = 0;
+					}
+
+					FlxMath.wrap(curAnim, 0, attacks.length - 1);
+				}
+			}
+
+			assignAttackData(curAttack, attacks[curAnim]);
+			fillTempDirectionArray();
+			updateAttackOptions();
+		});
+		deleteAttack.normalStyle.bgColor = FlxColor.RED;
+		deleteAttack.normalStyle.textColor = FlxColor.WHITE;
+
+		directionDropDown = new PsychUIDropDownMenu(attackEndAnimInputText.x, addAttack.y + 13, [''], function(selectedDirection:Int, pressed:String)
+		{
+			curAttack.direction = pressed;
+			if (curAttack.direction == 'NONE')
+				curAttack.append_direction_to_anim_name = false;
+			else if (curAttack.direction == 'ANY')
+				curAttack.append_direction_to_anim_name = true;
+			appendDirectionCheckBox.checked = curAttack.append_direction_to_anim_name;
+
+			if (curChain != null)
+				evaluateCurrentTempDirection(curAnim);
+			else
+				fillTempDirectionArray();
+		}, 80);
+		directionDropDown.list = ['NONE', 'ANY', 'LEFT', 'SPECIAL', 'UP', 'RIGHT'];
+
+		appendDirectionCheckBox = new PsychUICheckBox(directionDropDown.x, directionDropDown.y + 30, "Append Direction* To Anims", 100);
+		appendDirectionCheckBox.onClick = function()
+		{
+			if (curAttack.direction == 'ANY')
+				appendDirectionCheckBox.checked = true;
+			if (curAttack.direction == 'NONE')
+				appendDirectionCheckBox.checked = false;
+			if (curAttack.direction == 'ANY' || curAttack.direction == 'NONE')
+				return;
+
+			curAttack.append_direction_to_anim_name = appendDirectionCheckBox.checked;
+
+			if (curChain != null)
+				evaluateCurrentTempDirection(curAnim);
+			else
+				fillTempDirectionArray();
+		};
+
+		chainDropDown = new PsychUIDropDownMenu(UI_characterbox.width - 15, attackDropDown.y, [''], function(selectedChain:Int, pressed:String)
+		{
+			if (chains[selectedChain] == null)
+				return;
+
+			var getChain = chains[selectedChain];
+			assignChainData(getChain, curChain);
+
+			for (attack in attacks)
+			{
+				if (attack.name == curChain.attack_chain[0])
+				{
+					assignAttackData(curAttack, attack);
+					break;
+				}
+			}
+
+			fillTempDirectionArray(true);
+			updateAttackOptions();
+			updateAttackAnim();
+		});
+		chainDropDown.x -= chainDropDown.width;
+
+		var varX = chainDropDown.x + 20;
+
+		chainNameInputText = new PsychUIInputText(varX, attackNameInputText.y, 80, '', 8);
+
+		var addChain:PsychUIButton = new PsychUIButton(varX, attackEndAnimInputText.y - 3, "Add/Up Chain", function()
+		{
+			if (curChain == null)
+				curChain = Character.generateChain();
+
+			var chainExists = false;
+			for (chain in chains)
+			{
+				if (chain.name == chainNameInputText.text || chainNameInputText.text == '' && chain.name == curChain.name)
+				{
+					chainExists = true;
+					chain.attack_chain = curChain.attack_chain;
+					break;
+				}
+			}
+			if (!chainExists)
+			{
+				if (chainNameInputText.text == '')
+					return;
+
+				var newChain:ChainData = Character.generateChain();
+				newChain.name = chainNameInputText.text;
+				newChain.attack_chain = ['NO ATTACKS'];
+				chains.push(newChain);
+				curChain.name = newChain.name;
+			}
+
+			curAnim = 0;
+			for (attack in attacks)
+			{
+				if (attack.name == curChain.attack_chain[0])
+				{
+					assignAttackData(attack, curAttack);
+					break;
+				}
+			}
+			fillTempDirectionArray(true);
+			updateAttackOptions();
+			updateAttackAnim();
+		});
+
+		var deleteChain:PsychUIButton = new PsychUIButton(varX, attackEndDurationStepper.y - 3, "Delete Chain", function()
+		{
+			if (curChain == null)
+				return;
+
+			var chainInt:Int = 0;
+			for (chain in chains)
+			{
+				if (chain.name == curChain.name)
+				{
+					chains.remove(chain);
+					break;
+				}
+				++chainInt;
+			}
+
+			chainInt -= 1;
+			if (chainInt > 0 && chainInt < chains.length - 1)
+				assignChainData(chains[chainInt - 1], curChain);
+			else
+				curChain = null;
+
+			fillTempDirectionArray(curChain != null);
+			updateAttackOptions();
+			updateAttackAnim();
+		});
+		deleteChain.normalStyle.bgColor = FlxColor.RED;
+		deleteChain.normalStyle.textColor = FlxColor.WHITE;
+
+		var linkAttack:PsychUIButton = new PsychUIButton(varX, addAttack.y, "Link Attack", function()
+		{
+			if (curChain == null)
+				return;
+
+			if (curChain.attack_chain[curAnim] == 'NO ATTACKS')
+			{
+				curChain.attack_chain.remove(curChain.attack_chain[curAnim]);
+				curChain.attack_chain.insert(curAnim, attackNameInputText.text);
+			}
+			else
+				curChain.attack_chain.insert(curAnim + 1, attackNameInputText.text);
+
+			evaluateCurrentTempDirection(curChain.attack_chain.indexOf(attackNameInputText.text));
+			updateAttackOptions();
+		});
+		var unlinkAttack:PsychUIButton = new PsychUIButton(varX, deleteAttack.y, "Unlink Attack", function()
+		{
+			if (curChain == null)
+				return;
+
+			curChain.attack_chain.remove(curChain.attack_chain[curAnim]);
+			if (curChain.attack_chain.length == 0)
+				curChain.attack_chain.push('NO ATTACKS');
+
+			if (tempDirectionArray.length > curChain.attack_chain.length)
+				tempDirectionArray.remove(tempDirectionArray[curAnim]);
+
+			updateAttackOptions();
+		});
+
+		var loadCombatJson:PsychUIButton = new PsychUIButton(deleteAttack.x, deleteAttack.y + 30, "Load Com. Json", function()
+		{
+			loadCombatFile();
+		});
+
+		var saveCombatJson:PsychUIButton = new PsychUIButton(unlinkAttack.x, unlinkAttack.y + 30, "Save Com. Json", function()
+		{
+			openSubState(new Prompt('Warning:\nThis saves a combat data json.\nDo not overwrite a character file!', saveCombatFile));
+		});
+
+		tab_group.add(new FlxText(attackNameInputText.x, attackNameInputText.y - 18, 100, 'Attack Name:'));
+		tab_group.add(new FlxText(attackStartAnimInputText.x, attackStartAnimInputText.y - 18, 100, 'Startup Animation:'));
+		tab_group.add(new FlxText(attackEndAnimInputText.x, attackEndAnimInputText.y - 18, 100, 'Finish Animation:'));
+		tab_group.add(new FlxText(attackDropDown.x, attackDropDown.y - 18, 100, 'Attacks:'));
+		tab_group.add(new FlxText(directionDropDown.x, directionDropDown.y - 18, 100, 'Direction:'));
+		tab_group.add(new FlxText(chainNameInputText.x, chainNameInputText.y - 18, 100, 'Chain Name:'));
+
+		var tabName = 'Attacks';
+		createHoverLabel(appendDirectionCheckBox.text, "Direction \"ANY\" ignores this and appends regardless.\n
+		Direction \"NONE\" implies *no* direction and never appends.", tabName);
+		tab_group.add(createHoverLabel(new FlxText(deleteAttack.x + deleteAttack.width + 2, deleteAttack.y, 0, '<*'),
+			"Deleting an attack will also remove it from every existing chain\n
+			Previously existing attacks also maintain information that cannot be edited in this editor\n
+			So deleting and remaking an attack can lead to losing prior information\nBe sure to backup your files accordingly", tabName));
+		tab_group.add(createHoverLabel(new FlxText(attackStartDurationStepper.x, attackStartDurationStepper.y - 18, 0, 'Windup*:'),
+			'Length of frame in current attack startup anim: ${attackStartDurationStepper.step} Seconds', tabName));
+		tab_group.add(createHoverLabel(new FlxText(attackEndDurationStepper.x, attackEndDurationStepper.y - 18, 0, 'Recovery*:'),
+			'Length of frame in current attack execution anim: ${attackEndDurationStepper.step} Seconds', tabName));
+		tab_group.add(createHoverLabel(new FlxText(chainDropDown.x, chainDropDown.y - 18, 100, 'Chains*:'),
+			'Chains reference attacks by name,\nthus they pull from the attack list instead of the fluid curAttack object.\n
+			This means editing attacks in chains need to be Add/Updated for changes to apply', tabName));
+		tab_group.add(createHoverLabel(new FlxText(saveCombatJson.x - 15, saveCombatJson.y, 0, '*>'),
+			"This saves a json of just the current combat information\n
+			Saving a character in the character tab automatically saves this combat information.\n
+			So use this to switch combat information on a broad scale,\nLike for fight phases or as player/as enemy stat differences", tabName));
+
+		tab_group.add(attackNameInputText);
+		tab_group.add(saveCombatJson);
+		tab_group.add(loadCombatJson);
+		tab_group.add(attackStartAnimInputText);
+		tab_group.add(attackEndAnimInputText);
+		tab_group.add(attackStartDurationStepper);
+		tab_group.add(attackEndDurationStepper);
+		tab_group.add(addAttack);
+		tab_group.add(deleteAttack);
+		tab_group.add(appendDirectionCheckBox);
+		tab_group.add(chainNameInputText);
+		tab_group.add(addChain);
+		tab_group.add(deleteChain);
+		tab_group.add(linkAttack);
+		tab_group.add(unlinkAttack);
+		tab_group.add(directionDropDown);
+		tab_group.add(chainDropDown);
+		tab_group.add(attackDropDown);
+	}
+
+	function addCharacterExtras()
+	{
+		characterGroup.clear();
+		curEffect = null;
+
+		character.generateCharacterExtras();
 
 		if (character.characterSprites.members.length > 0)
 		{
-			character.characterSprites.forEach(function(spr:CharacterExtra)
+			character.characterSprites.forEach(function(extra:CharacterExtra)
 			{
-				characterGroup.add(spr);
-				spr.x = character.x;
-				spr.y = character.y;
+				if (curEffect == null)
+					curEffect = extra;
+				characterGroup.add(extra);
+				extra.x = character.x;
+				extra.y = character.y;
 			});
 		}
 
 		characterGroup.add(character);
 		characterGroup.sort(PlayState.sortByZ);
+	}
+
+	function updateEffectPositions()
+	{
+		for (member in character.characterSprites.members)
+		{
+			member.x = character.x;
+			member.y = character.y;
+
+			var animOffset:Array<Float> = [0, 0];
+
+			if (member.animation.curAnim != null)
+				animOffset = member.animOffsets.get(member.animation.curAnim.name);
+
+			member.offset.x = member.generalOffset[0] + animOffset[0];
+			member.offset.y = member.generalOffset[1] + animOffset[1];
+		}
+		updatePointerPos(false);
+	}
+
+	function reloadEffectDropDown()
+	{
+		effectDropDown.list = character.characterExtraArray;
+		if (curEffect != null)
+			effectDropDown.selectedLabel = curEffect.thisSprite;
+	}
+
+	function reloadEffectAnimationDropDown()
+	{
+		var animList:Array<String> = [];
+		if (curEffect != null)
+		{
+			for (anim in anims)
+				animList.push(anim.anim);
+			if (animList.length < 1)
+				animList.push('NO ANIMATIONS'); // Prevents crash
+		}
+		else
+			animList.push('NO ANIMATIONS');
+
+		effectAnimationDropDown.list = animList;
+	}
+
+	function reloadEffectOptions()
+	{
+		if (UI_characterbox == null)
+			return;
+
+		if (curEffect == null)
+		{
+			effectImageInputText.text = '';
+			effectNameInputText.text = '';
+			effectScaleStepper.value = 1;
+			effectPositionXStepper.value = 0;
+			effectPositionYStepper.value = 0;
+			effectFlipXCheckBox.checked = false;
+			effectLayerStepper.value = 0;
+			effectNoAntialiasingCheckBox.checked = false;
+			reloadEffectAnimationDropDown();
+		}
+		else
+		{
+			effectImageInputText.text = curEffect.imageFile;
+			effectNameInputText.text = '';
+			effectScaleStepper.value = curEffect.jsonScale;
+			effectPositionXStepper.value = curEffect.generalOffset[0];
+			effectPositionYStepper.value = curEffect.generalOffset[1];
+			effectFlipXCheckBox.checked = curEffect.flipX;
+			effectLayerStepper.value = curEffect.layer;
+			effectNoAntialiasingCheckBox.checked = !curEffect.antialiasing;
+			reloadEffectAnimationDropDown();
+		}
+	}
+
+	function reloadEffectImage()
+	{
+		if (curEffect == null)
+			return;
+		var lastAnim:String = curEffect.getAnimationName();
+		var anims:Array<SpriteAnimArray> = curEffect.animationsArray.copy();
+
+		curEffect.color = FlxColor.WHITE;
+		curEffect.alpha = 1;
+
+		curEffect.frames = Paths.getMultiAtlas(curEffect.imageFile.split(','));
+
+		for (anim in anims)
+		{
+			var animAnim:String = '' + anim.anim;
+			var animName:String = '' + anim.name;
+			var animFps:Int = anim.fps;
+			var animLoop:Bool = !!anim.loop; // Bruh
+			var animIndices:Array<Int> = anim.indices;
+			var angle:Float = anim.angle;
+			addEffectAnimation(animAnim, animName, animFps, animLoop, animIndices, angle);
+		}
+
+		if (anims.length > 0)
+		{
+			if (lastAnim != '')
+				character.playAnim(lastAnim, true);
+			else
+				character.dance();
+		}
+	}
+
+	inline function newEffectAnim(anim:String, name:String):SpriteAnimArray
+	{
+		return {
+			offsets: [0, 0],
+			loop: false,
+			fps: 24,
+			anim: anim,
+			indices: [],
+			angle: 0,
+			finishCallback: '',
+			name: name
+		};
+	}
+
+	function addEffectAnimation(anim:String, name:String, fps:Float, loop:Bool, indices:Array<Int>, angle:Float = 0)
+	{
+		if (curEffect == null)
+			return;
+		if (indices != null && indices.length > 0)
+			curEffect.animation.addByIndices(anim, name, indices, "", fps, loop);
+		else
+			curEffect.animation.addByPrefix(anim, name, fps, loop);
+
+		if (!curEffect.hasAnimation(anim))
+			curEffect.addOffset(anim, 0, 0);
+
+		curEffect.addAngle(anim, angle);
+	}
+
+	function determineCurrentEditMode():String
+	{
+		var mode:String = 'character';
+
+		switch (UI_characterbox.selectedTab.name)
+		{
+			case 'Effect Anim' | 'Effect':
+				mode = 'effect';
+			case 'Attacks':
+				mode = 'attack';
+		}
+
+		return mode;
+	}
+
+	function updateCurAnim(newInt:Int)
+	{
+		curAnim = newInt;
+		undoOffsets = null;
+		curAnim = FlxMath.wrap(curAnim, 0, anims.length - 1);
+		character.playAnim(anims[curAnim].anim, true);
+		updateText();
+	}
+
+	// save
+	function saveEffect()
+	{
+		if (_file != null)
+			return;
+
+		var json:SpriteFile = {
+			"animations": curEffect.animationsArray,
+			"image": curEffect.imageFile,
+			"scale": curEffect.jsonScale,
+			"global_offset": curEffect.generalOffset,
+			"layer": curEffect.layer,
+
+			"flip_x": curEffect.originalFlipX,
+			"no_antialiasing": curEffect.noAntialiasing,
+		};
+
+		var data:String = PsychJsonPrinter.print(json, ['offsets', 'position', 'indices']);
+
+		if (data.length > 0)
+		{
+			_file = new FileReference();
+			_file.addEventListener(#if desktop Event.SELECT #else Event.COMPLETE #end, onSaveComplete);
+			_file.addEventListener(Event.CANCEL, onSaveCancel);
+			_file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
+			_file.save(data, '${curEffect.thisSprite}.json');
+		}
+	}
+
+	function saveCombatFile()
+	{
+		if (_file != null)
+			return;
+
+		var json:Dynamic = {
+			"combat_data": generateCombatFile(true)
+		};
+
+		var data:String = PsychJsonPrinter.print(json);
+
+		if (data.length > 0)
+		{
+			_file = new FileReference();
+			_file.addEventListener(#if desktop Event.SELECT #else Event.COMPLETE #end, onSaveComplete);
+			_file.addEventListener(Event.CANCEL, onSaveCancel);
+			_file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
+			_file.save(data, '${_char}CombatFile.json');
+		}
+	}
+
+	function generateCombatFile(minimizeInfo:Bool = false):CombatFile
+	{
+		var attackEffectArray:Array<AttackEffectData> = [];
+		for (effect in character.attackEffectMap)
+			attackEffectArray.push(clearStructureNulls(effect));
+
+		var defendEffectArray:Array<DefendEffectData> = [];
+		for (effect in character.defendEffectMap)
+			defendEffectArray.push(clearStructureNulls(effect));
+
+		var soundArray:Array<SoundData> = [];
+		for (sound in character.soundMap)
+			soundArray.push(clearStructureNulls(sound));
+
+		for (attack in attacks)
+		{
+			clearStructureNulls(attack);
+			clearStructureDefaults(attack, Character.generateAttack());
+		}
+		for (chain in chains)
+		{
+			clearStructureNulls(chain);
+			clearStructureDefaults(chain, Character.generateChain());
+		}
+
+		var combatFile:Dynamic =
+			{
+				{
+					"death_soundName": null,
+					"death_characterName": null,
+					"idle_defaultFrame": character.idleDefaultFrame,
+					"has_reflexGuard": character.hasReflexGuard,
+					"death_by_stamina": character.deathByStamina,
+					"default_guard_position": character.guardPosition,
+					"posture_max": character.postureMax,
+					"posture_recoveryCoefficient": character.postureRecoveryCoefficient,
+					"combat_healthMax": character.combatHealthMax,
+					"alternatingIdle": character.alternatingIdle,
+					"characterExtras": character.characterExtraArray,
+					"combatSoundEffects": null,
+					"soundsToPickFromRandom": null,
+					"soundsToVaryVolume": null,
+
+					"attacks": attacks,
+					"chains": chains,
+					"attack_effects": attackEffectArray,
+					"defense_effects": defendEffectArray,
+					"sounds": soundArray,
+					"character_sounds": character.characterSounds
+				}
+			}
+
+		if (minimizeInfo)
+		{
+			Reflect.deleteField(combatFile, "idle_defaultFrame");
+			Reflect.deleteField(combatFile, "has_reflexGuard");
+			Reflect.deleteField(combatFile, "death_by_stamina");
+			Reflect.deleteField(combatFile, "default_guard_position");
+			Reflect.deleteField(combatFile, "posture_max");
+			Reflect.deleteField(combatFile, "posture_recoveryCoefficient");
+			Reflect.deleteField(combatFile, "combat_healthMax");
+			Reflect.deleteField(combatFile, "alternatingIdle");
+			Reflect.deleteField(combatFile, "sounds");
+			Reflect.deleteField(combatFile, "character_sounds");
+		}
+
+		return clearStructureNulls(combatFile);
+	}
+
+	function loadCombatFile()
+	{
+		if (_file != null)
+			return;
+
+		_file = new FileReference();
+		_file.addEventListener(#if desktop Event.SELECT #else Event.COMPLETE #end, onCombatFileBrowseComplete);
+		_file.addEventListener(Event.CANCEL, onLoadCancel);
+		_file.addEventListener(IOErrorEvent.IO_ERROR, onLoadError);
+		_file.browse();
+
+		return;
+	}
+
+	function onCombatFileBrowseComplete(_):Void
+	{
+		if (_file == null)
+			return;
+		_file.removeEventListener(Event.COMPLETE, onCombatFileBrowseComplete);
+		_file.addEventListener(Event.COMPLETE, onCombatFileLoadComplete);
+
+		_file.load();
+	}
+
+	function onCombatFileLoadComplete(_):Void
+	{
+		if (_file == null)
+			return;
+		_file.removeEventListener(Event.COMPLETE, onCombatFileLoadComplete);
+		_file.removeEventListener(Event.CANCEL, onLoadCancel);
+		_file.removeEventListener(IOErrorEvent.IO_ERROR, onLoadError);
+
+		var combatFile:CharacterFile = Json.parse(_file.data.toString());
+
+		if (Type.typeof(combatFile) == TObject)
+		{
+			character.switchCombatJson(combatFile.combat_data);
+			fillCombatData();
+			updateAttackText();
+			addCharacterExtras();
+			FlxG.log.notice("Successfully loaded file.");
+		}
+
+		_file = null;
+	}
+
+	/**
+	 * Called when the save file dialog is cancelled.
+	 */
+	function onLoadCancel(_):Void
+	{
+		if (_file == null)
+			return;
+		_file.removeEventListener(Event.COMPLETE, onCombatFileBrowseComplete);
+		_file.removeEventListener(Event.CANCEL, onLoadCancel);
+		_file.removeEventListener(IOErrorEvent.IO_ERROR, onLoadError);
+		_file = null;
+	}
+
+	/**
+	 * Called if there is an error while saving the gameplay recording.
+	 */
+	function onLoadError(_):Void
+	{
+		if (_file == null)
+			return;
+		_file.removeEventListener(Event.COMPLETE, onCombatFileBrowseComplete);
+		_file.removeEventListener(Event.CANCEL, onLoadCancel);
+		_file.removeEventListener(IOErrorEvent.IO_ERROR, onLoadError);
+		_file = null;
+		FlxG.log.error("Problem loading file");
+	}
+
+	public static function clearStructureNulls(structure:Dynamic):Dynamic
+	{
+		structure = Reflect.copy(structure);
+
+		for (field in Reflect.fields(structure))
+		{
+			if (Reflect.getProperty(structure, field) == null)
+				Reflect.deleteField(structure, field);
+		}
+
+		return structure;
+	}
+
+	public static function clearStructureDefaults(structure:Dynamic, defaultStructure:Dynamic):Dynamic
+	{
+		structure = Reflect.copy(structure);
+
+		for (field in Reflect.fields(structure))
+			if (Reflect.getProperty(structure, field) == Reflect.getProperty(defaultStructure, field))
+				Reflect.deleteField(structure, field);
+
+		return structure;
+	}
+
+	function fillCombatData()
+	{
+		curAttack = null;
+		curChain = null;
+		attacks = [];
+		chains = [];
+
+		for (attack in character.attackMap)
+			attacks.push(attack);
+		if (attacks.length == 0)
+		{
+			attacks.push(Character.generateAttack());
+			attacks[0].name = 'NO ATTACKS';
+		}
+
+		for (chain in character.chainMap)
+			chains.push(chain);
+
+		curAttack = Character.generateAttack();
+		assignAttackData(curAttack, attacks[0]);
+	}
+
+	function updateAttackOptions()
+	{
+		fillDropDownList('attack');
+		attackNameInputText.text = '';
+		attackDropDown.selectedLabel = curAttack.name;
+		attackStartAnimInputText.text = curAttack.startup_animation_name;
+		attackEndAnimInputText.text = curAttack.attack_animation_name;
+		attackStartDurationStepper.value = curAttack.duration;
+		attackEndDurationStepper.value = curAttack.recovery;
+		directionDropDown.selectedLabel = curAttack.direction;
+		appendDirectionCheckBox.checked = curAttack.append_direction_to_anim_name;
+		fillDropDownList('chain');
+		chainNameInputText.text = '';
+		chainDropDown.selectedLabel = curAttack.name;
+
+		updateAttackText();
+	}
+
+	function fillDropDownList(list:String)
+	{
+		var dropList:Array<String> = [];
+
+		switch (list)
+		{
+			case 'attack':
+				for (attack in attacks)
+					dropList.push(attack.name);
+				attackDropDown.list = dropList;
+			case 'chain':
+				for (chain in chains)
+					dropList.push(chain.name);
+				chainDropDown.list = dropList;
+		}
+	}
+
+	function fillTempDirectionArray(isChain:Bool = false)
+	{
+		if (isChain)
+		{
+			tempDirectionArray = [];
+			for (attackName in curChain.attack_chain)
+			{
+				if (attackName == curAttack.name)
+				{
+					if (curAttack.direction == 'ANY')
+						tempDirectionArray.push('LEFT');
+					else if (curAttack.append_direction_to_anim_name)
+						tempDirectionArray.push(curAttack.direction);
+					else
+						tempDirectionArray.push('N/A');
+				}
+				else
+					for (attack in attacks)
+					{
+						if (attack.name == attackName)
+						{
+							if (attack.direction == 'ANY')
+								tempDirectionArray.push('LEFT');
+							else if (attack.append_direction_to_anim_name)
+								tempDirectionArray.push(attack.direction);
+							else
+								tempDirectionArray.push('N/A');
+							break;
+						}
+					}
+			}
+		}
+		else
+		{
+			if (curAttack.direction == 'ANY')
+				tempDirectionArray = ['LEFT'];
+			else if (curAttack.append_direction_to_anim_name)
+				tempDirectionArray = [curAttack.direction];
+			else
+				tempDirectionArray = ['N/A'];
+		}
+	}
+
+	function evaluateCurrentTempDirection(index:Int)
+	{
+		if (curAttack.append_direction_to_anim_name && curAttack.direction != 'NONE')
+		{
+			if (curAttack.direction == 'ANY')
+				tempDirectionArray[index] = 'LEFT';
+			else
+				tempDirectionArray[index] = curAttack.direction;
+		}
+		else
+			tempDirectionArray[index] = 'N/A';
+	}
+
+	function updateAttackAnim(newInt:Int = 0)
+	{
+		curAnim = newInt;
+		curAnim = FlxMath.wrap(curAnim, 0, attacks.length - 1);
+		chainProgress = 0;
+		animateAttack(true);
+		updateAttackText();
+	}
+
+	function assignAttackData(attack:AttackData, attackData:AttackData)
+	{
+		if (attackData == null)
+			return;
+		if (attack == null)
+			attack = Character.generateAttack();
+
+		attack.name = attackData.name;
+		attack.startup_animation_name = attackData.startup_animation_name;
+		attack.attack_animation_name = attackData.attack_animation_name;
+		attack.duration = attackData.duration;
+		attack.recovery = attackData.recovery;
+		attack.step_based_timing = attackData.step_based_timing;
+		attack.direction = attackData.direction;
+		if (attackData.direction == 'NONE')
+			attack.append_direction_to_anim_name = false;
+		else if (attackData.direction == 'ANY')
+			attack.append_direction_to_anim_name = true;
+		else
+			attack.append_direction_to_anim_name = attackData.append_direction_to_anim_name;
+	}
+
+	function assignChainData(chainData:ChainData, chain:ChainData)
+	{
+		if (chainData == null)
+			return;
+		if (chain == null && chain == curChain)
+		{
+			curChain = Character.generateChain();
+			chain = curChain;
+		}
+
+		chain.name = chainData.name;
+		chain.attack_chain = chainData.attack_chain;
+
+		if (chain == curChain)
+		{
+			for (attack in attacks)
+			{
+				if (attack.name == curChain.attack_chain[curAnim])
+				{
+					assignAttackData(curAttack, attack);
+					break;
+				}
+			}
+			fillTempDirectionArray(true);
+			animateAttack(true);
+		}
+	}
+
+	function animateAttack(resetChainProgress:Bool = false)
+	{
+		if (resetChainProgress)
+			chainProgress = 0;
+
+		var animAttack:AttackData = Character.generateAttack();
+
+		if (curChain != null)
+			for (attack in attacks)
+			{
+				if (attack.name == curChain.attack_chain[chainProgress])
+				{
+					assignAttackData(animAttack, attack);
+					break;
+				}
+			}
+		else
+		{
+			assignAttackData(animAttack, curAttack);
+
+			if (character.animation.getByName(curAttack.startup_animation_name) != null)
+				attackStartDurationStepper.step = FlxMath.roundDecimal(1 / character.animation.getByName(curAttack.startup_animation_name).frameRate, 3);
+			else
+				attackStartDurationStepper.step = 0.042;
+
+			if (character.animation.getByName(curAttack.attack_animation_name) != null)
+				attackEndDurationStepper.step = FlxMath.roundDecimal(1 / character.animation.getByName(curAttack.attack_animation_name).frameRate, 3);
+			else
+				attackStartDurationStepper.step = 0.042;
+		}
+
+		var attackAnim:String = animAttack.startup_animation_name;
+		if (animAttack.append_direction_to_anim_name || animAttack.direction == 'ANY')
+		{
+			if (curChain != null)
+			{
+				attackAnim += tempDirectionArray[chainProgress];
+			}
+			else
+				attackAnim += tempDirectionArray[0];
+		}
+
+		if (animAttack.step_based_timing)
+		{
+			var simulatedBPM = 90;
+			var stepTimerCrochet:Float = (60 / simulatedBPM) * 1000 / 4 / 1000;
+			animAttack.duration = animAttack.duration * stepTimerCrochet;
+			animAttack.recovery = animAttack.recovery * stepTimerCrochet;
+		}
+
+		var onActionFinish = function(tmr:FlxTimer)
+		{
+			var attackAnim:String = animAttack.attack_animation_name;
+			if (animAttack.append_direction_to_anim_name || animAttack.direction == 'ANY')
+			{
+				if (curChain != null)
+				{
+					attackAnim += tempDirectionArray[chainProgress];
+				}
+				else
+					attackAnim += tempDirectionArray[0];
+			}
+
+			character.playAnim(attackAnim, true);
+			character.actionTimer.start(animAttack.recovery, function(tmr:FlxTimer)
+			{
+				if (curChain != null && chainProgress < curChain.attack_chain.length - 1)
+				{
+					++chainProgress;
+					animateAttack();
+				}
+				else
+					chainProgress = 0;
+			});
+		}
+
+		if (animAttack.duration <= 0)
+			onActionFinish(character.actionTimer);
+		else
+		{
+			character.playAnim(attackAnim, true);
+			character.actionTimer.start(animAttack.duration, onActionFinish);
+		}
+	}
+
+	function updateAttackText()
+	{
+		animsTxt.removeFormat(selectedFormat);
+
+		var intendText:String = '';
+		var formatStart:Int = 0;
+		var formatEnd:Int = 0;
+		textPages = [];
+
+		for (num => attack in attacks)
+		{
+			if (intendText != '')
+				intendText += '\n';
+
+			if (num == curAnim)
+			{
+				formatStart = intendText.length;
+				intendText += attack.name;
+				formatEnd = intendText.length;
+
+				curPage = textPages.length;
+			}
+			else
+				intendText += attack.name;
+
+			if (num != 0 && num % 20 == 0)
+			{
+				textPages.push(intendText);
+				intendText = '';
+			}
+		}
+		if (intendText != '')
+			textPages.push(intendText);
+		intendText = '';
+		for (chain in chains)
+		{
+			for (num => atk in chain.attack_chain)
+			{
+				if (intendText != '')
+					intendText += '\n';
+
+				if (curChain != null && chain.name == curChain.name && num == curAnim)
+				{
+					formatStart = intendText.length;
+					intendText += atk;
+					formatEnd = intendText.length;
+
+					curPage = textPages.length;
+				}
+				else
+					intendText += atk;
+
+				if (num != 0 && num % 20 == 0)
+				{
+					textPages.push(intendText);
+					intendText = '';
+				}
+			}
+			textPages.push(intendText);
+			intendText = '';
+		}
+
+		intendText = 'Current Page: ${curPage + 1}/${textPages.length}}\n';
+		intendText += 'Current List: ${curChain != null ? 'Chain ' + curChain.name : 'Full Attack List'}\n';
+		formatStart += intendText.length;
+		formatEnd += intendText.length;
+
+		animsTxt.text = intendText + textPages[curPage];
+		animsTxt.addFormat(selectedFormat, formatStart, formatEnd);
+	}
+
+	function createHoverLabel(txt:FlxText, info:String, tab:String):FlxText
+	{
+		txt.addFormat(new FlxTextFormat(FlxColor.YELLOW), txt.text.indexOf('*'), txt.text.indexOf('*') + 1);
+
+		labelledTextGroup.add(txt);
+		labelMap.set(txt.ID, info);
+		labelTabMap.set(txt.ID, tab);
+		return txt;
+	}
+
+	function setupLabelSystem()
+	{
+		labelBackground = new FlxSprite().makeGraphic(1, 1, FlxColor.BLACK);
+		labelBackground.alpha = 0.8;
+		labelBackground.cameras = [camHUD];
+		labelBackground.active = labelBackground.visible = false;
+		add(labelBackground);
+
+		labelText = new FlxText(0, 0, 0, 'This is a placeholder. If you\'re seeing this, something went wrong.', 8);
+		labelText.cameras = [camHUD];
+		labelText.active = labelText.visible = false;
+		add(labelText);
+	}
+
+	function updateLabel(newText:String)
+	{
+		labelBackground.active = labelBackground.visible = true;
+		labelText.active = labelText.visible = true;
+
+		labelText.text = newText;
+		labelText.updateHitbox();
+
+		var mousePoint:FlxPoint = FlxG.mouse.getScreenPosition(camHUD);
+
+		labelText.x = mousePoint.x + 5;
+		labelText.y = mousePoint.y + 20;
+
+		if (labelText.x + labelText.width > camHUD.width)
+			labelText.x -= labelText.width + 5;
+
+		if (labelText.y + labelText.height > camHUD.height)
+			labelText.y = mousePoint.y - labelText.height - 10;
+
+		labelBackground.scale.set(labelText.width + 4, labelText.height + 4);
+		labelBackground.updateHitbox();
+		labelBackground.x = labelText.x - 2;
+		labelBackground.y = labelText.y - 2;
+	}
+
+	function evaluateCharacterControls(elapsed:Float, shiftMult:Float, ctrlMult:Float, shiftMultBig:Float)
+	{
+		// CHARACTER CONTROLS
+		var changedAnim:Bool = false;
+		if (anims.length > 1)
+		{
+			if (FlxG.keys.justPressed.W && (changedAnim = true))
+				curAnim--;
+			else if (FlxG.keys.justPressed.S && (changedAnim = true))
+				curAnim++;
+
+			if (FlxG.keys.pressed.CONTROL)
+			{
+				if (FlxG.keys.justPressed.W || FlxG.keys.justPressed.S)
+				{
+					changedAnim = true;
+
+					if (curAnim == 1 || curAnim % 20 != 1)
+					{
+						if (FlxG.keys.justPressed.W)
+						{
+							curAnim -= 20;
+						}
+						if (FlxG.keys.justPressed.S)
+						{
+							if (curAnim == 1)
+								++curAnim;
+							curAnim += 20;
+						}
+
+						if (curAnim < 0)
+							curAnim = anims.length - 1;
+
+						curAnim -= curAnim % 20;
+						++curAnim;
+
+						if (curAnim > anims.length - 1)
+							curAnim = 0;
+					}
+
+					if (curAnim == 1)
+						--curAnim;
+				}
+			}
+			else if (FlxG.keys.pressed.SHIFT)
+			{
+				if (FlxG.keys.justPressed.W)
+					curAnim -= 3;
+				if (FlxG.keys.justPressed.S)
+					curAnim += 3;
+			}
+
+			if (changedAnim)
+			{
+				undoOffsets = null;
+				curAnim = FlxMath.wrap(curAnim, 0, anims.length - 1);
+				character.playAnim(anims[curAnim].anim, true);
+				updateText();
+			}
+		}
+
+		var changedOffset = false;
+		var moveKeysP = [
+			FlxG.keys.justPressed.LEFT,
+			FlxG.keys.justPressed.RIGHT,
+			FlxG.keys.justPressed.UP,
+			FlxG.keys.justPressed.DOWN
+		];
+		var moveKeys = [
+			FlxG.keys.pressed.LEFT,
+			FlxG.keys.pressed.RIGHT,
+			FlxG.keys.pressed.UP,
+			FlxG.keys.pressed.DOWN
+		];
+
+		var curObject:Dynamic = character;
+
+		// Trying to simplify this by adjusting the CharacterExtra's x, y instead of using it as an offset
+		// Resulted in some super weird behavior
+		// So I'm just accepting that offsets probably work in some weird way and doing this more complicated solution
+		var generalOffsetModifier:Array<Float> = [0, 0];
+
+		if (currentEditMode == 'effect' && curEffect != null)
+		{
+			curObject = curEffect;
+			generalOffsetModifier[0] = curEffect.generalOffset[0];
+			generalOffsetModifier[1] = curEffect.generalOffset[1];
+		}
+
+		if (moveKeysP.contains(true))
+		{
+			curObject.offset.x += ((moveKeysP[0] ? 1 : 0) - (moveKeysP[1] ? 1 : 0)) * shiftMultBig;
+			curObject.offset.y += ((moveKeysP[2] ? 1 : 0) - (moveKeysP[3] ? 1 : 0)) * shiftMultBig;
+			changedOffset = true;
+		}
+
+		if (moveKeys.contains(true))
+		{
+			holdingArrowsTime += elapsed;
+			if (holdingArrowsTime > 0.6)
+			{
+				holdingArrowsElapsed += elapsed;
+				while (holdingArrowsElapsed > (1 / 60))
+				{
+					curObject.offset.x += ((moveKeys[0] ? 1 : 0) - (moveKeys[1] ? 1 : 0)) * shiftMultBig;
+					curObject.offset.y += ((moveKeys[2] ? 1 : 0) - (moveKeys[3] ? 1 : 0)) * shiftMultBig;
+					holdingArrowsElapsed -= (1 / 60);
+					changedOffset = true;
+				}
+			}
+		}
+		else
+			holdingArrowsTime = 0;
+
+		if (FlxG.mouse.pressedRight && (FlxG.mouse.deltaScreenX != 0 || FlxG.mouse.deltaScreenY != 0))
+		{
+			curObject.offset.x -= FlxG.mouse.deltaScreenX;
+			curObject.offset.y -= FlxG.mouse.deltaScreenY;
+			changedOffset = true;
+		}
+
+		if (FlxG.keys.pressed.CONTROL)
+		{
+			if (FlxG.keys.justPressed.C)
+			{
+				copiedOffset[0] = curObject.offset.x - generalOffsetModifier[0];
+				copiedOffset[1] = curObject.offset.y - generalOffsetModifier[1];
+				changedOffset = true;
+			}
+			else if (FlxG.keys.justPressed.V)
+			{
+				undoOffsets = [
+					curObject.offset.x - generalOffsetModifier[0],
+					curObject.offset.y - generalOffsetModifier[1]
+				];
+				curObject.offset.x = copiedOffset[0] + generalOffsetModifier[0];
+				curObject.offset.y = copiedOffset[1] + generalOffsetModifier[1];
+				changedOffset = true;
+			}
+			else if (FlxG.keys.justPressed.R)
+			{
+				undoOffsets = [
+					curObject.offset.x - generalOffsetModifier[0],
+					curObject.offset.y - generalOffsetModifier[1]
+				];
+				curObject.offset.set(generalOffsetModifier[0], generalOffsetModifier[1]);
+				changedOffset = true;
+			}
+			else if (FlxG.keys.justPressed.Z && undoOffsets != null)
+			{
+				curObject.offset.x = undoOffsets[0] + generalOffsetModifier[0];
+				curObject.offset.y = undoOffsets[1] + generalOffsetModifier[1];
+				changedOffset = true;
+			}
+		}
+
+		var anim = anims[curAnim];
+		if (changedOffset && anim != null && anim.offsets != null)
+		{
+			anim.offsets[0] = Std.int(curObject.offset.x) - generalOffsetModifier[0];
+			anim.offsets[1] = Std.int(curObject.offset.y) - generalOffsetModifier[1];
+
+			curObject.addOffset(anim.anim, curObject.offset.x - generalOffsetModifier[0], curObject.offset.y - generalOffsetModifier[1]);
+			updateText();
+		}
+
+		var txt = 'ERROR: No Animation Found';
+		var clr = FlxColor.RED;
+		if (!character.isAnimationNull())
+		{
+			if (FlxG.keys.pressed.A || FlxG.keys.pressed.D)
+			{
+				holdingFrameTime += elapsed;
+				if (holdingFrameTime > 0.5)
+					holdingFrameElapsed += elapsed;
+			}
+			else
+				holdingFrameTime = 0;
+
+			if (FlxG.keys.justPressed.SPACE)
+				character.playAnim(character.getAnimationName(), true);
+
+			var frames:Int = -1;
+			var length:Int = -1;
+
+			if (!character.isAnimateAtlas && character.animation.curAnim != null)
+			{
+				frames = character.animation.curAnim.curFrame;
+				length = character.animation.curAnim.numFrames;
+			}
+			else if (character.isAnimateAtlas && character.atlas.anim != null)
+			{
+				frames = character.atlas.anim.curFrame;
+				length = character.atlas.anim.length;
+			}
+
+			if (currentEditMode == 'effect'
+				&& curEffect != null
+				&& curEffect.animation.curAnim != null
+				&& curEffect.animation.curAnim.numFrames > length)
+			{
+				length = curEffect.animation.curAnim.numFrames;
+				frames = curEffect.animation.curAnim.curFrame;
+			}
+
+			if (length >= 0)
+			{
+				if (!FlxG.keys.pressed.CONTROL && (FlxG.keys.justPressed.A || FlxG.keys.justPressed.D || holdingFrameTime > 0.5))
+				{
+					var isLeft = false;
+					if ((holdingFrameTime > 0.5 && FlxG.keys.pressed.A) || FlxG.keys.justPressed.A)
+						isLeft = true;
+
+					character.animPaused = true;
+					for (member in character.characterSprites.members)
+					{
+						member.animation.paused = true;
+						member.animation.finishCallback = null;
+					}
+
+					if (holdingFrameTime <= 0.5 || holdingFrameElapsed > 0.1)
+					{
+						frames = FlxMath.wrap(frames + Std.int(isLeft ? -shiftMult : shiftMult), 0, length - 1);
+
+						if (!character.isAnimateAtlas && frames <= character.animation.curAnim.numFrames)
+							character.animation.curAnim.curFrame = frames;
+						else if (frames <= character.atlas.anim.length)
+							character.atlas.anim.curFrame = frames;
+
+						for (member in character.characterSprites.members)
+						{
+							if (member.animation.curAnim != null)
+							{
+								var memberAnim = member.animation.curAnim;
+
+								if (frames <= character.animation.curAnim.numFrames)
+									memberAnim.curFrame = frames;
+								else
+									memberAnim.curFrame = memberAnim.numFrames;
+
+								if (memberAnim.name == character.animation.curAnim.name)
+									member.visible = true;
+								switch (member.animCallbacks.get(memberAnim.name))
+								{
+									case 'finish':
+										if (frames > memberAnim.curFrame)
+											member.visible = false;
+									case 'toLoopAnim':
+										// So fun fact:
+										// Using modulo with a modulus/divisor higher than the dividend returns the dividend
+										// In other words this perfectly loops the frames if it creeps higher than the sprite's max frame count
+										memberAnim.curFrame = frames % memberAnim.curFrame;
+									case 'fade':
+										// This is a placeholder for when effect finishes are softcoded better
+										member.alpha = 1 - (FlxEase.quadIn((frames / memberAnim.frameRate)) / 0.05);
+										// FlxTween.tween(member, {alpha: 0}, 0.05, {ease: FlxEase.quadIn});
+								}
+							}
+						}
+
+						holdingFrameElapsed -= 0.1;
+					}
+				}
+
+				txt = 'Frames: ( $frames / ${length - 1} )';
+				// if(character.animation.curAnim.paused) txt += ' - PAUSED';
+				clr = FlxColor.WHITE;
+			}
+		}
+
+		if (txt != frameAdvanceText.text)
+			frameAdvanceText.text = txt;
+		frameAdvanceText.color = clr;
 	}
 
 	// End of changes

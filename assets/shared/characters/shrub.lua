@@ -15,12 +15,12 @@ function onStartingAttack(character, currentAttack)
 end
 
 function onDeterminePlayerChain(input, nextAttack, currentChain)
-    nextAttack = 'chain_attack'
+    -- nextAttack = 'chain_attack'
 end
 
 function onCreatePost()
     luaDebugMode = true
-    toggleEnemyOffense(true)
+    toggleEnemyOffense(false)
 end
 
 function onBeatHit()

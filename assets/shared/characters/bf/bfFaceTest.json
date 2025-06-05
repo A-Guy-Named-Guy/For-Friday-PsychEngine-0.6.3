@@ -1,0 +1,61 @@
+{
+	"animations": [
+		{
+			"loop": false,
+			"offsets": [0, 0],
+			"anim": "combatBlockLEFT",
+			"fps": 24,
+			"name": "leftDodgeFace",
+			"indices": []
+		},
+		{
+			"loop": false,
+			"offsets": [0, 0],
+			"anim": "combatBlockUP",
+			"fps": 24,
+			"name": "upDodgeFace",
+			"indices": []
+		},
+		{
+			"loop": false,
+			"offsets": [0, 0],
+			"anim": "combatBlockRIGHT",
+			"fps": 24,
+			"name": "rightDodgeFace",
+			"indices": []
+		},
+		{
+			"loop": false,
+			"offsets": [0, 0],
+			"anim": "combatParryLEFT",
+			"fps": 24,
+			"name": "leftParryFace",
+			"indices": []
+		},
+		{
+			"loop": false,
+			"offsets": [0, 0],
+			"anim": "combatParryUP",
+			"fps": 24,
+			"name": "upParryFace",
+			"indices": []
+		},
+		{
+			"loop": false,
+			"offsets": [0, 0],
+			"anim": "combatParryRIGHT",
+			"fps": 24,
+			"name": "rightParryFace",
+			"indices": []
+		}
+	],
+	"no_antialiasing": false,
+	"image": "effects/bfFace",
+	"global_offset": [
+		388,
+		171
+	],
+	"flip_x": false,
+	"layer": 1,
+	"scale": 1
+}

@@ -1,0 +1,187 @@
+{
+	"combat_data": {
+		"combat_healthMax": 120,
+		"attacks": [
+			{
+				"recovery": 0.292,
+				"direction": "RIGHT",
+				"duration": 0.333,
+				"attack_animation_name": "RchainSwing1R",
+				"name": "Rchain1R",
+				"startup_animation_name": "RchainWindR1",
+				"chain_duration": 0.792
+			},
+			{
+				"recovery": 0.249,
+				"direction": "UP",
+				"duration": 0.416,
+				"attack_animation_name": "UchainSwing1U",
+				"name": "Uchain1U",
+				"startup_animation_name": "UchainWind1U",
+				"chain_duration": 0.833
+			},
+			{
+				"recovery": 0.25,
+				"direction": "LEFT",
+				"duration": 0.25,
+				"damage": 7,
+				"attack_animation_name": "LchainSwing1L",
+				"name": "Lchain1L",
+				"startup_animation_name": "LchainWind1L",
+				"chain_duration": 0.75
+			},
+			{
+				"stamina_damage": 0.5,
+				"is_bash": true,
+				"direction": "SPECIAL",
+				"name": "enemy_sing_special"
+			},
+			{
+				"name": "enemy_sing_attack"
+			},
+			{
+				"recovery": 0.082,
+				"direction": "UP",
+				"duration": 0.207,
+				"attack_animation_name": "RchainSwing2U",
+				"name": "Rchain2U",
+				"startup_animation_name": "RchainWind2U",
+				"chain_duration": 0.792
+			},
+			{
+				"stamina_damage": 0.5,
+				"recovery": 0.333,
+				"is_bash": true,
+				"direction": "SPECIAL",
+				"duration": 0.499,
+				"damage": 5,
+				"attack_animation_name": "LchainSwing3B",
+				"name": "Lchain3B",
+				"startup_animation_name": "LchainWind3B",
+				"chain_duration": 0.875
+			},
+			{
+				"recovery": 0.25,
+				"direction": "RIGHT",
+				"duration": 0.125,
+				"damage": 7,
+				"attack_animation_name": "RmixupSwing2R",
+				"name": "Rmixup2R",
+				"startup_animation_name": "RmixupWind2R",
+				"chain_duration": 0.75
+			},
+			{
+				"recovery": 0.996,
+				"direction": "LEFT",
+				"duration": 0.375,
+				"attack_animation_name": "UchainSwing3R",
+				"name": "Uchain3L",
+				"startup_animation_name": "UchainWind3R",
+				"chain_duration": 2
+			},
+			{
+				"recovery": 0.25,
+				"direction": "RIGHT",
+				"duration": 0.208,
+				"damage": 4,
+				"attack_animation_name": "LchainSwing2R",
+				"name": "Lchain2R",
+				"startup_animation_name": "LchainWind2R",
+				"chain_duration": 0.75
+			},
+			{
+				"recovery": 0.375,
+				"direction": "RIGHT",
+				"duration": 0.333,
+				"attack_animation_name": "RchainSwing1R",
+				"name": "Rmixup1R",
+				"startup_animation_name": "RchainWindR1",
+				"chain_duration": 0.875
+			},
+			{
+				"recovery": 1,
+				"direction": "LEFT",
+				"duration": 0.458,
+				"attack_animation_name": "dodgeSwingA",
+				"name": "dodgeSwing",
+				"startup_animation_name": "dodgeWindA",
+				"chain_duration": 1.5
+			},
+			{
+				"stamina_damage": 0.5,
+				"hitstun": 2,
+				"is_bash": true,
+				"damage": 0,
+				"name": "player_sing_special",
+				"chain_duration": 1,
+				"step_based_timing": true
+			},
+			{
+				"recovery": 0.996,
+				"direction": "LEFT",
+				"duration": 0.582,
+				"attack_animation_name": "RchainSwing3L",
+				"name": "Rchain3L",
+				"startup_animation_name": "RchainWind3L",
+				"chain_duration": 2
+			},
+			{
+				"recovery": 0.1,
+				"duration": 0.5,
+				"name": "basic_attack",
+				"chain_duration": 0.6
+			},
+			{
+				"damage": 5
+			},
+			{
+				"recovery": 0.208,
+				"direction": "RIGHT",
+				"duration": 0.374,
+				"attack_animation_name": "combatAttackRIGHT",
+				"name": "RchainAlt1R",
+				"startup_animation_name": "combatWindRIGHT",
+				"chain_duration": 0.792
+			},
+			{
+				"recovery": 0.996,
+				"direction": "LEFT",
+				"duration": 0.417,
+				"attack_animation_name": "LchainSwing4L",
+				"name": "Lchain4L",
+				"startup_animation_name": "LchainWind4L",
+				"chain_duration": 2
+			},
+			{
+				"recovery": 1.5,
+				"direction": "LEFT",
+				"duration": 0.125,
+				"damage": 7,
+				"attack_animation_name": "RmixupSwing3L",
+				"name": "Rmixup3L",
+				"startup_animation_name": "RmixupWind3L",
+				"chain_duration": 2
+			},
+			{
+				"recovery": 0.208,
+				"direction": "LEFT",
+				"duration": 0.5,
+				"damage": 7,
+				"attack_animation_name": "LchainSwing1L",
+				"name": "LchainAlt1L",
+				"startup_animation_name": "combatWindLEFT",
+				"chain_duration": 0.75
+			},
+			{
+				"recovery": 0.248,
+				"direction": "UP",
+				"duration": 0.624,
+				"damage": 20,
+				"attack_animation_name": "UchainSwing2U",
+				"name": "Uchain2U",
+				"startup_animation_name": "UchainWind2U",
+				"chain_duration": 1.042
+			}
+		]
+	}
+}

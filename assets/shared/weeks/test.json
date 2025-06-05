@@ -1,6 +1,7 @@
 {
 	"songs": [
-		["training-test", "bf", [40, 73, 31]]
+		["training-test", "bf", [40, 73, 31]],
+		["tutorial-test", "bf", [40, 73, 31]]
 	],
 
 	"weekCharacters": [

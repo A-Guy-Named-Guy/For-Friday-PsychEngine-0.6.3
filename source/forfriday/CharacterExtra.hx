@@ -38,7 +38,7 @@ typedef SpriteAnimArray =
 	var indices:Array<Int>;
 	var offsets:Array<Int>;
 	var finishCallback:String;
-	var angle:Float;
+	var angle:Null<Float>;
 }
 
 // I don't fully understand the effects of making this class a child of Character directly
@@ -52,6 +52,7 @@ class CharacterExtra extends FlxSprite
 	public var animAngle:Map<String, Float> = new Map<String, Float>();
 
 	public var thisSprite:String = '';
+	public var jsonName:String = '';
 
 	// Constant for organizing layers according to base character
 	// (e.g. layer 1 for bf's face, unblockable effect is layer 2 to ensure it overlaps both bf himself and his face)
@@ -62,7 +63,6 @@ class CharacterExtra extends FlxSprite
 	public var isPlayer:Bool = true;
 	public var curCharacter:String = '';
 	public var animationsArray:Array<SpriteAnimArray> = [];
-	public var positionArray:Array<Float> = [0, 0];
 
 	// For Character Editor
 	public var imageFile:String = '';
@@ -76,11 +76,13 @@ class CharacterExtra extends FlxSprite
 
 	public static var validCallbacks:Array<String> = ['', 'finish', 'toLoopAnim', 'fade'];
 
-	public function new(x:Float, y:Float, character:Character, name:String)
+	public function new(x:Float, y:Float, character:Character, name:String, jsonName:String = '')
 	{
 		super(x, y);
 
 		this.thisSprite = name;
+		if (jsonName == '')
+			jsonName = thisSprite;
 		// Not assigning the entire character to a Character variable since I believe that probably duplicates the character data for each sprite
 		// Basically that eats up far more memory than needed, so just pull whatever info you need on construction
 		this.curCharacter = character.curCharacter;
@@ -93,19 +95,7 @@ class CharacterExtra extends FlxSprite
 
 		visible = false;
 
-		animation.finishCallback = function(name:String)
-		{
-			switch (animCallbacks.get(animation.curAnim.name))
-			{
-				case 'toLoopAnim':
-					if (visible && alpha > 0)
-						playAnim(animation.curAnim.name + 'LOOP');
-				case 'finish':
-					visible = false;
-				case 'fade':
-					FlxTween.tween(this, {alpha: 0}, 0.05, {ease: FlxEase.quadIn});
-			}
-		}
+		createFinishCallback();
 
 		switch (curCharacter)
 		{
@@ -132,9 +122,7 @@ class CharacterExtra extends FlxSprite
 							'.json'); // If a character couldn't be found, change him to BF just to prevent a crash
 					}
 				 */
-				var path:String = Paths.getValidCharacterPath(thisSprite, true, character.curCharacter);
-				if (path == null)
-					path = Paths.getValidCharacterPath(thisSprite, false, 'characterExtras');
+				var path:String = Paths.getValidCharacterPath(jsonName, false, character.curCharacter, '.json', true);
 
 				#if MODS_ALLOWED
 				var rawJson = File.getContent(path);
@@ -192,7 +180,7 @@ class CharacterExtra extends FlxSprite
 				if (json.no_antialiasing)
 				{
 					antialiasing = false;
-					noAntialiasing = true;
+					antialiasing = ClientPrefs.data.antialiasing ? !noAntialiasing : false;
 				}
 
 				if (json.scale != 1)
@@ -214,29 +202,22 @@ class CharacterExtra extends FlxSprite
 						var animIndices:Array<Int> = anim.indices;
 
 						if (animIndices != null && animIndices.length > 0)
-						{
 							animation.addByIndices(animAnim, animName, animIndices, "", animFps, animLoop);
-						}
 						else
-						{
 							animation.addByPrefix(animAnim, animName, animFps, animLoop);
-						}
 
 						if (anim.offsets != null && anim.offsets.length > 1)
-						{
 							addOffset(anim.anim, anim.offsets[0], anim.offsets[1]);
-						}
+
+						if (anim.angle != null)
+							addAngle(anim.anim, anim.angle);
 
 						if (anim.finishCallback != null)
-						{
 							animCallbacks.set(animAnim, anim.finishCallback);
-						}
 					}
 				}
 				else
-				{
 					quickAnimAdd('idle', 'BF idle dance');
-				}
 
 				playAnim('idle');
 		}
@@ -274,6 +255,7 @@ class CharacterExtra extends FlxSprite
 		alpha = 1;
 
 		animation.play(AnimName, Force, Reversed, Frame);
+		_lastPlayedAnimation = AnimName;
 
 		var daOffset:Array<Float> = determineOffset(AnimName);
 		offset.set(daOffset[0], daOffset[1]);
@@ -283,11 +265,13 @@ class CharacterExtra extends FlxSprite
 			daAngle += animAngle.get(AnimName);
 
 		angle = daAngle;
+
+		if (animation.finishCallback == null)
+			createFinishCallback();
 	}
 
 	public function determineOffset(AnimName:String):Array<Float>
 	{
-		// Offset logic tweaked a bit to add in a generalOffset component
 		var daOffset:Array<Float> = [0, 0];
 
 		if (animOffsets.exists(AnimName))
@@ -302,6 +286,40 @@ class CharacterExtra extends FlxSprite
 		daOffset[1] += generalOffset[1];
 
 		return daOffset;
+	}
+
+	public function createFinishCallback()
+	{
+		animation.finishCallback = function(name:String)
+		{
+			switch (animCallbacks.get(animation.curAnim.name))
+			{
+				case 'toLoopAnim':
+					if (visible && alpha > 0)
+						playAnim(animation.curAnim.name + 'LOOP');
+				case 'finish':
+					visible = false;
+				case 'fade':
+					FlxTween.tween(this, {alpha: 0}, 0.05, {ease: FlxEase.quadIn});
+			}
+		}
+	}
+
+	var _lastPlayedAnimation:String;
+
+	inline public function getAnimationName():String
+	{
+		return _lastPlayedAnimation;
+	}
+
+	public function hasAnimation(anim:String):Bool
+	{
+		return animOffsets.exists(anim);
+	}
+
+	inline public function isAnimationNull():Bool
+	{
+		return animation.curAnim == null;
 	}
 
 	public function addOffset(name:String, x:Float = 0, y:Float = 0)

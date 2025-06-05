@@ -459,9 +459,6 @@
 		"has_unblockableNoteAttacks": true,
 		"default_guard_position": 0,
 		"special_attack": "recover",
-		"ifPlayer_damage": 2,
-		"ifEnemy_damage": 12,
-		"posture_damage": 3,
 		"posture_max": 90,
 		"combat_healthMax": 80,
 		"posture_recoveryCoefficient": 0.8,
@@ -499,9 +496,7 @@
 			},
 			{
 				"name": "oos",
-				"file_name": "oos",
-				"volume_min": 0.7,
-				"volume_max": 0.9
+				"file_name": "oos"
 			},
 			{
 				"name": "miss",
@@ -530,19 +525,6 @@
 
 		"attacks":
 		[
-			{
-				"name": "basic_attack",
-				"attack_animation_name": "combatAttack",
-				"startup_animation_name": "combatWind",
-				"direction": "ANY",
-				"damage": 7,
-				"stamina_cost": 0.15,
-				"step_based_timing": true,
-				"duration": 1,
-				"recovery": 2,
-				"hitstun": 3,
-				"chain_duration": 4 
-			},
 			{
 				"name": "sing_attack",
 				"attack_animation_name": "combatAttack",
@@ -606,11 +588,11 @@
 				"attack_animation_name": "combatAttack",
 				"startup_animation_name": "combatWind",
 				"direction": "ANY",
-				"damage": 7,
+				"damage": 12,
 				"stamina_cost": 0.15,
 				"step_based_timing": true,
 				"duration": 1,
-				"recovery": 2,
+				"recovery": 1,
 				"hitstun": 3,
 				"chain_duration": 4 
 			},
@@ -619,11 +601,24 @@
 				"attack_animation_name": "combatAttack",
 				"startup_animation_name": "combatWind",
 				"direction": "ANY",
-				"damage": 15,
-				"stamina_cost": 0.15,
+				"damage": 9,
+				"stamina_cost": 0.1,
+				"step_based_timing": true,
+				"duration": 1,
+				"recovery": 1,
+				"hitstun": 3,
+				"chain_duration": 4 
+			},
+			{
+				"name": "chain_finisher",
+				"attack_animation_name": "combatAttack",
+				"startup_animation_name": "combatWind",
+				"direction": "ANY",
+				"damage": 18,
+				"stamina_cost": 0.2,
 				"step_based_timing": true,
 				"duration": 0,
-				"recovery": 2,
+				"recovery": 6,
 				"hitstun": 3
 			},
 			{
@@ -678,8 +673,8 @@
 				"attack_chain":
 				[
 					"basic_attack",
-					"basic_attack",
-					"chain_attack"
+					"chain_attack",
+					"chain_finisher"
 				]
 			},
 			{
@@ -696,7 +691,7 @@
 				"attack_chain":
 				[
 					"basic_attack",
-					"basic_attack",
+					"chain_attack",
 					"recover_finisher"
 				]
 			}

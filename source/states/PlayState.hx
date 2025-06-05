@@ -3953,9 +3953,16 @@ class PlayState extends MusicBeatState
 		if (boyfriend != null
 			&& beat % boyfriend.danceEveryNumBeats == 0
 			&& !boyfriend.getAnimationName().startsWith('sing')
-			&& !boyfriend.stunned)
+			&& !boyfriend.stunned // Combat change
+			&& boyfriend.currentAction == 'neutral' // End of change
+		)
 			boyfriend.dance();
-		if (dad != null && beat % dad.danceEveryNumBeats == 0 && !dad.getAnimationName().startsWith('sing') && !dad.stunned)
+		if (dad != null
+			&& beat % dad.danceEveryNumBeats == 0
+			&& !dad.getAnimationName().startsWith('sing')
+			&& !dad.stunned // Combat change
+			&& dad.currentAction == 'neutral' // End of change
+		)
 			dad.dance();
 	}
 

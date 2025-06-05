@@ -2009,6 +2009,24 @@ class FunkinLua
 				luaTrace('isOfType mismatch! Modifying parameter type ${Type.typeof(currentChainParameter)}, new parameter type ${Type.typeof(newParameter)}');
 		});
 
+		Lua_helper.add_callback(lua, "getCurrentAction", function(characterName:String)
+		{
+			return getCharacter(characterName).currentAction;
+		});
+
+		Lua_helper.add_callback(lua, "setCurrentAction", function(characterName:String, actionName:String, duration:Float)
+		{
+			PlayState.instance.COMBAT.changeAction(getCharacter(characterName), actionName, duration, function(tmr:FlxTimer)
+			{
+				PlayState.instance.dad.currentAction = 'neutral';
+			});
+		});
+
+		Lua_helper.add_callback(lua, "inflictHitstun", function(characterName:String, duration:Float = 1, timingType:String = 'seconds')
+		{
+			PlayState.instance.COMBAT.inflictHitstun(getCharacter(characterName), duration, timingType);
+		});
+
 		Lua_helper.add_callback(lua, "switchCombatJson", function(character:String, jsonName:String, cleanCharacter:Bool = true)
 		{
 			var characterName = getCharacter(character).curCharacter;
@@ -2036,7 +2054,7 @@ class FunkinLua
 				return;
 			}
 
-			getCharacter(character).switchCombatJson(json);
+			getCharacter(character).switchCombatJson(json.combat_data);
 			if (cleanCharacter)
 				cleanSlate(character);
 		});
@@ -2049,6 +2067,25 @@ class FunkinLua
 		Lua_helper.add_callback(lua, "enemyDodge", function(duration:Float = 1)
 		{
 			PlayState.instance.COMBAT.changeAction(PlayState.instance.dad, 'dodge', duration, function(tmr:FlxTimer)
+			{
+				PlayState.instance.dad.currentAction = 'neutral';
+			});
+		});
+
+		Lua_helper.add_callback(lua, "enemyFeint", function(duration:Float = 1, feintSound:String = '', ?feintAnim:String)
+		{
+			if (feintAnim == null)
+				feintAnim = Combat.appendDirection('idle', PlayState.instance.dad.defaultGuardPosition);
+
+			PlayState.instance.dad.currentAttack.is_feint = true;
+			PlayState.instance.dad.currentAttack.recovery = duration;
+			PlayState.instance.dad.currentAttack.sound_on_hit = feintSound;
+			PlayState.instance.dad.currentAttack.attack_animation_name = feintAnim;
+		});
+
+		Lua_helper.add_callback(lua, "enemyParry", function(duration:Float = 1)
+		{
+			PlayState.instance.COMBAT.changeAction(PlayState.instance.dad, 'hasParried', duration, function(tmr:FlxTimer)
 			{
 				PlayState.instance.dad.currentAction = 'neutral';
 			});
