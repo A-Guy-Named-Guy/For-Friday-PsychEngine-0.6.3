@@ -492,8 +492,6 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 			{
 				if (PlayState.SONG.chartArray[i].chartName == null)
 					PlayState.SONG.chartArray[i].chartName = 'null';
-				if (PlayState.SONG.chartArray[i].lengthOfChartInSections == null)
-					PlayState.SONG.chartArray[i].lengthOfChartInSections = 0;
 				if (PlayState.SONG.chartArray[i].sourceFileName == null)
 					PlayState.SONG.chartArray[i].sourceFileName = PlayState.SONG.song;
 				if (PlayState.SONG.chartArray[i].songFileName == null)
@@ -513,7 +511,6 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 				if (PlayState.SONG.chartArray[i].chartOffset == null)
 					PlayState.SONG.chartArray[i].chartOffset = PlayState.SONG.offset;
 			}
-			writeFromChartArray('Inst', false);
 		}
 
 		PlayState.SONG.activeChart = 'Inst';
@@ -4825,6 +4822,10 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 	function saveChart(canQuickSave:Bool = true)
 	{
 		updateChartData();
+		// Combat change
+		var initialChart:String = PlayState.SONG.activeChart;
+		storeInstNotes();
+		// End of change
 		var chartData:String = PsychJsonPrinter.print(PlayState.SONG, ['sectionNotes', 'events']);
 		if (canQuickSave && Song.chartPath != null)
 		{
@@ -4844,6 +4845,9 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 				showOutput('Chart saved successfully to: $newPath');
 			}, null, function() showOutput('Error on saving chart!', true));
 		}
+		// Combat change
+		switchChart(initialChart);
+		// End of change
 	}
 
 	inline function getCurChartSection()
@@ -5052,6 +5056,9 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 
 		setSongPlaying(false);
 		updateChartData();
+		// Combat change
+		storeInstNotes();
+		// End of change
 		StageData.loadDirectory(PlayState.SONG);
 		LoadingState.loadAndSwitchState(new PlayState());
 		ClientPrefs.toggleVolumeKeys(true);
@@ -5716,13 +5723,13 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 			}
 	}
 
-	function newChartChunk(chartName:String):SwagChart
+	public static function newChartChunk(chartName:String):SwagChart
 	{
 		var chart:SwagChart = {
 			chartName: chartName,
+			shouldLoop: PlayState.SONG.endSongOnDefeat,
 			chartNotes: [],
 			chartEvents: [],
-			lengthOfChartInSections: 0,
 			sourceFileName: PlayState.SONG.song,
 			songFileName: chartName,
 			voiceFileName: '${chartName}Voices',
@@ -5776,6 +5783,17 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 		chartDropDown.list = chartNameArray;
 		chartDropDown.selectedLabel = chart;
 		newChartNameInputText.text = '';
+	}
+
+	function storeInstNotes()
+	{
+		switchChart('Inst');
+		for (i in 0...PlayState.SONG.chartArray.length)
+			if (PlayState.SONG.chartArray[i].chartName == 'Inst')
+			{
+				PlayState.SONG.chartArray[i].chartNotes = [];
+				break;
+			}
 	}
 
 	function getCurrentChartChunk():Null<SwagChart>
@@ -5925,6 +5943,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 		endSongOnDefeatCheckbox = new PsychUICheckBox(objX, objY, 'Loop Song Until Enemy Defeat', 80, function()
 		{
 			PlayState.SONG.endSongOnDefeat = endSongOnDefeatCheckbox.checked;
+			Song.getChartByName('Inst', PlayState.SONG).shouldLoop = endSongOnDefeatCheckbox.checked;
 		});
 
 		objY += 40;

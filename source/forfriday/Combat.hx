@@ -2078,17 +2078,10 @@ class Combat extends FlxBasic
 	public function changeAction(character:Character, actionName:String, actionTimerDuration:Float, ?onComplete:FlxTimer->Void):Void
 	{
 		if (onComplete == null)
-		{
-			switch (character)
+			onComplete = function(tmr:FlxTimer)
 			{
-				case boyfriend:
-					onComplete = function(tmr:FlxTimer)
-					{
-						boyfriend.currentAction = 'neutral';
-					};
-				case dad:
+				character.currentAction = 'neutral';
 			}
-		}
 
 		character.currentAction = actionName;
 		if (character.actionTimer.active)

@@ -257,7 +257,7 @@ class Song
 		return returnNotes;
 	}
 
-	static function newSection(section:SwagSection = null, song:SwagSong):SwagSection
+	public static function newSection(section:SwagSection = null, song:SwagSong):SwagSection
 	{
 		var sec:SwagSection = null;
 
@@ -311,43 +311,6 @@ class Song
 		}
 
 		return null;
-	}
-
-	public static function appendUpcomingChart(upcomingChart:SwagChart, currentChart:SwagChart, currentNotes:Array<SwagSection>):Void
-	{
-		var noteTimeModifier:Float = 0;
-		var sectionCount:Int = 0;
-
-		for (section in currentChart.chartNotes)
-		{
-			if (section != null)
-			{
-				++sectionCount;
-
-				if (sectionCount > {currentChart.lengthOfChartInSections == 0 ? currentChart.chartNotes.length : currentChart.lengthOfChartInSections;})
-					break;
-
-				noteTimeModifier += ((section.bpm / 60) * 1000 * section.sectionBeats);
-			}
-		}
-
-		var sectionsToAdd:Array<SwagSection> = [];
-
-		for (i in 0...1)
-		{
-			sectionsToAdd.push(upcomingChart.chartNotes[i]);
-		}
-
-		for (section in sectionsToAdd)
-		{
-			if (section != null)
-			{
-				for (i in 0...section.sectionNotes.length)
-					section.sectionNotes[i][0] += noteTimeModifier;
-
-				currentNotes.push(section);
-			}
-		}
 	}
 
 	// End of changes

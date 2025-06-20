@@ -571,7 +571,9 @@ class Note extends FlxSprite
 
 			if (!wasGoodHit && strumTime <= Conductor.songPosition)
 			{
-				if (!isSustainNote || (prevNote.wasGoodHit && !ignoreNote))
+				// Combat change
+				// if (!isSustainNote || (prevNote.wasGoodHit && !ignoreNote))
+				if (!isSustainNote || ((prevNote.wasGoodHit || prevNote.strumTime > strumTime) && !ignoreNote))
 					wasGoodHit = true;
 			}
 
@@ -655,6 +657,28 @@ class Note extends FlxSprite
 				reloadNote('noteSkins/deathNOTE_asset');
 			else if (isUnblockable)
 				reloadNote('noteSkins/unblockableNOTE_asset');
+		}
+	}
+
+	override function revive()
+	{
+		super.revive();
+
+		active = true;
+		visible = true;
+		missed = false;
+		spawned = false;
+		canBeHit = true;
+		ignoreNote = false;
+		tooLate = false;
+		wasGoodHit = false;
+		hitByOpponent = false;
+
+		if (isSustainNote)
+		{
+			if (parent != null)
+				alpha = parent.alpha;
+			clipRect = null;
 		}
 	}
 

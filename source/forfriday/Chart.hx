@@ -5,7 +5,7 @@ import backend.Song.SwagSection;
 typedef SwagChart =
 {
 	var chartName:Null<String>;
-	var lengthOfChartInSections:Null<Int>;
+	var shouldLoop:Null<Bool>;
 
 	var songFileName:Null<String>;
 	var voiceFileName:Null<String>;
@@ -22,7 +22,6 @@ typedef SwagChart =
 class Chart
 {
 	public var chartName:Null<String> = 'Inst';
-	public var lengthOfChartInSections:Null<Int>;
 
 	public var songFileName:Null<String> = 'Inst';
 	public var voiceFileName:Null<String> = 'Voices';
