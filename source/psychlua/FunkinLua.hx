@@ -1954,14 +1954,9 @@ class FunkinLua
 			return Reflect.getProperty(attack, parameter);
 		});
 
-		Lua_helper.add_callback(lua, "setCurrentAttackParam", function(attackerName:String, attack:AttackData, parameterName:String, newParameter:Dynamic)
+		Lua_helper.add_callback(lua, "setCurrentAttackParam", function(attackerName:String, parameterName:String, newParameter:Dynamic)
 		{
-			var currentAttackParameter:Dynamic = Reflect.getProperty(attack, parameterName);
-
-			if (Type.typeof(currentAttackParameter) == Type.typeof(newParameter))
-				Reflect.setProperty(getCharacter(attackerName).currentAttack, parameterName, newParameter);
-			else
-				luaTrace('isOfType mismatch! Modifying parameter type ${Type.typeof(currentAttackParameter)}, new parameter type ${Type.typeof(newParameter)}');
+			Reflect.setProperty(getCharacter(attackerName).currentAttack, parameterName, newParameter);
 		});
 
 		Lua_helper.add_callback(lua, "getCurrentChain", function(characterName:String)
@@ -1979,14 +1974,13 @@ class FunkinLua
 			return getCharacter(characterName).chainMap.get(chainName);
 		});
 
-		Lua_helper.add_callback(lua, "setEnemyChainByName", function(chainName:String, startAttackImmediately:Bool = false)
+		Lua_helper.add_callback(lua, "setEnemyChainByName", function(chainName:String)
 		{
 			var dad = getCharacter('dad');
 
 			dad.currentChain = dad.chainMap.get(chainName);
-			dad.placeInChain = 0;
-			if (startAttackImmediately)
-				PlayState.instance.COMBAT.chooseEnemyAttack();
+			dad.placeInChain = -1;
+			PlayState.instance.COMBAT.chooseEnemyAttack();
 		});
 
 		Lua_helper.add_callback(lua, "setEnemyChain", function(chain:ChainData, startAttackImmediately:Bool = false)
@@ -1994,19 +1988,19 @@ class FunkinLua
 			var dad = getCharacter('dad');
 
 			dad.currentChain = chain;
-			dad.placeInChain = 0;
+			dad.placeInChain = -1;
 			if (startAttackImmediately)
 				PlayState.instance.COMBAT.chooseEnemyAttack();
 		});
 
-		Lua_helper.add_callback(lua, "setCurrentChainParam", function(attackerName:String, chain:ChainData, parameterName:String, newParameter:Dynamic)
+		Lua_helper.add_callback(lua, "getChainParam", function(chain:ChainData, parameter:String)
 		{
-			var currentChainParameter:Dynamic = Reflect.getProperty(chain, parameterName);
+			return Reflect.getProperty(chain, parameter);
+		});
 
-			if (Type.typeof(currentChainParameter) == Type.typeof(newParameter))
-				Reflect.setProperty(getCharacter(attackerName).currentChain, parameterName, newParameter);
-			else
-				luaTrace('isOfType mismatch! Modifying parameter type ${Type.typeof(currentChainParameter)}, new parameter type ${Type.typeof(newParameter)}');
+		Lua_helper.add_callback(lua, "setCurrentChainParam", function(attackerName:String, parameterName:String, newParameter:Dynamic)
+		{
+			Reflect.setProperty(getCharacter(attackerName).currentChain, parameterName, newParameter);
 		});
 
 		Lua_helper.add_callback(lua, "getCurrentAction", function(characterName:String)
@@ -2141,6 +2135,30 @@ class FunkinLua
 				Combat.disableControls = !Combat.disableControls;
 			else
 				Combat.disableControls = controlsActive;
+			return;
+		});
+
+		Lua_helper.add_callback(lua, "togglePlayerCanAttack", function(controlsActive:Null<Bool>)
+		{
+			if (controlsActive == null)
+				PlayState.instance.COMBAT.canAttack = !PlayState.instance.COMBAT.canAttack;
+			else
+				PlayState.instance.COMBAT.canAttack = controlsActive;
+			return;
+		});
+
+		Lua_helper.add_callback(lua, "inputGuard", function(input:Null<String>)
+		{
+			if (input == null)
+				return;
+			PlayState.instance.COMBAT.guardInput(input);
+			return;
+		});
+
+		Lua_helper.add_callback(lua, "inputDodge", function()
+		{
+			PlayState.instance.COMBAT.dodgeInput();
+			return;
 		});
 
 		// Note for later:
@@ -2232,6 +2250,40 @@ class FunkinLua
 
 				return true;
 			});
+
+		Lua_helper.add_callback(lua, "getKeyboardInputKeys", function(name:String)
+		{
+			var keysArray:Array<FlxKey> = PlayState.instance.controls.keyboardBinds.get(name);
+			var keyNameArray:Array<String> = [];
+
+			if (keysArray == null)
+				keysArray = [];
+
+			for (i in 0...keysArray.length)
+				keyNameArray.push(FlxKey.toStringMap.get(keysArray[i]));
+
+			while (keyNameArray.contains(null))
+				keyNameArray.remove(null);
+
+			return Std.string(keyNameArray);
+		});
+
+		Lua_helper.add_callback(lua, "getGamepadInputKeys", function(name:String, controllerBinds:Bool = false)
+		{
+			var keysArray:Array<FlxGamepadInputID> = PlayState.instance.controls.gamepadBinds.get(name);
+			var keyNameArray:Array<String> = [];
+
+			if (keysArray == null)
+				keysArray = [];
+
+			for (i in 0...keysArray.length)
+				keyNameArray.push(FlxGamepadInputID.toStringMap.get(keysArray[i]));
+
+			while (keyNameArray.contains(null))
+				keyNameArray.remove(null);
+
+			return Std.string(keyNameArray);
+		});
 		// End of changes
 
 		#if DISCORD_ALLOWED DiscordClient.addLuaCallbacks(lua); #end

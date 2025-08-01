@@ -1,0 +1,546 @@
+Core Changes
+	- VERY IMPORTANT
+		- DO NOT FORGET TO DO THIS
+			- FOR THE LOVE OF GOD
+				- Merge the export stuff into the main
+					- Character data
+	- Core Combat
+		- To Do
+			- Preload?
+				- See readme in Data folder
+				- Figure out how this works
+			- Stuff To Solve Before Tutorial Playtesting
+				- Chain linking implementation
+					- Link delay
+						- How long until chain link applies
+					- Link duration
+						- How long can press to continue chain
+					- Linking tech
+						- Short duration = ability to softfeint
+							- Might need extra logic to evaluate between chains?
+						- Recovery cancel
+							- Allow attacks to "interrupt" recovery
+								- May need its own boolean (overrideRecovery)
+				- Counter section
+					- Countering dodge attacks/parries
+				- Skip tutorial on death
+				- End tutorial into full fight
+				- End tutorial on performing special
+					- Right now it checks spacebar, not ideal
+					- Rework special to be a recovery cancel
+			- Normal Tutorial Outline
+				- Enemy mixups
+					- Watch carefully for the enemy shaking your offense
+					- Defend, and watch their guard
+					- If no guard arrow is active, they cannot block
+				- Basic attack chains
+					- Your attack's properties differ depending on their sequence
+					- Your first attack deals strong damage, but is only in play on countering
+					- Your second attack uses little stamina, with decent damage
+					- Your third attack is strong and executes instantly
+					- By aiming away from your opponent's guard initially, you can set up to use the third attack
+			- Hard Tutorial Outline
+				- Advanced attack chains
+					- When applying block stun,
+					- Your opponent's guard is thrown where you haven't been aiming for
+					- Simply put: When your opponent is attacked once, their guard often aims away from yours
+					- When your opponent is attacked twice in the same direction, they often aim that same direction
+					- *Land your second and third chains to observe this behavior
+				- Special attacks
+					- Boyfriend can trade health for stamina with a taunt
+					- This taunt also shortens his recovery
+					- With quick timing, you can press your offense without reliance on parrying...
+					- ...albeit shortening your room to make mistakes by doing so
+				- Unblockable attacks
+					- Attacks with this orange symbol cannot be blocked,
+					- Thus requiring a parry to defend
+			- Known bugs
+				- Chain not resetting on idling
+					- Maybe chain timer is too generous?
+				- postureBar null on playing Easy chart
+				- Boyfriend upDodge missing first frame
+					- Missing from spritesheet
+			- Honor Of The Grove
+				- Shrub Offense
+					- Feints
+						- Change direction mid attack
+					- Posture
+						- BF dodges consistently
+						- Gets worse at it at higher posture
+				- Shrub AI
+					- Third Phase
+						- Feints
+							- Baits player parries
+							- Enemy parries after feinting
+								- Follows up into a swift unblockable
+							- Lua function
+								- "feint" action
+								- Response on player execute attack
+									- Parry function
+						- Further trim timers
+							- Relying on reading known chains
+						- Very little chain end recoveries
+							- Feels more like chains chain
+							- Animations need to have repeat frames cut
+					- Bugs
+						- Un-step Boyfriend timings
+			- Port Code
+				- Player Chains
+					- Add guards and dodges as inputs
+						- Dodge forward into attack
+				- Character Path
+					- Sweep use of getValidCharacterPath()
+				- Character Editor
+					- Template Character
+						- Add a placeholder combat file
+						- Add combat animations
+					- Template effect
+						- More specifically, figure out support for making an effect from scratch
+					- Effect onComplete
+						- Softcode alongside effect ease
+					- Weird width behavior
+						- Maybe clean this up for the Boyfriend character
+					- Switching curAnim quickly breaks some animations
+					- Fix clicking stuff underneath dropdowns
+					- Crash on advancing last frame of RchainWind3L
+						- Something to do with 'toLoopAnim' on the effect
+					- Have adding an attack copy over all currentAttack information
+						- So changing an attack can preserve information
+				- Charting State
+					- General
+						- Sweep undo compatibility
+					- Customize attack notes
+						- isUnblockable
+						- isDeath
+						- attack field
+					- Charts Window
+						- Song File
+							- Rename?
+							- Merge into Charts?
+							- Put a label that describes using the BPM and such in main Song tab
+						- General tab
+							- Use Intro Chart
+							- Skip Countdown
+							- Skip Intro On Restart
+					- Chart Chunks
+						- Avoid use of Inst in chartArray
+							- Use normal notes
+						- Vocals File Postfix
+							- Look into how this works
+				- Notes
+					- Optimize note colors?
+						- Eugh
+				- Lua
+					- Chart Chunk functions
+						- Probably needs a lot
+					- Make sure lua files can be pulled from character files
+					- Delete shrub lua
+					- Change "flipBoyfriendAndDad" chart setting to a lua function
+					- avoidStaleChains
+				- Combat jsons
+					- Infrastructure is mostly there
+						- Just need to support swapping out
+					- Extract death_soundName and death_characterName
+						- Deaths are handled via the song charting
+					- Clear combat prefix
+				- Chart Chunk
+					- Implement Fade Strumlines with soft lua
+					- Refactor sweep
+						- Check if everything's best practice
+							- activeChart is a bit strange
+					- Looping desyncs camfollows
+						- Likely related to there being no notes in the charts
+							- Probably reading from placeholder chart
+						- Fix with a neutral camera point
+					- Idle anim desyncs
+						- Ending at wrong beat?
+						- May be dance() issue, not beatHit()
+					- Cache voices and songs
+					- Cache notes?
+						- Failed spectacularly before
+						- But maybe?
+					- ghostNotesCaught
+						- Fairly sure the trace is broken
+				- Clear out unused information
+					- Stages
+					- Characters
+					- OG assets
+				- Freeplay Week Order
+				- Story Menu Format
+					- Deprecate character select?
+				- Tutorials
+				- Opponent voices
+					- Player voice gets muted long term on miss
+						- Thus opponent voices get muted too
+				- Sorting character layering
+					- deprecate spriteOrder
+					- Manually sort in current state's members
+						- Be careful it's not only PlayState
+				- Saving highscores
+					- Singing/Combat Victories
+				- Animations on note hit
+					- opponentNoteHit + goodNoteHit
+						- Remember the "harm note" animation case too
+					- Needs a check to not animate on a combat note
+					- Need to figure out note rework first to see how to accomplish this
+				- Implement enemy feints
+				- Game over character+sound
+				- CharacterExtra
+					- Atlas stuff
+				- Controls Substate
+					- Option to match guard keys to note keys
+				- flipBoyfriendAndDad
+					- Put somewhere other than WeekData
+					- Broke
+			- Global Stuff
+				- Test disable mods
+					- Probably crashes characters
+			- Timer Indicator
+				- Would be neat to revisit
+			- Refactor
+				- Null Coalescing
+					- Can use ?? more in Character
+				- Character Data
+					- Use Reflect to optimize?
+						- Take note from WeekData
+				- Charting
+					- Prune things better left to lua scripts
+					- Add toggleActiveCombat
+						- Lua function gives general blueprint
+				- Notes
+					- Assign attack names per note
+					- evaluateCombatNotes
+						- Overhaul in port?
+					- isCombatNote check not dependent on Attack Note type
+				- Achievements
+					- Overhaul in port
+				- Combat victories
+					- Overhaul in port
+				- hitOverlay
+					- Inspect it later
+				- CharacterExtra
+					- Refactor finishCallback system
+					- Check on/remove "isEffect"
+						- Way too vague on what that is
+				- Combat note logic
+					- Will need cleaning up after softcoding attack notes
+				- Posture
+					- Rework logic so it can work on the player
+					- Remove hard-coded "result" logic
+						- The results of full posture should be fully softcoded
+				- Parries
+					- Soft code effects
+				- Countdown
+					- Controls are not disabled
+			- Animation
+				- Animation priority
+					- Checking animations with prefix "combat" no longer effective due to custom attack names
+						- Replace by checking character action states?
+					- Check which state is active
+						- Disable priorities in CharacterEditor
+					- Override guard animation when dodging
+				- Idle default frame
+					- Probably just deprecate this
+				- Refactor
+					- Sweep animations entirely
+				- Allow unblockable animations to be null
+				- Use danceIdle for combat characters
+					- Could fix a bug with looping songs
+			- Lua
+					- Inputs
+						- On hold
+						- On release
+					- checkCombatInfoAvailable
+					- currentAction
+						- changeAction function
+						- currentActionTimer.onComplete
+					- onHasParried
+					- Functions
+						- changeBarColor
+							- healthbars
+							- posturebars
+							- enemybars
+							- allybars
+					- Combat json switching
+						- Refill health and posture
+			- Enemy
+				- parryWindow
+					- Not sure if should be an attack parameter or character stat
+				- Fix if executePlayerAttack overwrites applied hitstuns from parries
+				- Posture
+					- Remove old on-bash logic
+				- Parry
+					- Too fast
+						- Wait for player's attack proper
+						- Let block play out before enemy attacks
+					- Block Count control
+						- Block count stat on attacks
+				- Singing
+					- Clear blockstun+block count on note hit
+				- Single direction spam exploit
+					- Loops if enemy gets hit first
+						- Current prevention relies on blockstun
+						- Technically resolved by blockcount, but ideally shouldn't be necessary
+			- Player
+				- Stamina regen parameter
+				- characterDeathByStamina
+				- reflexGuardDuration
+					- Apply to isDodge too?
+				- Sing chain
+					- Verify this works with the json rework
+				- Action logic
+					- hasHitNote
+						- Ignore hitstun in hasHitNote
+					- Valid attack currentAction
+						- Make a function to determine this?
+					- Valid attack on note hit
+						- More nuanced check
+						- Probably "attackDelay" and "startup"
+				- Countdown
+					- Disable controls
+						- BUT
+						- Make parries possible in case of attack openers
+				- Parry
+					- Stats
+						- Use an effect?
+					- Evaluation
+						- Setup parries to work regardless of windup direction
+					- Bug
+						- Attacking with an inactive guard cancels the attack without the parry
+						- Do feints morph into a parry?
+				- Player chains
+					- Chains
+						- Setup chains with required directions
+						- Fix parries progressing chains
+				- Specials
+					- Shrub
+						- Bash
+							- Opener chain shortcut?
+						- Offensive Stance
+							- May be smart to implement this early
+					- Boyfriend
+						- Pose
+							- Health/Stamina trade
+							- Cancel bash stun?
+			- Character jsons
+				- Remove player/enemy sing attack names
+					- Make different character jsons instead
+			- Character Extra
+				- Softcode 'fade' finishCallback
+				- Add "defaultAlpha" variable
+						
+			- Sound
+				- Sweep with bash implementation
+				- Sweep with posture implementation
+			- Debug sweep
+				- json null crashes
+				- json missing data failsafes
+				- Parrying during very long moves
+				- Attack effects
+				- Lua functions
+					- enemyStartChain
+					- Other suspects
+	- Documentation
+		- General
+			- Great majority of non-essential stats can be left null to leave untouched
+		- Posture recovery
+			- Null posture damage will not trigger posture pause
+				- Posture damage of 0 will still trigger posture pause
+		- Attack Data
+			- sound_on_miss only used for dodging bashes
+			- is_bash
+				- Replaces 'hitstun' with 'bashed'
+				- Uses hitstun duration
+		- Attack Effects
+			- onComplete effect stacks with the other situational effects
+			- All non-null changes stack with normal attack stats
+				- Damage added on top of on_hit damage
+				- Sounds play in addition to on_hit or on_miss
+		- "Note Attacks"
+			- Attacking by hitting an attack sing note does not consume stamina
+			- Its own input for progressing chains
+		- Current Actions
+			- Player
+				- neutral
+				- startup
+				- recovery
+				- attackDelay
+				- bufferNoteAttack
+				- hasParried
+				- hasHitNote
+				- hasSustainAttacked
+				- bashed
+		- Lua
+			- Character Stat Functions
+				- Functions
+					- getHealth
+					- setMaxHealth
+					- etc.
+				- Sets
+					- boyfriend
+					- dad
+					- posture
+					- stamina
+				- Stamina
+					- Affects "health"
+					- Functions like getStamina function the same as getHealth
+					- Exists to follow name clarity
+			- currentAttackName
+				- Note that getting currentAttack returns the raw attack data
+			- setEnemyChain
+				- The player's chain is dynamically determined based on their actions
+					- Thus "changing" the player's chain is a lot more involved
+			- actions
+				- Avoid add/using new non existing actions
+				- Existing functions for actions use those because there are special behaviors hard coded
+				- It is recommended to track things with local variables instead
+					- Simply put: Enemy defense uses a couple actions that tend to override actions in between
+			- character
+				- Have any lua name be valid within respective character file
+	- Chart Chunks
+		- WIP
+			- Make section swapping public functions for PlayState later
+				- Integrate intro segment to song
+					- Replace countdown
+					- Intro chart
+						- Include start of Inst chart
+					- Preserve note press on next-chart dummy sections
+				- Outro on defeat
+				- Failsafe missing sound files
+				- Pass over param variables and check function
+			- ToDo
+				- Very small memory leak on loop
+				- Make events work
+				- Enabling intro should not loop without enabling loop checkmark
+				- Add additional charts beyond Intro, Inst, and Outro
+			- Bugs
+				- Sound effects cut out on loop
+	- Misc Bugs
+		- Note attack buffer should clear if note never occurs
+		- Character Editor State
+			- CharacterExtras appear unintentionally when loaded off a song
+				- Could be Shrub on load in?
+		- Achievement sweep
+			- Make some exclusive to specific songs
+				- "Beating The Bush" potentially
+			- Make achievements stop checks once earned
+	- Song Handling
+		- Song Params
+			- TBD
+		- Song Loop
+			- Check dialogue
+		- Phase Divisions
+			- Divide songs into phases for audio flair
+Gameplay Design
+	- Non-sing combat
+		- Enemy Behavior
+			- Behavior can no longer be charted
+				- Need to develop an "AI" for how the enemy acts and responds
+			- Enemy Attacks
+				- Enemy attacks in "Chains", or combos
+				- Attack direction typically set, or can vary on a specific move
+				- Special properties on different steps in the chain
+					- Unblockable, uninterruptible, bash, etc.
+				- Chains can chain to other movesets until interrupted
+			- Disruption
+				- Making a correct move that forces opponent out of their chain
+					- Superior block
+						- Ends chain, but much stricter and specific to pull off
+							- Requires either a slower enemy attack or a hard-read
+						- Some attacks opponent can defend this maneuver
+					- Parry
+						- Defends but doesn't end chain for most attacks
+						- Some "Chain Finishers" have a special parry that signals a forced chain-end
+					- Bash
+						- Very slow, rarely can interrupt mid chain
+						- Works great on chain end
+			- Defense
+				- Certain attacks and opponent actions restrict defensive actions
+					- In a neutral state, the opponent defends against everything
+				- Blocking
+					- Opponent switches their guard after every interaction
+						- Enemy blocking or getting hit, etc.
+				- Beat/Bind
+					- Attacking the same direction as the opponent's guard keeps their guard in place
+						- Thus, match direction attack -> different direction = bypass guard
+					- Primarily used to deal health damage
+					- Opponent can randomly counterattack when performing this action
+						- There's enough time to react, but it requires paying attention
+				- Posture/Health
+					- Posture fills faster than health lowers
+					- Lower health leads to lower posture recovery
+					- Opponent-specific defenses and health values can tilt best victory one way or another
+						
+	- Sing combat
+		- Feint notes
+			- Two attacks displayed at once
+				- "Feint" note missing a detail
+					- Maybe the white shine?
+	- Both
+		- Special: Offensive Stance
+			- Adopts a guard that alters a lot of effects
+				- Heavy attack
+					- Attacks gain new properties
+				- Superior block
+					- Parry attempts instead overpower with an attack
+					- Some opponent attacks will defend this move
+				- Feint
+					- Adopting an offensive stance prompts opponent to react
+				- Bash
+					- Pressing "down" to dodge makes an attack attempt perform a bash
+			- Light Attack
+				- An attack performed WITHOUT offensive stance
+					- Vanilla attack
+					- Laid out here to figure out tools of a normal light
+				- Parries
+					- Parries increase enemy posture
+				- Interrupt
+					- Certain enemy actions can be interrupted
+				- Punish
+					- Certain player actions return to neutral and use the default light
+		- Interruption/Hyperarmor
+			- Actions being interrupted is not yet a feature
+- Songs
+	- Misc.
+		- The Long Night Will End
+			- Stand
+			- For death's fire's come to
+			- Land
+			- Rivals breach unto our
+			- Shores
+			- Sons and daughters raise their
+			- Swords
+			- Say goodbye, time's come for
+			- War
+
+			- Friend and foe forsake their
+			- Soul
+			- Speak with steel, till blood runs
+			- Cold
+			- With this fight begins our
+			- Night
+			- No dawn, light, no end in
+			- Sight
+
+			- Hold
+			- Fast
+			- Stand together, for the
+			- Die
+			- Cast
+			- Favors not the broken
+			- De-
+			- scend
+			- Reaper's mark condemns we
+			- Fend
+			- For we march unto night's
+			- End
+		- Nox Longa Finiet
+			- Surge
+			- Ignis mortis
+			- Advenit
+			- Domum nostram
+			- Invadit
+			- Filii filiae
+			- Ad arma
+			- Vale bellum
+			- Incipit

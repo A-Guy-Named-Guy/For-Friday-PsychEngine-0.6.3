@@ -383,7 +383,7 @@ class Character extends FlxSprite
 		switchCombatJson(json.combat_data);
 
 		if (currentAttack == null)
-			currentAttack = generateAttack(null);
+			currentAttack = Reflect.copy(generateAttack(null));
 		// End of changes
 
 		// antialiasing

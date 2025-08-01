@@ -544,6 +544,7 @@
 				"not_an_attack": true,
 				"direction": "SPECIAL",
 				"damage": 0,
+				"duration": 0.25,
 				"stamina_cost": -0.6,
 				"health_recover": 40
 			},
@@ -594,7 +595,7 @@
 				"duration": 1,
 				"recovery": 1,
 				"hitstun": 3,
-				"chain_duration": 4 
+				"chain_duration": 1.5
 			},
 			{
 				"name": "chain_attack",
@@ -607,7 +608,7 @@
 				"duration": 1,
 				"recovery": 1,
 				"hitstun": 3,
-				"chain_duration": 4 
+				"chain_duration": 1.5 
 			},
 			{
 				"name": "chain_finisher",
@@ -642,7 +643,7 @@
 				"not_an_attack": true,
 				"direction": "SPECIAL",
 				"step_based_timing": true,
-				"duration": 2,
+				"duration": 1,
 				"on_complete": "health_trade"
 			},
 			{
@@ -652,7 +653,7 @@
 				"not_an_attack": true,
 				"direction": "SPECIAL",
 				"step_based_timing": true,
-				"duration": 2,
+				"duration": 1,
 				"on_complete": "finisher_heal"
 			}
 		],

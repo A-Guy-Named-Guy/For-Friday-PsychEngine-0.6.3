@@ -57,10 +57,8 @@ function onDeterminePlayerChain(input, nextAttack, currentChain)
 end
 
 function onCreatePost()
-    luaDebugMode = true
-    toggleEnemyOffense(true)
     setPostureMechanicMode('disabled', true)
-    advancePhase(2)
+    -- advancePhase(2)
 end
 
 function onBeatHit()

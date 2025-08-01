@@ -1,11 +1,12 @@
 {
 	"player1": "bf",
+	"player2": "shrubReanim",
 	"notes": [
 		{
 			"gfSection": false,
 			"altAnim": false,
 			"sectionNotes": [
-				[0, 0, 666.666666666667],
+				[0, 0, 0],
 				[666.666666666667, 2, 0],
 				[1000, 3, 0],
 				[1333.33333333333, 0, 0],
@@ -22,7 +23,7 @@
 			"gfSection": false,
 			"altAnim": false,
 			"sectionNotes": [
-				[2666.66666666667, 1, 666.666666666667],
+				[2666.66666666667, 1, 0],
 				[3333.33333333333, 2, 0],
 				[3666.66666666667, 3, 0],
 				[4000, 1, 0],
@@ -63,86 +64,85 @@
 			"mustHitSection": true
 		}
 	],
-	"player2": "shrubReanim",
-	"isHey": false,
-	"player3": null,
 	"endSongOnDefeat": true,
-	"offset": null,
+	"player3": null,
+	"isHey": false,
 	"skipIntroOnRestart": false,
-	"isUnblockable": true,
+	"offset": null,
 	"cutsceneType": "none",
-	"isSpooky": false,
+	"isUnblockable": true,
 	"song": "training-test",
+	"isSpooky": false,
 	"validScore": true,
-	"format": "psych_v1_convert",
 	"speed": 2,
-	"activeChart": "Inst",
-	"isMoody": false,
+	"format": "psych_v1_convert",
 	"sectionLengths": [],
-	"useIntroChart": true,
-	"events": [],
+	"isMoody": false,
+	"activeChart": "Inst",
 	"gfVersion": "gf",
+	"events": [],
+	"useIntroChart": true,
 	"chartArray": [
 		{
 			"chartNeedsVoices": true,
-			"chartOffset": null,
-			"chartSpeed": 2,
-			"chartBpm": 90,
-			"voiceFileName": "InstVoices",
 			"chartName": "Inst",
+			"voiceFileName": "InstVoices",
+			"chartBpm": 90,
+			"chartSpeed": 2,
+			"chartOffset": null,
 			"sourceFileName": "training-test",
 			"chartNotes": [],
-			"lengthOfChartInSections": 0,
 			"songFileName": "Inst",
-			"shouldLoop": true,
-			"chartEvents": []
+			"lengthOfChartInSections": 0,
+			"chartEvents": [],
+			"shouldLoop": true
 		},
 		{
 			"chartNeedsVoices": true,
-			"chartOffset": null,
-			"chartSpeed": 2,
-			"chartBpm": 90,
-			"voiceFileName": "IntroVoices",
 			"chartName": "Intro",
+			"voiceFileName": "IntroVoices",
+			"chartBpm": 90,
+			"chartSpeed": 2,
+			"chartOffset": null,
 			"sourceFileName": "training-test",
 			"chartNotes": [
 				{
-					"gfSection": false,
-					"altAnim": false,
+					"sectionBeats": 4,
 					"sectionNotes": [
 						[0, 0, 0],
 						[1333.33333333333, 0, 0],
 						[2000, 0, 0]
 					],
-					"bpm": 90,
-					"sectionBeats": 4,
+					"gfSection": false,
+					"altAnim": false,
+					"mustHitSection": true,
 					"changeBPM": false,
-					"mustHitSection": true
+					"bpm": 90
 				}
 			],
-			"lengthOfChartInSections": 0,
 			"songFileName": "Intro",
+			"lengthOfChartInSections": 0,
 			"chartEvents": []
 		},
 		{
 			"chartNeedsVoices": true,
-			"chartOffset": null,
-			"chartSpeed": 2,
-			"chartBpm": 90,
-			"voiceFileName": "OutroVoices",
 			"chartName": "Outro",
+			"voiceFileName": "OutroVoices",
+			"chartBpm": 90,
+			"chartSpeed": 2,
+			"chartOffset": null,
 			"sourceFileName": "training-test",
 			"chartNotes": [],
-			"lengthOfChartInSections": 0,
 			"songFileName": "Outro",
+			"lengthOfChartInSections": 0,
 			"chartEvents": []
 		}
 	],
 	"noteType": "attack",
-	"stage": "stage",
-	"uiType": "normal",
-	"needsVoices": true,
 	"sections": 0,
-	"gf": "gf",
-	"bpm": 90
+	"needsVoices": true,
+	"uiType": "normal",
+	"stage": "stage",
+	"bpm": 90,
+	"gf": "gf"
 }

@@ -48,6 +48,7 @@ class Combat extends FlxBasic
 	public var avoidStaleChainOdds:Float = 0.75;
 
 	public var isDodge:Bool = false;
+	public var canAttack:Bool = true;
 	public var playerInputChainArray:Array<String> = [];
 
 	public static var disableControls:Bool = false;
@@ -244,58 +245,22 @@ class Combat extends FlxBasic
 			{
 				if (controls.GLEFT_P || controls.GUP_P || controls.GRIGHT_P)
 				{
-					cancelDodge();
-					playerPreviousGuardPosition = boyfriend.guardPosition;
-
-					var newGuardPosition:Int = 0;
+					var input:String = '';
 
 					if (controls.GLEFT_P)
-						newGuardPosition = 0;
+						input = 'LEFT';
 					if (controls.GUP_P)
-						newGuardPosition = 2;
+						input = 'UP';
 					if (controls.GRIGHT_P)
-						newGuardPosition = 3;
+						input = 'RIGHT';
 
-					switchGuard(playerGuard, 'normal', newGuardPosition);
-					if (boyfriend.currentAction == 'neutral')
-						changeAction(boyfriend, 'defending', 1);
-
-					playerGuardActive = true;
-
-					if (boyfriend.hasReflexGuard)
-					{
-						reflexGuardTimer.start(1, function(tmr:FlxTimer)
-						{
-							playerGuardActive = false;
-							updateGuardUI(playerGuard, 'inactive');
-						});
-					}
-
-					// Not sure if the note hit function occurs before or after this guard switch,
-					// So to be generous with the only-left-guard achievement guard switches under singGuard are not counted
-					// This way either note goes first and this doesn't apply, or notes go after and flip this to false
-					if (!singGuard)
-						manuallySwitchedGuard = true;
+					guardInput(input);
 				}
 
 				if (controls.DDOWN_P)
-				{
-					if (isDodgeTimer.active)
-						isDodgeTimer.reset();
-					else
-						isDodge = true;
-					isDodgeTimer.start(1, function(tmr:FlxTimer)
-					{
-						isDodge = false;
-					});
+					dodgeInput();
 
-					if (boyfriend.currentAction == 'neutral')
-						changeAction(boyfriend, 'dodge', 1);
-
-					boyfriend.playAnim('combatReadyDOWN', true);
-				}
-
-				if (controls.ATTACK_P && !playerIsWaitingToAttack())
+				if (controls.ATTACK_P && !playerIsWaitingToAttack() && canAttack)
 				{
 					// attackDelay is here to make a small delay before an attack is thrown if it's not unblockable
 					// Unblockables account for buffering the attack in time to let a guard switch happen
@@ -534,12 +499,12 @@ class Combat extends FlxBasic
 			attackTypeIndicator.animation.addByPrefix('specialIndicator', 'indicator bash', false);
 			attackTypeIndicator.animation.addByPrefix('unblockableIndicator', 'indicator unblockable', false);
 			attackTypeIndicator.antialiasing = true;
-			attackTypeIndicator.setGraphicSize(Std.int(attackTypeIndicator.width * 0.6));
+			attackTypeIndicator.setGraphicSize(Std.int(attackTypeIndicator.width * 0.64));
 			attackTypeIndicator.updateHitbox();
 			attackTypeIndicator.scrollFactor.set();
 
-			attackTypeIndicator.x = leftGuardX - 5;
-			attackTypeIndicator.y = upGuardY + 2;
+			attackTypeIndicator.x = leftGuardX - 7;
+			attackTypeIndicator.y = upGuardY + 3;
 			attackTypeIndicator.animation.play('specialIndicator');
 			attackTypeIndicator.visible = false;
 			combatUI.add(attackTypeIndicator);
@@ -640,14 +605,14 @@ class Combat extends FlxBasic
 							attackTypeIndicator.animation.play('unblockableIndicator');
 					}
 				}
-				else
+				else if (!dad.currentAction.endsWith('tartup'))
 					attackTypeIndicator.visible = false;
 
 				updateGuardUI(enemyGuard, 'attack');
 
 				enemyAttackIndicated = true;
 			}
-			else
+			else if (!dad.currentAction.endsWith('tartup'))
 				attackTypeIndicator.visible = false;
 		}
 
@@ -793,7 +758,7 @@ class Combat extends FlxBasic
 				else
 				{
 					nextAttack = chain.attack_chain[boyfriend.placeInChain];
-					boyfriend.currentChain = chain;
+					boyfriend.currentChain = Reflect.copy(chain);
 					break;
 				}
 			}
@@ -821,14 +786,14 @@ class Combat extends FlxBasic
 	{
 		var currentAttack:AttackData = null;
 
-		currentAttack = boyfriend.attackMap.get(attackName);
+		currentAttack = Reflect.copy(boyfriend.attackMap.get(attackName));
 
 		if (currentAttack == null)
-			currentAttack = boyfriend.attackMap.get('basic_attack');
+			currentAttack = Reflect.copy(boyfriend.attackMap.get('basic_attack'));
 		if (currentAttack == null)
-			currentAttack = boyfriend.attackMap.get('player_sing_attack');
+			currentAttack = Reflect.copy(boyfriend.attackMap.get('player_sing_attack'));
 		if (currentAttack == null)
-			currentAttack = Character.generateAttack(null);
+			currentAttack = Reflect.copy(Character.generateAttack(null));
 
 		return currentAttack;
 	}
@@ -1100,7 +1065,7 @@ class Combat extends FlxBasic
 		else
 			cancelSingGuard();
 
-		boyfriend.currentAttack = determinePlayerAttack(determinePlayerChain(input));
+		boyfriend.currentAttack = Reflect.copy(determinePlayerAttack(determinePlayerChain(input)));
 
 		// Sustain notes trigger hasSustainAttacked to remove sing properties if more than one attack is thrown
 		// Basically this is to prevent spamming attack during a sustain note from being optimal
@@ -1268,7 +1233,7 @@ class Combat extends FlxBasic
 						determineEnemyChain(true);
 						return;
 					}
-					dad.currentChain = chain;
+					dad.currentChain = Reflect.copy(chain);
 					break;
 				}
 			}
@@ -1314,7 +1279,10 @@ class Combat extends FlxBasic
 			return;
 		}
 
-		dad.currentAttack = dad.attackMap.get(dad.currentChain.attack_chain[dad.placeInChain]);
+		if (dad.placeInChain < 0)
+			dad.placeInChain = 0;
+
+		dad.currentAttack = Reflect.copy(dad.attackMap.get(dad.currentChain.attack_chain[dad.placeInChain]));
 
 		if (dad.currentChain.directions == null)
 			return;
@@ -1338,12 +1306,21 @@ class Combat extends FlxBasic
 	{
 		if (attack != null)
 		{
-			dad.currentAttack = attack;
+			dad.currentAttack = Reflect.copy(attack);
 			resetEnemyChain();
 			dad.currentChain.attack_chain.push(attack.name);
 		}
 
 		PlayState.instance.callOnLuas('onStartingAttack', ['dad', dad.currentAttack]);
+
+		if (dad.currentAttack.is_unblockable || dad.currentAttack.direction == 'SPECIAL')
+		{
+			attackTypeIndicator.visible = true;
+			if (dad.currentAttack.direction == 'SPECIAL')
+				attackTypeIndicator.animation.play('specialIndicator');
+			else
+				attackTypeIndicator.animation.play('unblockableIndicator');
+		}
 
 		var currentDirection:Int = 0;
 
@@ -1408,6 +1385,7 @@ class Combat extends FlxBasic
 			attackData = dad.currentAttack;
 
 		enemyAttackIndicated = false;
+		attackTypeIndicator.visible = false;
 
 		PlayState.instance.callOnLuas('onExecutingAttack', ['dad', dad.currentAttack]);
 
@@ -1549,7 +1527,7 @@ class Combat extends FlxBasic
 
 			boyfriend.combatHealth += 5;
 
-			startSingGuard();
+			// startSingGuard();
 
 			if (boyfriend.hasReflexGuard && playerGuardActive)
 			{
@@ -1708,6 +1686,8 @@ class Combat extends FlxBasic
 			else
 				dad.currentAction = 'neutral';
 		}
+
+		PlayState.instance.callOnLuas('onGuardUpdate', ['dad', appendDirection('', dad.guardPosition)]);
 	}
 
 	function enemyContinueChain():Void
@@ -1772,7 +1752,7 @@ class Combat extends FlxBasic
 
 			// If the player hit off-guard to force a match, imposes 50/50 to stay the same side
 			// In other words this is to prevent spamming a single side from being too effective
-			if (enemyMatchedPlayerGuard && FlxG.random.int(0, 1) == 1)
+			if (enemyMatchedPlayerGuard && FlxG.random.int(0, 2) > 0)
 				newPosition = playerAttackPosition;
 			// Re-randomizing once to decrease chance that guard sticks to one side
 			else if (newPosition == playerAttackPosition)
@@ -2067,6 +2047,68 @@ class Combat extends FlxBasic
 
 		if (character == boyfriend && !singGuard || character != boyfriend)
 			updateGuardUI(characterGuard, updateType);
+	}
+
+	public function guardInput(input:String)
+	{
+		var newGuardPosition:Int = 0;
+
+		switch (input)
+		{
+			case 'LEFT':
+				newGuardPosition = 0;
+			case 'UP':
+				newGuardPosition = 2;
+			case 'RIGHT':
+				newGuardPosition = 3;
+			default:
+				return;
+		}
+
+		cancelDodge();
+		playerPreviousGuardPosition = boyfriend.guardPosition;
+
+		switchGuard(playerGuard, 'normal', newGuardPosition);
+		if (boyfriend.currentAction == 'neutral')
+			changeAction(boyfriend, 'defending', 1);
+
+		playerGuardActive = true;
+
+		if (boyfriend.hasReflexGuard)
+		{
+			reflexGuardTimer.start(1, function(tmr:FlxTimer)
+			{
+				playerGuardActive = false;
+				updateGuardUI(playerGuard, 'inactive');
+			});
+		}
+
+		// Not sure if the note hit function occurs before or after this guard switch,
+		// So to be generous with the only-left-guard achievement guard switches under singGuard are not counted
+		// This way either note goes first and this doesn't apply, or notes go after and flip this to false
+		if (!singGuard)
+			manuallySwitchedGuard = true;
+
+		PlayState.instance.callOnLuas('onGuardUpdate', ['boyfriend', appendDirection('', boyfriend.guardPosition)]);
+	}
+
+	public function dodgeInput()
+	{
+		if (isDodgeTimer.active)
+			isDodgeTimer.reset();
+		else
+			isDodge = true;
+		isDodgeTimer.start(1, function(tmr:FlxTimer)
+		{
+			isDodge = false;
+		});
+
+		if (boyfriend.currentAction == 'neutral')
+			changeAction(boyfriend, 'dodge', 1);
+
+		boyfriend.playAnim('combatReadyDOWN', true);
+
+		PlayState.instance.callOnLuas('onGuardUpdate', ['boyfriend', 'DOWN']);
 	}
 
 	/**
